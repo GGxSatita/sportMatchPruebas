@@ -1,0 +1,7 @@
+{
+  "name": "sportMatch",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
