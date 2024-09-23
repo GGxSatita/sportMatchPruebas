@@ -10,6 +10,7 @@ import { importProvidersFrom } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getFirestore, initializeFirestore, persistentLocalCache, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, indexedDBLocalPersistence, initializeAuth, provideAuth } from '@angular/fire/auth';
+
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ScreenTrackingService, getAnalytics, provideAnalytics, UserTrackingService } from '@angular/fire/analytics';
@@ -40,6 +41,7 @@ bootstrapApplication(AppComponent, {
     }),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
+
     provideFunctions(() => getFunctions()),
     provideStorage(() => getStorage()),
     provideAnalytics(() => getAnalytics() ),
