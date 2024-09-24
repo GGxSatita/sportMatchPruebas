@@ -1,0 +1,41 @@
+<ion-content>
+  <div>
+    <h1>Registro</h1>
+  </div>
+
+  <div>
+    <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
+      <!--email -->
+      <div class="input-content">
+        <label>Email</label>
+        <input type="email" formControlName="email" />
+        <span *ngIf="datosForm.controls['email'].hasError('required')">
+          <i>Este campo es <strong>requerido</strong></i>
+        </span>
+        <span *ngIf="datosForm.controls['email'].hasError('email')">
+          <i>Ingresa un email <strong>válido</strong></i>
+        </span>
+      </div>
+
+      <!-- password -->
+      <div>
+        <label>Contraseña</label>
+        <input
+        formControlName="password"
+        type="password"
+        placeholder="Contraseña"
+        minlength="6">
+        <span *ngIf="datosForm.controls['password'].hasError('required')">
+          <i>Este campo es <strong>requerido</strong></i>
+        </span>
+      </div>
+
+      <!-- enviar -->
+      <div>
+        <button type="submit" [disabled]="cargando">
+          <strong>Registrarse</strong>
+        </button>
+      </div>
+    </form>
+  </div>
+</ion-content>
