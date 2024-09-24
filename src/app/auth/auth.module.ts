@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import{ IonicModule }from'@ionic/angular'
 
 
+
 @NgModule({
   declarations: [
     LoginComponent,
@@ -20,7 +21,8 @@ import{ IonicModule }from'@ionic/angular'
     AuthRoutingModule,
     IonicModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ]
 })
 export class AuthModule { }

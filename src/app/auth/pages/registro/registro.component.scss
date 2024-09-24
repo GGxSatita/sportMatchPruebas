@@ -1,0 +1,50 @@
+// Variables de color personalizadas
+$form-primary-color: #3880ff;  // primary color (blue)
+$form-secondary-color: #3dc2ff; // secondary (light blue)
+$form-background-color: #f0f0f5; // background color for inputs
+$form-error-color: #eb445a; // danger color (red)
+$form-button-color: #7044ff; // tertiary color (purple)
+$form-button-text-color: #ffffff; // white text color for button
+$form-disabled-color: #b3b3b3; // disabled button color
+
+// Estilos personalizados
+ion-content {
+  --ion-background-color: $form-background-color;
+}
+
+.form-title {
+  text-align: center;
+  color: $form-button-color;
+  margin-bottom: 20px;
+}
+
+.input-content {
+  --background: $form-background-color;
+  --border-radius: 10px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 15px;
+}
+
+ion-label {
+  color: $form-primary-color !important;
+}
+
+ion-input {
+  color: $form-primary-color;
+}
+
+.error-message {
+  color: $form-error-color !important;
+}
+
+ion-button {
+  --background: $form-button-color;
+  --color: $form-button-text-color; // Asegura que el texto sea blanco
+  --border-radius: 12px;
+}
+
+ion-button[disabled] {
+  --background: $form-disabled-color;
+  --color: $form-button-text-color; // Mantiene el texto legible incluso cuando está deshabilitado
+}

@@ -1,41 +1,82 @@
-<ion-content>
-  <div>
-    <h1>Registro</h1>
-  </div>
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
+        <h1 class="form-title">Registro</h1>
+      </ion-col>
+    </ion-row>
 
-  <div>
-    <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
-      <!--email -->
-      <div class="input-content">
-        <label>Email</label>
-        <input type="email" formControlName="email" />
-        <span *ngIf="datosForm.controls['email'].hasError('required')">
-          <i>Este campo es <strong>requerido</strong></i>
-        </span>
-        <span *ngIf="datosForm.controls['email'].hasError('email')">
-          <i>Ingresa un email <strong>válido</strong></i>
-        </span>
-      </div>
+    <ion-row>
+      <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
+        <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
+          <!-- email -->
+          <ion-item class="input-content">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" formControlName="email"></ion-input>
+            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required')">
+              Este campo es <strong>requerido</strong>
+            </ion-note>
+            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('email')">
+              Ingresa un email <strong>válido</strong>
+            </ion-note>
+          </ion-item>
 
-      <!-- password -->
-      <div>
-        <label>Contraseña</label>
-        <input
-        formControlName="password"
-        type="password"
-        placeholder="Contraseña"
-        minlength="6">
-        <span *ngIf="datosForm.controls['password'].hasError('required')">
-          <i>Este campo es <strong>requerido</strong></i>
-        </span>
-      </div>
+          <!-- password -->
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" formControlName="password" minlength="6"></ion-input>
+            <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required')">
+              Este campo es <strong>requerido</strong>
+            </ion-note>
+          </ion-item>
 
-      <!-- enviar -->
-      <div>
-        <button type="submit" [disabled]="cargando">
-          <strong>Registrarse</strong>
-        </button>
-      </div>
-    </form>
-  </div>
+          <!-- Nombre -->
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+            <ion-note class="error-message" *ngIf="datosForm.controls['name'].hasError('required')">
+              Este campo es <strong>requerido</strong>
+            </ion-note>
+          </ion-item>
+
+          <!-- Edad -->
+          <ion-item>
+            <ion-label position="floating">Edad</ion-label>
+            <ion-input type="number" formControlName="edad"></ion-input>
+            <ion-note class="error-message" *ngIf="datosForm.controls['edad'].hasError('required')">
+              Este campo es <strong>requerido</strong>
+            </ion-note>
+          </ion-item>
+
+          <!-- Foto -->
+          <ion-item>
+            <ion-label position="floating">Foto</ion-label>
+            <ion-input type="text" formControlName="photo"></ion-input>
+            <ion-note class="error-message" *ngIf="datosForm.controls['photo'].hasError('required')">
+              Este campo es <strong>requerido</strong>
+            </ion-note>
+          </ion-item>
+
+          <!-- enviar -->
+          <ion-row>
+            <ion-col size="12" class="ion-padding">
+              <ion-button expand="full" type="submit" [disabled]="cargando">
+                <strong>Registrarse</strong>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+          <!-- Ya tienes un usuario -->
+          <ion-row>
+            <ion-col size="12"class="ion-padding">
+              <p>¿ Ya tienes un usuario ?</p>
+              <ion-button expand="block" [routerLink]="['./login']">
+                Ingresar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
