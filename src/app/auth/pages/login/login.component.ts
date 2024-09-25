@@ -11,6 +11,7 @@ export class LoginComponent implements OnInit {
 
   autenticacionService: AutenticacionService = inject(AutenticacionService);
 
+
   user: { email: string; name: string };
 
   constructor() {

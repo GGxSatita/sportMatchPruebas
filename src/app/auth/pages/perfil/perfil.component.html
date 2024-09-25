@@ -1,0 +1,42 @@
+<ion-content>
+  @if(!cargando){
+    @if(user && userProfile){
+      <h3>BIENVENIDO</h3>
+      @if(user.photo){
+        <ion-img [src]="user.photo"></ion-img>
+      }@else{
+        <ion-img src="https://www.google.com/imgres?q=usuario&imgurl=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F6326%2F6326055.png&imgrefurl=https%3A%2F%2Fwww.flaticon.es%2Ficono-gratis%2Fperfil-del-usuario_6326055&docid=RO0rwJ_znB1twM&tbnid=RXLpBDBX5qZ7hM&vet=12ahUKEwiOza34ztyIAxUGK7kGHXmwMHUQM3oECH0QAA..i&w=512&h=512&hcb=2&ved=2ahUKEwiOza34ztyIAxUGK7kGHXmwMHUQM3oECH0QAA"></ion-img>
+      }
+      <p><strong>Email : </strong>{{user.email}}</p>
+      <p><strong>Nombre : </strong>{{user.name}}</p>
+      <p><strong>Edad : </strong></p>
+        <input type="number" [(ngModel)]="userProfile.edad">
+        <ion-button (click)="actualizarEdad()" expand="block">
+          Guardar
+        </ion-button>
+
+        <div>
+          <p>Cambiar nombre de perfil</p>
+          <div>
+            <ion-input type="text" [(ngModel)]="newName"></ion-input>
+          </div>
+        </div>
+        <div>
+          <p>Cambiar foto de perfil</p>
+          <div>
+            <ion-input type="text" [(ngModel)]="newPhoto"></ion-input>
+          </div>
+        </div>
+        <div>
+          <ion-button (click)="actualizarPerfil()">
+            Actualizar
+          </ion-button>
+        </div>
+
+
+    }
+
+
+
+  }
+</ion-content>

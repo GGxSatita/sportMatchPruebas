@@ -12,7 +12,7 @@ export namespace ModelsAuth {
 
   export interface UpdateProfileI {
     displayName?: string;
-    photoURL: string;
+    photoURL?: string;
   }
 
   export interface UserProfile {
