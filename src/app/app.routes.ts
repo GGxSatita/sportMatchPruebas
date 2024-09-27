@@ -11,7 +11,7 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'user',
+    path: '',
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   }
 ];

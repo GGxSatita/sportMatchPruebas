@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent }, // Login
   { path: 'registro', component: RegistroComponent }, // Registro
   { path: 'perfil', component: PerfilComponent }, // Perfil
+  {path : '', redirectTo : 'login', pathMatch: 'full'} //redirige al login por defecto
 ];
 
 @NgModule({
