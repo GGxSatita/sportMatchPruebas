@@ -1,31 +1,35 @@
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" style="--background: linear-gradient(135deg, #eeeeee, #666666, #000000);">
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
-        <h1 class="form-title">Registro</h1>
+        <h1 class="form-title ion-text-center" style="color: #eeeeee;">Registro</h1>
       </ion-col>
     </ion-row>
 
     <ion-row>
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
         <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
-          <!-- email -->
+
+          <!-- Mensaje de error si el correo ya está registrado -->
+          <ion-text color="danger" *ngIf="errorMensaje">{{ errorMensaje }}</ion-text>
+
+          <!-- Email -->
           <ion-item class="input-content">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" formControlName="email"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required') && datosForm.controls['email'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
-            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('email')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('email') && datosForm.controls['email'].touched">
               Ingresa un email <strong>válido</strong>
             </ion-note>
           </ion-item>
 
-          <!-- password -->
+          <!-- Password -->
           <ion-item>
             <ion-label position="floating">Contraseña</ion-label>
             <ion-input type="password" formControlName="password" minlength="6"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required') && datosForm.controls['password'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
           </ion-item>
@@ -34,7 +38,7 @@
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
             <ion-input type="text" formControlName="name"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['name'].hasError('required')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['name'].hasError('required') && datosForm.controls['name'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
           </ion-item>
@@ -43,7 +47,7 @@
           <ion-item>
             <ion-label position="floating">Edad</ion-label>
             <ion-input type="number" formControlName="edad"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['edad'].hasError('required')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['edad'].hasError('required') && datosForm.controls['edad'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
           </ion-item>
@@ -52,15 +56,15 @@
           <ion-item>
             <ion-label position="floating">Foto</ion-label>
             <ion-input type="text" formControlName="photo"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['photo'].hasError('required')">
+            <ion-note class="error-message" *ngIf="datosForm.controls['photo'].hasError('required') && datosForm.controls['photo'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
           </ion-item>
 
-          <!-- enviar -->
+          <!-- Botón de Enviar -->
           <ion-row>
             <ion-col size="12" class="ion-padding">
-              <ion-button expand="full" type="submit" [disabled]="cargando">
+              <ion-button expand="full" type="submit" [disabled]="cargando" style="background: linear-gradient(135deg, #666666, #000000); color: #eeeeee;">
                 <strong>Registrarse</strong>
               </ion-button>
             </ion-col>
@@ -68,9 +72,9 @@
 
           <!-- Ya tienes un usuario -->
           <ion-row>
-            <ion-col size="12"class="ion-padding">
-              <p>¿ Ya tienes un usuario ?</p>
-              <ion-button expand="block" [routerLink]="['./login']">
+            <ion-col size="12" class="ion-padding ion-text-center">
+              <p style="color: #eeeeee;">¿Ya tienes un usuario?</p>
+              <ion-button expand="block" [routerLink]="['./login']" style="background-color: #666666; color: #eeeeee;">
                 Ingresar
               </ion-button>
             </ion-col>

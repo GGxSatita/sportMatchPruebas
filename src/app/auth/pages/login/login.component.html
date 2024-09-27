@@ -1,38 +1,61 @@
-<ion-content>
+<ion-content class="ion-padding" style="--background: linear-gradient(135deg, #eeeeee, #666666, #000000);">
   <div class="login-container">
-    <h1>Login</h1>
-
-    <div *ngIf="user; else loginForm">
-      <div>
-        <h3>Bienvenido</h3>
-        <p>Email: {{ user.email }}</p>
-        <p>Nombre: {{ user.name }}</p>
-      </div>
-      <div>
-        <ion-button expand="full" (click)="salir()">Salir</ion-button>
-      </div>
+    <!-- Título de Login en la parte superior -->
+    <div class="login-header">
+      <h1 class="ion-text-center">Iniciar Sesión</h1>
     </div>
 
-    <ng-template #loginForm>
-      <div>
-        <ion-item>
-          <ion-label position="floating">Email</ion-label>
-          <ion-input type="text" [(ngModel)]="form.email"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Contraseña</ion-label>
-          <ion-input type="password" [(ngModel)]="form.password"></ion-input>
-        </ion-item>
-        <div class="button-container">
-          <ion-button expand="full" (click)="login()">Login</ion-button>
-        </div>
-        <div>
-          <p>¿ No tienes una cuenta ?</p>
-          <ion-button  expand="block" color="danger" [routerLink]="['/registro']">
-            Registrarse
-          </ion-button>
+    <ion-card class="login-card">
+      <!-- Imagen dentro de un div en el card -->
+      <div class="image-container">
+        <div class="image-wrapper">
+          <ion-img src="assets/img/login-image.png" class="login-image"></ion-img>
         </div>
       </div>
-    </ng-template>
+
+      <ion-card-content>
+        <div *ngIf="user; else loginForm">
+          <div class="ion-text-center">
+            <h3>Bienvenido</h3>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Nombre:</strong> {{ user.name }}</p>
+          </div>
+          <div class="ion-margin-top">
+            <ion-button expand="block" color="dark" (click)="salir()" style="background: linear-gradient(135deg, #666666, #000000);">
+              Salir
+            </ion-button>
+          </div>
+        </div>
+
+        <ng-template #loginForm>
+          <ion-item>
+            <ion-label position="floating">Correo electrónico</ion-label>
+            <ion-input type="text" [(ngModel)]="form.email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" [(ngModel)]="form.password"></ion-input>
+          </ion-item>
+
+          <ion-row class="ion-margin-top">
+            <ion-col>
+              <ion-button expand="block" (click)="login()" style="background: linear-gradient(135deg, #eeeeee, #666666); color: #eeeeee;">
+                Login
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="ion-margin-top ion-text-center">
+            <ion-col>
+              <p>¿No tienes una cuenta?</p>
+              <ion-button expand="block" color="dark" [routerLink]="['/registro']" style="background-color: #666666; color: #eeeeee;">
+                Registrarse
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ng-template>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>
