@@ -1,17 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Models } from 'src/app/models/models';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  form: Models.Auth.DatosLogin;
-
+  form: Models.Auth.DatosLogin; //formulario
   autenticacionService: AutenticacionService = inject(AutenticacionService);
-
-
+  router: Router = inject(Router);
   user: { email: string; name: string };
 
   constructor() {
@@ -55,17 +54,19 @@ export class LoginComponent implements OnInit {
 
   async login() {
     if (this.form?.email && this.form?.password) {
-      try{
-        await this.autenticacionService.login(this.form.email, this.form.password);
-      }catch(error){
-        console.log('Error ---->', error)
-        //agregar algun mensaje de que las credenciales estan mal aquí
+      try {
+        // Realizamos el login a través del servicio de autenticación
+        const user = await this.autenticacionService.login(this.form.email, this.form.password);
+        if (user) {
+          // Redirigimos al menú principal si el login es exitoso
+          this.router.navigate(['/menu-principal']);
+        }
+      } catch (error) {
+        console.log('Error ---->', error);
+        // Aquí puedes agregar algún mensaje de error para credenciales incorrectas
       }
-
     }
   }
 
-  salir() {
-    this.autenticacionService.logout();
-  }
+
 }
