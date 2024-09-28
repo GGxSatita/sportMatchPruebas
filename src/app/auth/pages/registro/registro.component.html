@@ -53,12 +53,10 @@
           </ion-item>
 
           <!-- Foto -->
+
           <ion-item>
-            <ion-label position="floating">Foto</ion-label>
-            <ion-input type="text" formControlName="photo"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['photo'].hasError('required') && datosForm.controls['photo'].touched">
-              Este campo es <strong>requerido</strong>
-            </ion-note>
+            <ion-label position="stacked">Foto de perfil</ion-label>
+            <input type="file" (change)="uploadFile($event)" accept="image/*">
           </ion-item>
 
           <!-- Botón de Enviar -->

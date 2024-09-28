@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon , AlertController} from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon , AlertController, IonItem, IonList, IonLabel } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
 
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   templateUrl: './menu-principal.page.html',
   styleUrls: ['./menu-principal.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonLabel, IonList, IonItem, IonIcon, IonButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 export class MenuPrincipalPage implements OnInit {
 
@@ -23,6 +23,10 @@ export class MenuPrincipalPage implements OnInit {
   ) {}
 
   ngOnInit() {
+  }
+
+  goToProfile() {
+    this.router.navigate(['/perfil']); // Redirige a la página de perfil del usuario
   }
   async confirmLogout() {
     const alert = await this.alertController.create({
@@ -48,7 +52,7 @@ export class MenuPrincipalPage implements OnInit {
 
   logout() {
     this.autenticacionService.logout();
-    this.router.navigate(['/login']) // redirige al login
+    this.router.navigate(['/login']); // Redirige al login después de cerrar sesión
   }
 
 }

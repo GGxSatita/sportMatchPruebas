@@ -29,21 +29,29 @@ bootstrapApplication(AppComponent, {
     // firebase
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebaseConfig);
+
+      // Configuración condicional según la plataforma
       if (Capacitor.isNativePlatform()) {
+        // Configuración especial para plataformas nativas
         initializeFirestore(app, {
           localCache: persistentLocalCache(),
         });
         initializeAuth(app, {
           persistence: indexedDBLocalPersistence
         });
+      } else {
+        // Configuración para plataformas web con un objeto vacío como ajustes
+        initializeFirestore(app, {}); // Aquí pasamos un objeto vacío como segundo argumento
+        initializeAuth(app, {}); // También aplicamos el mismo principio a Auth si es necesario
       }
+
       return app;
     }),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
+    provideStorage(() => getStorage()),
 
     provideFunctions(() => getFunctions()),
-    provideStorage(() => getStorage()),
     provideAnalytics(() => getAnalytics() ),
     ScreenTrackingService,
     UserTrackingService,

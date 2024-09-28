@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut, updateProfile, fetchSignInMethodsForEmail } from '@angular/fire/auth';
-
+import { Router } from '@angular/router'; // Importa el Router
 @Injectable({
   providedIn: 'root'
 })
@@ -9,6 +9,7 @@ export class AutenticacionService {
   // Inyectar el servicio de autenticación de Firebase
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
+  router : Router = inject(Router)
 
   constructor() {
     this.logout();
@@ -25,7 +26,11 @@ export class AutenticacionService {
   }
 
   logout() {
-    signOut(this.auth);
+    signOut(this.auth).then(() => {
+      this.router.navigate(['/login']); // Redirige al login después de cerrar sesión
+    }).catch(error => {
+      console.error('Error durante el logout:', error);
+    });
   }
 
   getCurrentUser() {

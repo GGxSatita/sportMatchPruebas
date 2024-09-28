@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Injector, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from './../../../services/firestore.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { Models } from 'src/app/models/models';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular'; // Importar AlertController para mostrar alertas
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-registro',
@@ -12,10 +14,11 @@ import { AlertController } from '@ionic/angular'; // Importar AlertController pa
   styleUrls: ['./registro.component.scss'],
 })
 export class RegistroComponent implements OnInit {
-  firestoreService: FirestoreService = inject(FirestoreService);
-  autenticacionService: AutenticacionService = inject(AutenticacionService);
-  router: Router = inject(Router);
+  firestoreService: FirestoreService = inject(FirestoreService); //Inyectar servcio de fireStore
+  autenticacionService: AutenticacionService = inject(AutenticacionService); //Inyectar servcio de autenticación
+  storageService: StorageService = inject(StorageService); //Inyectar servcio de storage
   alertController: AlertController = inject(AlertController); // Inyectar AlertController
+  router: Router = inject(Router);
 
   // Formulario
   datosForm = this.fb.group({
@@ -28,16 +31,25 @@ export class RegistroComponent implements OnInit {
 
   cargando: boolean = false;
   errorMensaje: string | null = null; // Agregar esta propiedad
+  imageUrl: string = ''; //Declara la propiedad imageUrl
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private injector : Injector) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+       // Inyectar los servicios solo cuando sea necesario
+       this.firestoreService = this.injector.get(FirestoreService);
+       this.autenticacionService = this.injector.get(AutenticacionService);
+       this.storageService = this.injector.get(StorageService);
+       this.router = this.injector.get(Router);
+       this.alertController = this.injector.get(AlertController);
+  }
 
   // Mostrar alerta cuando el correo ya esté registrado
   async showUserExistsAlert() {
     const alert = await this.alertController.create({
       header: 'Correo ya registrado',
-      message: 'Este correo ya está registrado. ¿Deseas iniciar sesión en su lugar?',
+      message:
+        'Este correo ya está registrado. ¿Deseas iniciar sesión en su lugar?',
       buttons: [
         {
           text: 'Cancelar',
@@ -64,7 +76,9 @@ export class RegistroComponent implements OnInit {
     if (this.datosForm.valid) {
       try {
         // Verificar si el email ya está registrado
-        const emailExists = await this.autenticacionService.isEmailRegistered(email);
+        const emailExists = await this.autenticacionService.isEmailRegistered(
+          email
+        );
 
         if (emailExists) {
           // Si el correo ya está registrado, mostrar la alerta
@@ -75,7 +89,10 @@ export class RegistroComponent implements OnInit {
 
         // Si el correo no está registrado, proceder con el registro
         const data = this.datosForm.value;
-        const res = await this.autenticacionService.createUser(data.email, data.password);
+        const res = await this.autenticacionService.createUser(
+          data.email,
+          data.password
+        );
 
         let profile: Models.Auth.UpdateProfileI = {
           displayName: data.name,
@@ -91,14 +108,39 @@ export class RegistroComponent implements OnInit {
           email: data.email,
         };
 
-        await this.firestoreService.createDocument(Models.Auth.PathUsers, datosUser, res.user.uid);
+        await this.firestoreService.createDocument(
+          Models.Auth.PathUsers,
+          datosUser,
+          res.user.uid
+        );
         console.log('Usuario creado con éxito');
         this.router.navigate(['/login']);
       } catch (error) {
         console.log('REGISTRARSE ERROR ->', error);
-        this.errorMensaje = 'Hubo un error durante el registro. Intenta de nuevo más tarde.'; // Asignar un mensaje de error
+        this.errorMensaje =
+          'Hubo un error durante el registro. Intenta de nuevo más tarde.'; // Asignar un mensaje de error
       }
     }
     this.cargando = false;
+  }
+
+  async uploadFile(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const filePath = `profile_pictures/${new Date().getTime()}_${file.name}`;
+      this.cargando = true;
+
+      this.storageService.uploadFile(filePath, file).subscribe({
+        next: (url) => {
+          this.imageUrl = url;
+          this.datosForm.patchValue({ photo: this.imageUrl });
+          this.cargando = false;
+        },
+        error: (err) => {
+          console.error('Error al subir la imagen:', err);
+          this.cargando = false;
+        },
+      });
+    }
   }
 }

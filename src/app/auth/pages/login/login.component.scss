@@ -7,26 +7,21 @@
 }
 
 .login-header {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  padding: 20px;
-  color: #eeeeee; /* Color claro para el texto del título */
+  margin-bottom: 20px;
+  font-size: 24px; /* Tamaño más grande para el texto */
+  font-weight: bold;
 }
 
 .login-card {
-  width: 100%;
-  max-width: 400px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para dar profundidad */
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Fondo transparente */
 }
 
 .image-container {
   width: 100%;
-  height: 200px;
-  overflow: hidden;
+  height: auto; /* Ajusta automáticamente la altura */
 }
 
 .image-wrapper {
@@ -36,11 +31,14 @@
 
 .login-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain; /* Mantiene las proporciones sin recortar */
 }
 
 ion-button {
-  --background: linear-gradient(135deg, #666666, #000000);
-  --color: #eeeeee; /* Color del texto en los botones */
+  background: #888888; /* Cambia el color a uno más claro */
+  color: #ffffff;
+  margin-top: 15px; /* Asegura que haya espacio entre los botones */
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

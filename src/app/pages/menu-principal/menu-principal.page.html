@@ -12,7 +12,15 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">menuPrincipal</ion-title>
+      <ion-title size="large">Menú Principal</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list>
+    <ion-item (click)="goToProfile()">
+      <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+      <ion-label>Perfil</ion-label>
+    </ion-item>
+    <!-- Puedes agregar más opciones de menú aquí -->
+  </ion-list>
 </ion-content>
