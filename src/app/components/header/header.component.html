@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Página Actual: {{ currentPage }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <!-- Botón para cerrar sesión -->
+      <ion-button (click)="confirmLogout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        Logout
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>

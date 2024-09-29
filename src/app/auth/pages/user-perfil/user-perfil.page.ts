@@ -1,22 +1,27 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit , inject} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonContent,IonCardContent,
+        IonCardHeader, IonHeader, IonTitle,
+        IonToolbar, IonButton,IonIcon,IonCard,
+        IonItem, IonLabel, IonSpinner ,IonCardTitle} from '@ionic/angular/standalone';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Models } from 'src/app/models/models';
 import { FirestoreService } from 'src/app/services/firestore.service';
 
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {IonicModule} from '@ionic/angular'
-
 @Component({
-  selector: 'app-perfil',
+  selector: 'app-user-perfil',
+  templateUrl: './user-perfil.page.html',
+  styleUrls: ['./user-perfil.page.scss'],
   standalone: true,
-  templateUrl: './perfil.component.html',
-  styleUrls: ['./perfil.component.scss'],
-  imports: [CommonModule, FormsModule, HeaderComponent,
-     IonicModule,]
+  imports: [IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
+    IonTitle, IonToolbar, CommonModule, FormsModule,IonLabel,IonIcon,IonCard,
+    IonCardHeader,IonCardContent,IonCardTitle,
+    HeaderComponent]
 })
-export class PerfilComponent implements OnInit {
+export class UserPerfilPage implements OnInit {
 
   autenticacionService: AutenticacionService = inject(AutenticacionService);
   firestoreService: FirestoreService = inject(FirestoreService);
@@ -107,4 +112,5 @@ export class PerfilComponent implements OnInit {
   salir() {
     this.autenticacionService.logout();
   }
+
 }
