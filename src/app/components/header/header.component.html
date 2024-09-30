@@ -1,7 +1,13 @@
 <ion-header>
   <ion-toolbar>
+    <!-- Mostrar el botón de volver solo si no está en menu-principal -->
+    <ion-buttons slot="start" *ngIf="currentPage !== '/menu-principal'">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>
-      Página Actual: {{ currentPage }}
+      {{ pageTitle }}
     </ion-title>
     <ion-buttons slot="end">
       <!-- Botón para cerrar sesión -->

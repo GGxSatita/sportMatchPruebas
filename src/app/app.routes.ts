@@ -15,5 +15,13 @@ export const routes: Routes = [
     path: 'user-perfil',
     loadComponent: () => import('./auth/pages/user-perfil/user-perfil.page').then( m => m.UserPerfilPage),
     canActivate:[authGuard]
+  },
+  {
+    path: 'editar-perfil',
+    loadComponent: () => import('./pages/editar-perfil/editar-perfil.page').then( m => m.EditarPerfilPage)
+  },
+  {
+    path: 'chat',
+    loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage)
   }
 ];

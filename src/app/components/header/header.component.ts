@@ -4,6 +4,7 @@ import { AlertController } from '@ionic/angular';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from "@ionic/angular/standalone";
+import { Location } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -16,11 +17,23 @@ import { filter } from 'rxjs/operators';
 export class HeaderComponent implements OnInit {
 
   currentPage: string = ''; // Variable para almacenar la página actual
+  pageTitle: string = ''; // Título personalizado de la página
+
+  // Mapeo de rutas a nombres personalizados
+  pageTitlesMap: { [key: string]: string } = {
+    '/menu-principal': 'Menú Principal',
+    '/user-perfil': 'Mi perfil',
+    '/settings': 'Configuraciones',
+    '/eventos': 'Eventos',
+    '/chat': 'Chat',
+    // Agrega las rutas y nombres que necesites
+  };
 
   constructor(
     private autenticacionService: AutenticacionService,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private location: Location // Inyectar el servicio Location para manejar el historial
   ) {}
 
   ngOnInit() {
@@ -29,7 +42,12 @@ export class HeaderComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.currentPage = event.urlAfterRedirects; // Almacena la URL actual
+      this.pageTitle = this.pageTitlesMap[this.currentPage] || 'Página Desconocida'; // Asigna el nombre de la página o un valor por defecto
     });
+  }
+
+  goBack() {
+    this.location.back(); // Navegar a la página anterior en el historial
   }
 
   async confirmLogout() {

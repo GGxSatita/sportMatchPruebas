@@ -41,7 +41,8 @@
           <ion-row class="ion-margin-top">
             <ion-col>
               <ion-button expand="block" (click)="login()" style="background: linear-gradient(135deg, #eeeeee, #666666); color: #eeeeee;">
-                Login
+                <ion-icon name="log-in-outline" slot="end"></ion-icon>
+                Iniciar sesión
               </ion-button>
             </ion-col>
           </ion-row>
@@ -50,6 +51,7 @@
             <ion-col>
               <p>¿No tienes una cuenta?</p>
               <ion-button expand="block" color="dark" [routerLink]="['/registro']" style="background-color: #666666; color: #eeeeee;">
+                <ion-icon name="person-add-outline" slot="end"></ion-icon>
                 Registrarse
               </ion-button>
             </ion-col>

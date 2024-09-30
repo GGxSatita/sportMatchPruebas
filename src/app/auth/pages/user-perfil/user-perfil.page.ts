@@ -1,15 +1,16 @@
-import { Component, OnInit , inject} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent,IonCardContent,
-        IonCardHeader, IonHeader, IonTitle,
-        IonToolbar, IonButton,IonIcon,IonCard,
-        IonItem, IonLabel, IonSpinner ,IonCardTitle} from '@ionic/angular/standalone';
-
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IonContent, IonCardContent, IonCardHeader, IonHeader, IonTitle,
+        IonToolbar, IonButton, IonIcon, IonCard, IonItem, IonLabel,
+        IonSpinner, IonCardTitle, IonList } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
-import { Models } from 'src/app/models/models';
 import { FirestoreService } from 'src/app/services/firestore.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { Models } from 'src/app/models/models';
+import { Router } from '@angular/router';
+import { FooterComponent } from 'src/app/components/footer/footer.component';
 
 @Component({
   selector: 'app-user-perfil',
@@ -17,33 +18,29 @@ import { FirestoreService } from 'src/app/services/firestore.service';
   styleUrls: ['./user-perfil.page.scss'],
   standalone: true,
   imports: [IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
-    IonTitle, IonToolbar, CommonModule, FormsModule,IonLabel,IonIcon,IonCard,
-    IonCardHeader,IonCardContent,IonCardTitle,
-    HeaderComponent]
+    IonTitle, IonToolbar, CommonModule, ReactiveFormsModule, IonIcon, IonCard,
+    IonCardHeader, IonCardContent, IonCardTitle, IonList, HeaderComponent, FooterComponent]
 })
 export class UserPerfilPage implements OnInit {
 
   autenticacionService: AutenticacionService = inject(AutenticacionService);
   firestoreService: FirestoreService = inject(FirestoreService);
+  storageService: StorageService = inject(StorageService);
 
+  profileForm: FormGroup;
   user: { email: string, name: string, photo: string };
   userProfile: Models.Auth.UserProfile;
-
-  newName: string = '';
-  newPhoto: string = '';
-  newEdad: string = '';
   cargando: boolean = false;
-  isEditing: boolean = false;  // Nueva propiedad para controlar el estado de edición
+  isEditing: boolean = false;
 
-  constructor() {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.cargando = true;
     this.autenticacionService.authState.subscribe(res => {
-      console.log('res --->', res);
       if (res) {
         this.user = {
           email: res.email,
           name: res.displayName,
-          photo: res.photoURL ? res.photoURL : 'assets/default-profile.png' // Imagen por defecto si no hay URL
+          photo: res.photoURL ? res.photoURL : 'assets/default-profile.png'
         };
         this.getDatosProfile(res.uid);
       } else {
@@ -53,7 +50,13 @@ export class UserPerfilPage implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.profileForm = this.fb.group({
+      newName: ['', [Validators.required, Validators.minLength(3)]],
+      newFoto: [null],
+      nuevaEdad: ['', [Validators.required, Validators.min(1)]],
+    });
+  }
 
   // Método para alternar el modo de edición
   toggleEditMode() {
@@ -61,56 +64,85 @@ export class UserPerfilPage implements OnInit {
   }
 
   getDatosProfile(uid: string) {
-    console.log('getDatosProfile ---->', uid);
     this.firestoreService.getDocumentChanges<Models.Auth.UserProfile>(`${Models.Auth.PathUsers}/${uid}`).subscribe(res => {
       if (res) {
         this.userProfile = res;
-        console.log('this.userProfile --->', this.userProfile);
+        this.profileForm.patchValue({ nuevaEdad: this.userProfile.edad });
       }
       this.cargando = false;
     });
   }
 
+  // Método para manejar la selección de archivo
+  onFileSelected(event: any) {
+    if (event.target.files.length > 0) {
+      this.profileForm.patchValue({ newFoto: event.target.files[0] });
+    }
+  }
+
   async actualizarPerfil() {
-    let data: Models.Auth.UpdateProfileI = {};
-    if (this.newName) {
-      data.displayName = this.newName;
+    if (this.profileForm.valid) {
+      let data: Models.Auth.UpdateProfileI = {};
+      const formValues = this.profileForm.value;
+
+      if (formValues.newFoto) {
+        const filePath = `users/${this.user.email}/profile_picture.jpg`;
+        this.storageService.uploadFile(filePath, formValues.newFoto).subscribe({
+          next: async (downloadURL) => {
+            data.photoURL = downloadURL;
+            await this.actualizarDatosUsuario(data);
+          },
+          error: (error) => console.error('Error al subir la imagen:', error)
+        });
+      } else {
+        await this.actualizarDatosUsuario(data);
+      }
     }
-    if (this.newPhoto) {
-      data.photoURL = this.newPhoto;
+  }
+
+  private async actualizarDatosUsuario(data: Models.Auth.UpdateProfileI) {
+    const formValues = this.profileForm.value;
+
+    if (formValues.newName) {
+      data.displayName = formValues.newName;
     }
+
     await this.autenticacionService.updateProfile(data);
+
     const user = this.autenticacionService.getCurrentUser();
-    const updateData: any = {
+    const updateData = {
       name: user.displayName,
       photo: user.photoURL
     };
+
     await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
+
     this.user = {
       email: user.email,
       name: user.displayName,
-      photo: user.photoURL ? user.photoURL : 'assets/default-profile.png' // Imagen por defecto después de actualizar
+      photo: user.photoURL ? user.photoURL : 'assets/default-profile.png'
     };
-    this.toggleEditMode();  // Salir del modo de edición después de actualizar
+
+    this.toggleEditMode();
   }
 
   async actualizarEdad() {
-    const user = this.autenticacionService.getCurrentUser();
-    const updateDoc: any = {
-      edad: this.userProfile.edad
-    };
-    await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateDoc);
-    console.log('Edad actualizada con éxito');
-    this.toggleEditMode();  // Salir del modo de edición después de actualizar
+    if (this.profileForm.get('nuevaEdad').valid) {
+      const user = this.autenticacionService.getCurrentUser();
+      const updateDoc = { edad: this.profileForm.value.nuevaEdad };
+      await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateDoc);
+      this.toggleEditMode();
+    }
   }
 
   // Manejador de errores de carga de imagen
   handleImageError(event: any) {
-    event.target.src = 'assets/img/default-profile.png'; // Cambia a imagen por defecto si hay un error
+    event.target.src = 'assets/img/default-profile.png';
   }
 
   salir() {
     this.autenticacionService.logout();
   }
 
+  goToEditProfile(){this.router.navigate(['/editar-perfil']);}
 }

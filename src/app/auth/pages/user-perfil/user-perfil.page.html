@@ -1,48 +1,34 @@
 <app-header></app-header>
-
-<ion-content>
+<ion-content class="login-container">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
 
   <!-- Mostrar la información del usuario -->
-  <div *ngIf="!cargando && user">
+  <div *ngIf="!cargando && user" class="login-card">
     <ion-card>
-      <!-- Cargar la imagen de perfil o una imagen por defecto si no está disponible -->
-      <img [src]="user?.photo || 'assets/img/default-profile.png'" alt="Foto de perfil del usuario" (error)="handleImageError($event)"/>
-      <ion-card-header>
-        <ion-card-title>{{ user?.name || 'Nombre no disponible' }}</ion-card-title>
+      <ion-card-header class="ion-text-center">
+        <!-- Cargar la imagen de perfil o una imagen por defecto si no está disponible -->
+        <div class="image-wrapper">
+          <img [src]="user?.photo || 'assets/img/default-profile.png'"
+               alt="Foto de perfil del usuario"
+               (error)="handleImageError($event)"
+               class="profile-image"/>
+        </div>
+        <ion-card-title class="login-header">{{ user?.name || 'Nombre no disponible' }}</ion-card-title>
       </ion-card-header>
+
       <ion-card-content>
         <p>Email: {{ user?.email }}</p>
         <p *ngIf="userProfile?.edad">Edad: {{ userProfile.edad }}</p>
       </ion-card-content>
     </ion-card>
 
-    <!-- Botón para activar el modo de edición -->
-    <ion-button expand="block" (click)="toggleEditMode()">
+    <!-- Botón para ir a la página de edición de perfil -->
+    <ion-button expand="block" (click)="goToEditProfile()">
       <ion-icon slot="start" name="create-outline"></ion-icon>
-      {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
+      Editar Perfil
     </ion-button>
 
-    <!-- Formulario de edición solo visible si isEditing es true -->
-    <div *ngIf="isEditing">
-      <ion-item>
-        <ion-label position="stacked">Nuevo Nombre</ion-label>
-        <ion-input [(ngModel)]="newName" placeholder="Escribe tu nuevo nombre"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Nueva Foto (URL)</ion-label>
-        <ion-input [(ngModel)]="newPhoto" placeholder="Escribe la URL de la nueva foto"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Nueva Edad</ion-label>
-        <ion-input [(ngModel)]="userProfile.edad" placeholder="Escribe tu nueva edad" type="number"></ion-input>
-      </ion-item>
-
-      <ion-button expand="block" (click)="actualizarPerfil()">Actualizar Perfil</ion-button>
-      <ion-button expand="block" (click)="actualizarEdad()">Actualizar Edad</ion-button>
-    </div>
   </div>
 </ion-content>
+<app-footer></app-footer>

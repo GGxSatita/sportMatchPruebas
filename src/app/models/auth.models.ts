@@ -1,10 +1,11 @@
 export namespace ModelsAuth {
-  export const PathUsers = 'Users'
+  export const PathUsers = 'Users';
 
   export interface DatosRegister {
     email: string;
     password: string;
   }
+
   export interface DatosLogin {
     email: string;
     password: string;
@@ -21,5 +22,8 @@ export namespace ModelsAuth {
     edad: string;
     id: string;
     email: string;
+    // Agregamos posibles nuevas propiedades, si es necesario para el perfil
+    phoneNumber?: string;  // Ejemplo de un campo opcional
+    address?: string;      // Otro campo opcional
   }
 }
