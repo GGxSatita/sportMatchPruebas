@@ -1,33 +1,77 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut, updateProfile, fetchSignInMethodsForEmail } from '@angular/fire/auth';
-import { Router } from '@angular/router'; // Importa el Router
+import { Router } from '@angular/router';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AutenticacionService {
 
-  // Inyectar el servicio de autenticación de Firebase
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
-  router : Router = inject(Router)
+  router: Router = inject(Router);
 
-  constructor() {
-    this.logout();
-  }
+  constructor() {}
 
   async createUser(email: string, password: string) {
-    const user = await createUserWithEmailAndPassword(this.auth, email, password);
-    return user;
+    try {
+      const user = await createUserWithEmailAndPassword(this.auth, email, password);
+      return user;
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        console.error('El correo electrónico ya está en uso.');
+        throw new Error('auth/email-already-in-use');
+      } else {
+        console.error('Error al crear usuario:', error);
+        throw error;
+      }
+    }
   }
 
   async login(email: string, password: string) {
-    const user = await signInWithEmailAndPassword(this.auth, email, password);
-    return user;
+    try {
+      // Verificar que las credenciales no estén vacías
+      if (!email || !password) {
+        throw new Error('Las credenciales no pueden estar vacías.');
+      }
+
+      // Verificar el formato del correo
+      if (!this.validateEmail(email)) {
+        throw new Error('El formato del correo electrónico no es válido.');
+      }
+
+      // Intentar el login
+      const user = await signInWithEmailAndPassword(this.auth, email, password);
+      return user;
+    } catch (error: any) {
+      // Capturar los códigos de error específicos de Firebase
+      if (error.code) {
+        if (error.code === 'auth/invalid-email') {
+          console.error('Correo electrónico inválido.');
+          throw new Error('Correo electrónico inválido.');
+        } else if (error.code === 'auth/user-disabled') {
+          console.error('Usuario deshabilitado.');
+          throw new Error('Este usuario ha sido deshabilitado.');
+        } else if (error.code === 'auth/user-not-found') {
+          console.error('Usuario no encontrado.');
+          throw new Error('No se encontró un usuario con este correo.');
+        } else if (error.code === 'auth/wrong-password') {
+          console.error('Contraseña incorrecta.');
+          throw new Error('Contraseña incorrecta. Por favor, intenta de nuevo.');
+        } else if (error.code === 'auth/invalid-credential') {
+          console.error('Credenciales inválidas.');
+          throw new Error('Credenciales inválidas.');
+        }
+      }
+
+      console.error('Error al iniciar sesión:', error);
+      throw error;
+    }
   }
 
   logout() {
     signOut(this.auth).then(() => {
-      this.router.navigate(['/login']); // Redirige al login después de cerrar sesión
+      this.router.navigate(['/login']);
     }).catch(error => {
       console.error('Error durante el logout:', error);
     });
@@ -38,17 +82,26 @@ export class AutenticacionService {
   }
 
   updateProfile(data: { displayName?: string, photoURL?: string }) {
-    return updateProfile(this.auth.currentUser, data);
+    if (this.auth.currentUser) {
+      return updateProfile(this.auth.currentUser, data);
+    } else {
+      throw new Error('No hay usuario autenticado para actualizar el perfil');
+    }
   }
 
-  // Nuevo método para verificar si un correo ya está registrado
   async isEmailRegistered(email: string): Promise<boolean> {
     try {
       const signInMethods = await fetchSignInMethodsForEmail(this.auth, email);
-      return signInMethods.length > 0; // Si hay métodos de inicio de sesión, el correo está registrado
+      return signInMethods.length > 0;
     } catch (error) {
       console.log('Error al verificar el correo electrónico:', error);
-      return false; // Si ocurre un error, asumimos que el correo no está registrado
+      return false;
     }
+  }
+
+  // Validar formato de correo electrónico
+  private validateEmail(email: string): boolean {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
   }
 }

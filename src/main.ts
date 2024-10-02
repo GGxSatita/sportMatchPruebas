@@ -6,33 +6,31 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { importProvidersFrom } from '@angular/core';
 
-//firebase
+// Firebase imports
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getFirestore, initializeFirestore, persistentLocalCache, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, indexedDBLocalPersistence, initializeAuth, provideAuth } from '@angular/fire/auth';
-
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ScreenTrackingService, getAnalytics, provideAnalytics, UserTrackingService } from '@angular/fire/analytics';
-import { Capacitor } from '@capacitor/core';
+import { getDatabase, provideDatabase } from '@angular/fire/database'; // Importación para Realtime Database
 
+import { Capacitor } from '@capacitor/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-// import { IonicStorageModule } from '@ionic/storage-angular';
 import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular({innerHTMLTemplatesEnabled: true, backButtonText: ''}),
+    provideIonicAngular({ innerHTMLTemplatesEnabled: true, backButtonText: '' }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
 
-    // firebase
+    // Firebase Initialization
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebaseConfig);
 
-      // Configuración condicional según la plataforma
+      // Configuración condicional para plataformas nativas vs web
       if (Capacitor.isNativePlatform()) {
-        // Configuración especial para plataformas nativas
         initializeFirestore(app, {
           localCache: persistentLocalCache(),
         });
@@ -40,23 +38,27 @@ bootstrapApplication(AppComponent, {
           persistence: indexedDBLocalPersistence
         });
       } else {
-        // Configuración para plataformas web con un objeto vacío como ajustes
-        initializeFirestore(app, {}); // Aquí pasamos un objeto vacío como segundo argumento
-        initializeAuth(app, {}); // También aplicamos el mismo principio a Auth si es necesario
+        initializeFirestore(app, {}); // Firestore para la web
+        initializeAuth(app, {}); // Auth para la web
       }
 
+      // Devuelve la app inicializada
       return app;
     }),
-    provideFirestore(() => getFirestore()),
-    provideAuth(() => getAuth()),
-    provideStorage(() => getStorage()),
 
-    provideFunctions(() => getFunctions()),
-    provideAnalytics(() => getAnalytics() ),
+    // Proveedores de Firebase (Firestore, Auth, Functions, Storage, Analytics y Realtime Database)
+    provideFirestore(() => getFirestore()), // Firestore
+    provideAuth(() => getAuth()), // Authentication
+    provideStorage(() => getStorage()), // Storage
+    provideFunctions(() => getFunctions()), // Functions
+    provideAnalytics(() => getAnalytics()), // Analytics
+    provideDatabase(() => getDatabase()), // Realtime Database
+
+    // Otros servicios de Firebase
     ScreenTrackingService,
     UserTrackingService,
-    provideAnimationsAsync(),
-    // IonicStorageModule.forRoot()
 
+    // Animations (opcional)
+    provideAnimationsAsync(),
   ],
 });

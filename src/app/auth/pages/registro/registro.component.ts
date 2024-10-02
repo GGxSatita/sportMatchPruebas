@@ -14,9 +14,9 @@ import { finalize } from 'rxjs/operators';
   styleUrls: ['./registro.component.scss'],
 })
 export class RegistroComponent implements OnInit {
-  firestoreService: FirestoreService = inject(FirestoreService); //Inyectar servcio de fireStore
-  autenticacionService: AutenticacionService = inject(AutenticacionService); //Inyectar servcio de autenticación
-  storageService: StorageService = inject(StorageService); //Inyectar servcio de storage
+  firestoreService: FirestoreService = inject(FirestoreService); // Inyectar servicio de Firestore
+  autenticacionService: AutenticacionService = inject(AutenticacionService); // Inyectar servicio de autenticación
+  storageService: StorageService = inject(StorageService); // Inyectar servicio de storage
   alertController: AlertController = inject(AlertController); // Inyectar AlertController
   router: Router = inject(Router);
 
@@ -31,17 +31,17 @@ export class RegistroComponent implements OnInit {
 
   cargando: boolean = false;
   errorMensaje: string | null = null; // Agregar esta propiedad
-  imageUrl: string = ''; //Declara la propiedad imageUrl
+  imageUrl: string = ''; // Declarar la propiedad imageUrl
 
-  constructor(private fb: FormBuilder, private injector : Injector) {}
+  constructor(private fb: FormBuilder, private injector: Injector) {}
 
   ngOnInit() {
-       // Inyectar los servicios solo cuando sea necesario
-       this.firestoreService = this.injector.get(FirestoreService);
-       this.autenticacionService = this.injector.get(AutenticacionService);
-       this.storageService = this.injector.get(StorageService);
-       this.router = this.injector.get(Router);
-       this.alertController = this.injector.get(AlertController);
+    // Inyectar los servicios solo cuando sea necesario
+    this.firestoreService = this.injector.get(FirestoreService);
+    this.autenticacionService = this.injector.get(AutenticacionService);
+    this.storageService = this.injector.get(StorageService);
+    this.router = this.injector.get(Router);
+    this.alertController = this.injector.get(AlertController);
   }
 
   // Mostrar alerta cuando el correo ya esté registrado
@@ -115,10 +115,15 @@ export class RegistroComponent implements OnInit {
         );
         console.log('Usuario creado con éxito');
         this.router.navigate(['/login']);
-      } catch (error) {
-        console.log('REGISTRARSE ERROR ->', error);
-        this.errorMensaje =
-          'Hubo un error durante el registro. Intenta de nuevo más tarde.'; // Asignar un mensaje de error
+      } catch (error: any) {
+        // Manejar el error 'auth/email-already-in-use'
+        if (error.message === 'auth/email-already-in-use') {
+          await this.showUserExistsAlert();
+        } else {
+          console.log('REGISTRARSE ERROR ->', error);
+          this.errorMensaje =
+            'Hubo un error durante el registro. Intenta de nuevo más tarde.';
+        }
       }
     }
     this.cargando = false;
@@ -143,4 +148,6 @@ export class RegistroComponent implements OnInit {
       });
     }
   }
+
+
 }
