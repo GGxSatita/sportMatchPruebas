@@ -1,8 +1,10 @@
-<ion-content class="ion-padding" style="--background: linear-gradient(135deg, #eeeeee, #666666, #000000);">
+<ion-content class="ion-padding" class="page-login">
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
-        <h1 class="form-title ion-text-center" style="color: #eeeeee;">Registro</h1>
+        <div class="registro-header">
+          <h1 class="ion-text-center">⚡ Registro de usuario⚡</h1>
+        </div>
       </ion-col>
     </ion-row>
 
@@ -63,7 +65,7 @@
           <!-- Botón de Enviar -->
           <ion-row>
             <ion-col size="12" class="ion-padding">
-              <ion-button expand="full" type="submit" [disabled]="cargando" style="background: linear-gradient(135deg, #666666, #000000); color: #eeeeee;">
+              <ion-button expand="block" type="submit" [disabled]="cargando" color="dark">
                 <strong>Registrarse</strong>
               </ion-button>
             </ion-col>
@@ -73,7 +75,7 @@
           <ion-row>
             <ion-col size="12" class="ion-padding ion-text-center">
               <p style="color: #eeeeee;">¿Ya tienes un usuario?</p>
-              <ion-button expand="block" [routerLink]="['/login']" style="background-color: #666666; color: #eeeeee;">
+              <ion-button expand="block" [routerLink]="['/login']" color="dark">
                 Ingresar
               </ion-button>
             </ion-col>

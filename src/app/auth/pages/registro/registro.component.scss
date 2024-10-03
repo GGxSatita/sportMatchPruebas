@@ -12,7 +12,94 @@ input-content {
   font-size: 0.9rem;
 }
 
-ion-button {
-  --background: linear-gradient(135deg, #666666, #000000);
-  --color: #eeeeee;
+
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
 }
+
+.register-header {
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffdd57;
+  text-shadow: 0px 0px 10px #ffdd57;
+}
+
+.register-card {
+  padding: 30px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 420px;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.image-wrapper {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+}
+
+.register-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+ion-item {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+ion-label {
+  color: #ffdd57;
+  font-weight: 500;
+}
+
+ion-input {
+  color: #1e1e1e;
+}
+
+ion-button {
+  background: linear-gradient(135deg, #ffdd57, #ffb700);
+  color: #1e1e1e;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+ion-button:hover {
+  transform: translateY(-2px);
+}
+
+ion-row p {
+  color: #ffdd57;
+  margin-bottom: 10px;
+}
+.input-email-password {
+  color: #1e1e1e;
+}
+
+.registro-header {
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffdd57;
+  text-shadow: 0px 0px 10px #ffdd57;
+}
+
