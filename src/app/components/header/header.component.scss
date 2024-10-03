@@ -1,0 +1,13 @@
+.gradient-header {
+  --background: linear-gradient(to top, #000000, #000000);
+}
+.titulo {
+  color: #ffffff; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
+  font-size: 20px; /* Ajusta el tamaño del ícono si es necesario */
+}
+ion-icon{
+  color: white;
+}
+.texto-logout{
+  color: white;
+}

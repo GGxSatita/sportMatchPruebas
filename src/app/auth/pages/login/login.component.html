@@ -1,8 +1,8 @@
-<ion-content class="ion-padding" style="--background: linear-gradient(135deg, #eeeeee, #666666, #000000);">
+<ion-content class="ion-padding  page-login">
   <div class="login-container">
     <!-- Título de Login en la parte superior -->
     <div class="login-header">
-      <h1 class="ion-text-center">Iniciar Sesión</h1>
+      <h1 class="ion-text-center">⚡ Iniciar Sesión ⚡</h1>
     </div>
 
     <ion-card class="login-card">
@@ -21,16 +21,14 @@
             <p><strong>Nombre:</strong> {{ user.name }}</p>
           </div>
           <div class="ion-margin-top">
-            <ion-button expand="block" color="dark"  style="background: linear-gradient(135deg, #666666, #000000);">
-              Salir
-            </ion-button>
+            <ion-button expand="block" color="dark">Salir</ion-button>
           </div>
         </div>
 
         <ng-template #loginForm>
           <ion-item>
             <ion-label position="floating">Correo electrónico</ion-label>
-            <ion-input type="text" [(ngModel)]="form.email"></ion-input>
+            <ion-input type="text" [(ngModel)]="form.email" class="input-email-password"></ion-input>
           </ion-item>
 
           <ion-item>
@@ -40,7 +38,7 @@
 
           <ion-row class="ion-margin-top">
             <ion-col>
-              <ion-button expand="block" (click)="login()" style="background: linear-gradient(135deg, #eeeeee, #666666); color: #eeeeee;">
+              <ion-button expand="block" color="dark" (click)="login()">
                 <ion-icon name="log-in-outline" slot="end"></ion-icon>
                 Iniciar sesión
               </ion-button>
@@ -50,7 +48,7 @@
           <ion-row class="ion-margin-top ion-text-center">
             <ion-col>
               <p>¿No tienes una cuenta?</p>
-              <ion-button expand="block" color="dark" [routerLink]="['/registro']" style="background-color: #666666; color: #eeeeee;">
+              <ion-button expand="block" color="dark" [routerLink]="['/registro']">
                 <ion-icon name="person-add-outline" slot="end"></ion-icon>
                 Registrarse
               </ion-button>

@@ -1,5 +1,5 @@
 <app-header></app-header>
-<ion-content class="login-container">
+<ion-content class="login-container" class="fondo-app">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
 
@@ -24,8 +24,8 @@
     </ion-card>
 
     <!-- Botón para ir a la página de edición de perfil -->
-    <ion-button expand="block" (click)="goToEditProfile()">
-      <ion-icon slot="start" name="create-outline"></ion-icon>
+    <ion-button expand="block" (click)="goToEditProfile()" color="dark">
+      <ion-icon slot="start" name="create-outline" slot="end"></ion-icon>
       Editar Perfil
     </ion-button>
 
