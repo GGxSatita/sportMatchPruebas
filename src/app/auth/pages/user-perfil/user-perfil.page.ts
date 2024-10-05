@@ -3,21 +3,23 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonCardContent, IonCardHeader, IonHeader, IonTitle,
         IonToolbar, IonButton, IonIcon, IonCard, IonItem, IonLabel,
-        IonSpinner, IonCardTitle, IonList } from '@ionic/angular/standalone';
+        IonSpinner, IonCardTitle, IonList, IonImg } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { DeportesService } from 'src/app/services/deportes.service'; // Servicio de deportes
 import { Models } from 'src/app/models/models';
 import { Router } from '@angular/router';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Deporte } from 'src/app/models/deporte';
 
 @Component({
   selector: 'app-user-perfil',
   templateUrl: './user-perfil.page.html',
   styleUrls: ['./user-perfil.page.scss'],
   standalone: true,
-  imports: [IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
+  imports: [IonImg, IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
     IonTitle, IonToolbar, CommonModule, ReactiveFormsModule, IonIcon, IonCard,
     IonCardHeader, IonCardContent, IonCardTitle, IonList, HeaderComponent, FooterComponent]
 })
@@ -26,10 +28,12 @@ export class UserPerfilPage implements OnInit {
   autenticacionService: AutenticacionService = inject(AutenticacionService);
   firestoreService: FirestoreService = inject(FirestoreService);
   storageService: StorageService = inject(StorageService);
+  deportesService: DeportesService = inject(DeportesService); // Inyectar servicio de deportes
 
   profileForm: FormGroup;
   user: { email: string, name: string, photo: string };
   userProfile: Models.Auth.UserProfile;
+  deportes: Deporte[] = []; // Lista de deportes
   cargando: boolean = false;
   isEditing: boolean = false;
 
@@ -55,6 +59,12 @@ export class UserPerfilPage implements OnInit {
       newName: ['', [Validators.required, Validators.minLength(3)]],
       newFoto: [null],
       nuevaEdad: ['', [Validators.required, Validators.min(1)]],
+      deporteFavorito: ['', Validators.required] // Campo para el deporte favorito
+    });
+
+    // Cargar deportes desde Firestore
+    this.deportesService.getDeportes().subscribe((deportes: Deporte[]) => {
+      this.deportes = deportes;
     });
   }
 
@@ -67,7 +77,11 @@ export class UserPerfilPage implements OnInit {
     this.firestoreService.getDocumentChanges<Models.Auth.UserProfile>(`${Models.Auth.PathUsers}/${uid}`).subscribe(res => {
       if (res) {
         this.userProfile = res;
-        this.profileForm.patchValue({ nuevaEdad: this.userProfile.edad });
+        // Rellenar el formulario con los datos del perfil
+        this.profileForm.patchValue({
+          nuevaEdad: this.userProfile.edad,
+          deporteFavorito: this.userProfile.deporteFavorito // Cargar deporte favorito en el formulario
+        });
       }
       this.cargando = false;
     });
@@ -112,7 +126,9 @@ export class UserPerfilPage implements OnInit {
     const user = this.autenticacionService.getCurrentUser();
     const updateData = {
       name: user.displayName,
-      photo: user.photoURL
+      photo: user.photoURL,
+      edad: formValues.nuevaEdad,
+      deporteFavorito: formValues.deporteFavorito // Actualizar deporte favorito en Firestore
     };
 
     await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
@@ -144,5 +160,7 @@ export class UserPerfilPage implements OnInit {
     this.autenticacionService.logout();
   }
 
-  goToEditProfile(){this.router.navigate(['/editar-perfil']);}
+  goToEditProfile() {
+    this.router.navigate(['/editar-perfil']);
+  }
 }

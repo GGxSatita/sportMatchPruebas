@@ -1,34 +1,44 @@
 <app-header></app-header>
-<ion-content class="login-container" class="fondo-app">
+<ion-content class="ion-padding login-container fondo-app">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
 
   <!-- Mostrar la información del usuario -->
-  <div *ngIf="!cargando && user" class="login-card">
-    <ion-card>
-      <ion-card-header class="ion-text-center">
-        <!-- Cargar la imagen de perfil o una imagen por defecto si no está disponible -->
+  <div *ngIf="!cargando && user" class="login-container">
+    <!-- Título similar al del segundo HTML -->
+    <div class="login-header">
+      <h1 class="ion-text-center">Perfil de Usuario</h1>
+    </div>
+
+    <!-- Card de perfil de usuario -->
+    <ion-card class="login-card">
+      <div class="image-container">
+        <!-- Cambiamos de ion-img a img para poder aplicar correctamente el estilo circular -->
         <div class="image-wrapper">
           <img [src]="user?.photo || 'assets/img/default-profile.png'"
                alt="Foto de perfil del usuario"
                (error)="handleImageError($event)"
                class="profile-image"/>
         </div>
-        <ion-card-title class="login-header">{{ user?.name || 'Nombre no disponible' }}</ion-card-title>
-      </ion-card-header>
+      </div>
 
       <ion-card-content>
-        <p>Email: {{ user?.email }}</p>
-        <p *ngIf="userProfile?.edad">Edad: {{ userProfile.edad }}</p>
+        <div class="ion-text-center">
+          <h3>{{ user?.name || 'Nombre no disponible' }}</h3>
+          <p><strong>Email:</strong> {{ user?.email }}</p>
+          <p *ngIf="userProfile?.edad"><strong>Edad:</strong> {{ userProfile.edad }}</p>
+          <p *ngIf="userProfile?.deporteFavorito"><strong>Deporte Favorito:</strong> {{ userProfile.deporteFavorito }}</p>
+        </div>
+
+        <!-- Botón para editar el perfil -->
+        <div class="ion-margin-top">
+          <ion-button expand="block" color="dark" (click)="goToEditProfile()">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar Perfil
+          </ion-button>
+        </div>
       </ion-card-content>
     </ion-card>
-
-    <!-- Botón para ir a la página de edición de perfil -->
-    <ion-button expand="block" (click)="goToEditProfile()" color="dark">
-      <ion-icon slot="start" name="create-outline" slot="end"></ion-icon>
-      Editar Perfil
-    </ion-button>
-
   </div>
 </ion-content>
 <app-footer></app-footer>

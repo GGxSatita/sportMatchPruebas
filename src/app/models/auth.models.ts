@@ -22,6 +22,7 @@ export namespace ModelsAuth {
     edad: string;
     id: string;
     email: string;
+    deporteFavorito : string;
     // Agregamos posibles nuevas propiedades, si es necesario para el perfil
     phoneNumber?: string;  // Ejemplo de un campo opcional
     address?: string;      // Otro campo opcional

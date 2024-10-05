@@ -103,3 +103,26 @@ ion-row p {
   text-shadow: 0px 0px 10px #ffdd57;
 }
 
+.iconos-grandes{
+    color: yellow; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
+    font-size: 30px; /* Ajusta el tamaño del ícono si es necesario */
+    display: flex;
+    justify-content: center;
+    align-items: center; // Asegúrate de que el tamaño del ícono sea adecuado.
+    text-align: center;
+}
+
+.boton-personalizado {
+  --width: 80px;
+  --height: 80px;
+  width: 80px; /* Aumenta el tamaño del botón */
+  height: 80px; /* Aumenta el tamaño del botón */
+  border-radius: 50%; /* Hacemos que los botones sean circulares */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boton-personalizado ion-icon {
+  font-size: 50px; /* Aumenta el tamaño del ícono */
+}

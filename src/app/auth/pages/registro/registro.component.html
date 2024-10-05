@@ -1,9 +1,9 @@
-<ion-content class="ion-padding" class="page-login">
+<ion-content class="ion-padding page-login">
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
         <div class="registro-header">
-          <h1 class="ion-text-center">⚡ Registro de usuario⚡</h1>
+          <h1 class="ion-text-center">⚡ Registro de usuario ⚡</h1>
         </div>
       </ion-col>
     </ion-row>
@@ -12,25 +12,22 @@
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
         <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
 
-          <!-- Mensaje de error si el correo ya está registrado -->
+          <!-- Mensaje de error -->
           <ion-text color="danger" *ngIf="errorMensaje">{{ errorMensaje }}</ion-text>
 
           <!-- Email -->
-          <ion-item class="input-content">
+          <ion-item>
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" formControlName="email"></ion-input>
             <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required') && datosForm.controls['email'].touched">
               Este campo es <strong>requerido</strong>
-            </ion-note>
-            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('email') && datosForm.controls['email'].touched">
-              Ingresa un email <strong>válido</strong>
             </ion-note>
           </ion-item>
 
           <!-- Password -->
           <ion-item>
             <ion-label position="floating">Contraseña</ion-label>
-            <ion-input type="password" formControlName="password" minlength="6"></ion-input>
+            <ion-input type="password" formControlName="password"></ion-input>
             <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required') && datosForm.controls['password'].touched">
               Este campo es <strong>requerido</strong>
             </ion-note>
@@ -54,15 +51,36 @@
             </ion-note>
           </ion-item>
 
-          <!-- Foto -->
+          <!-- Deporte Favorito -->
+          <ion-item>
+            <ion-select formControlName="deporteFavorito" placeholder="Selecciona tu deporte favorito">
+              <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">{{ deporte.nombre }}</ion-select-option>
+            </ion-select>
+            <ion-note class="error-message" *ngIf="datosForm.controls['deporteFavorito'].hasError('required') && datosForm.controls['deporteFavorito'].touched">
+              Selecciona un <strong>deporte favorito</strong>
+            </ion-note>
+          </ion-item>
 
+          <!-- Foto de Perfil -->
           <ion-item>
             <ion-label position="stacked">Foto de perfil</ion-label>
             <input type="file" (change)="uploadFile($event)" accept="image/*">
           </ion-item>
 
+          <ion-row>
+            <ion-col size="6" class="iconos-grandes">
+              <ion-button expand="block" fill="clear" class="boton-personalizado">
+                <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="6" class="iconos-grandes">
+              <ion-button expand="block" fill="clear" class="boton-personalizado">
+                <ion-icon slot="icon-only" name="image-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
 
-          <!-- Botón de Enviar -->
+          <!-- Botón de Registro -->
           <ion-row>
             <ion-col size="12" class="ion-padding">
               <ion-button expand="block" type="submit" [disabled]="cargando" color="dark">
@@ -71,17 +89,16 @@
             </ion-col>
           </ion-row>
 
-          <!-- Ya tienes un usuario -->
+          <!-- Ya tienes cuenta -->
           <ion-row>
             <ion-col size="12" class="ion-padding ion-text-center">
-              <p style="color: #eeeeee;">¿Ya tienes un usuario?</p>
+              <p>¿Ya tienes un usuario?</p>
               <ion-button expand="block" [routerLink]="['/login']" color="dark">
                 Ingresar
               </ion-button>
             </ion-col>
           </ion-row>
         </form>
-
       </ion-col>
     </ion-row>
   </ion-grid>
