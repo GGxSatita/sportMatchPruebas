@@ -122,7 +122,7 @@ export class RegistroComponent implements OnInit {
 
         await this.firestoreService.createDocument(Models.Auth.PathUsers, datosUser, res.user.uid);
         console.log('Usuario creado con éxito');
-        this.router.navigate(['/login']);
+        this.router.navigate(['/menu-principal']);
       } catch (error: any) {
         // Manejo de errores
         if (error.message === 'auth/email-already-in-use') {

@@ -18,10 +18,12 @@ export const routes: Routes = [
   },
   {
     path: 'editar-perfil',
-    loadComponent: () => import('./pages/editar-perfil/editar-perfil.page').then( m => m.EditarPerfilPage)
+    loadComponent: () => import('./pages/editar-perfil/editar-perfil.page').then( m => m.EditarPerfilPage),
+    canActivate:[authGuard]
   },
   {
     path: 'chat',
-    loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage)
+    loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage),
+    canActivate:[authGuard]
   }
 ];
