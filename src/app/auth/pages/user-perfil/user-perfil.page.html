@@ -1,25 +1,23 @@
 <app-header></app-header>
-<ion-content class="ion-padding login-container fondo-app">
+<ion-content class="ion-padding login-container">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
 
   <!-- Mostrar la información del usuario -->
   <div *ngIf="!cargando && user" class="login-container">
-    <!-- Título similar al del segundo HTML -->
+    <!-- Título -->
     <div class="login-header">
       <h1 class="ion-text-center">Perfil de Usuario</h1>
     </div>
 
     <!-- Card de perfil de usuario -->
     <ion-card class="login-card">
-      <div class="image-container">
-        <!-- Cambiamos de ion-img a img para poder aplicar correctamente el estilo circular -->
-        <div class="image-wrapper">
-          <img [src]="user?.photo || 'assets/img/default-profile.png'"
-               alt="Foto de perfil del usuario"
-               (error)="handleImageError($event)"
-               class="profile-image"/>
-        </div>
+      <div class="image-wrapper">
+        <!-- Imagen de perfil -->
+        <img [src]="user?.photo || 'assets/img/default-profile.png'"
+             alt="Foto de perfil del usuario"
+             (error)="handleImageError($event)"
+             class="profile-image"/>
       </div>
 
       <ion-card-content>
@@ -30,13 +28,13 @@
           <p *ngIf="userProfile?.deporteFavorito"><strong>Deporte Favorito:</strong> {{ userProfile.deporteFavorito }}</p>
         </div>
 
+        <!-- Aquí puedes agregar las estadísticas más adelante -->
+
         <!-- Botón para editar el perfil -->
-        <div class="ion-margin-top">
-          <ion-button expand="block" color="dark" (click)="goToEditProfile()">
-            <ion-icon name="create-outline" slot="start"></ion-icon>
-            Editar Perfil
-          </ion-button>
-        </div>
+        <ion-button expand="block" (click)="goToEditProfile()">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Editar Perfil
+        </ion-button>
       </ion-card-content>
     </ion-card>
   </div>
