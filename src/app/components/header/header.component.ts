@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit {
     '/settings': 'Configuraciones',
     '/eventos': 'Eventos',
     '/chat': 'Chat',
+    '/editar-perfil':'Editar perfil'
     // Agrega las rutas y nombres que necesites
   };
 
