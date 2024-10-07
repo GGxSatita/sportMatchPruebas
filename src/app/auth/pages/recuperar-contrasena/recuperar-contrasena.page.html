@@ -10,18 +10,22 @@
             <ion-input type="email" formControlName="email"></ion-input>
           </ion-item>
 
-          <!-- Mensaje de error si el correo es inválido -->
+          <!-- Mostrar errores si el formulario es inválido -->
           <ion-text color="danger" *ngIf="resetPasswordForm.get('email').invalid && resetPasswordForm.get('email').touched">
-            Ingresa un correo electrónico válido
+            Ingresa un correo electrónico válido.
           </ion-text>
 
-          <ion-button expand="block" type="submit" color="primary">
+          <!-- Mostrar un spinner mientras se envía la solicitud -->
+          <ion-spinner *ngIf="cargando"></ion-spinner>
+
+          <ion-button expand="block" type="submit" color="primary" [disabled]="cargando">
             Enviar Enlace de Recuperación
           </ion-button>
         </form>
+
+        <!-- Mensaje de éxito o error -->
+        <p *ngIf="mensaje">{{ mensaje }}</p>
       </ion-card-content>
     </ion-card>
-
-    <p *ngIf="mensaje">{{ mensaje }}</p>
   </div>
 </ion-content>

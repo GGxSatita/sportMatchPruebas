@@ -14,9 +14,12 @@ import {
   IonButton,
   IonText,
   IonInput,
+  IonSpinner,
+  AlertController // Importamos AlertController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-recuperar-contrasena',
@@ -25,8 +28,8 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,  // Importa FormsModule si lo usas para otros componentes
-    ReactiveFormsModule,  // Importa ReactiveFormsModule para formularios reactivos
+    FormsModule,
+    ReactiveFormsModule,
     HeaderComponent,
     IonContent,
     IonHeader,
@@ -38,16 +41,20 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
     IonLabel,
     IonButton,
     IonText,
-    IonInput
+    IonInput,
+    IonSpinner
   ],
 })
 export class RecuperarContrasenaPage implements OnInit {
   resetPasswordForm: FormGroup;
   mensaje: string;
+  cargando: boolean = false;  // Indicador de carga
 
   constructor(
     private fb: FormBuilder,
-    private authService: AutenticacionService
+    private authService: AutenticacionService,
+    private router: Router,
+    private alertController: AlertController // Inyectamos AlertController
   ) {}
 
   ngOnInit() {
@@ -59,9 +66,11 @@ export class RecuperarContrasenaPage implements OnInit {
 
   async sendPasswordReset() {
     this.mensaje = '';
+    this.cargando = true;  // Activa el indicador de carga
 
     if (this.resetPasswordForm.invalid) {
       this.mensaje = 'Por favor, ingresa un correo electrónico válido.';
+      this.cargando = false;
       return;
     }
 
@@ -70,9 +79,34 @@ export class RecuperarContrasenaPage implements OnInit {
     try {
       await this.authService.resetPassword(email);
       this.mensaje = 'Revisa tu correo electrónico para restablecer la contraseña.';
+
+      // Muestra el alert antes de redirigir al login
+      await this.presentAlert();
+
     } catch (error: any) {
       console.error('Error al enviar el enlace de recuperación:', error);
       this.mensaje = 'Hubo un error al enviar el enlace de recuperación. Intenta nuevamente.';
+    } finally {
+      this.cargando = false;  // Desactiva el indicador de carga
     }
+  }
+
+  // Función para mostrar el alert
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Enlace Enviado',
+      message: 'El enlace de recuperación ha sido enviado a tu correo. Serás redirigido al login',
+      buttons: [
+        {
+          text: 'Ir al Login',
+          handler: () => {
+            // Redirige al usuario al login
+            this.router.navigate(['/login']);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }
