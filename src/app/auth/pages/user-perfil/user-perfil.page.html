@@ -14,27 +14,43 @@
     <ion-card class="login-card">
       <div class="image-wrapper">
         <!-- Imagen de perfil -->
-        <img [src]="user?.photo || 'assets/img/default-profile.png'"
-             alt="Foto de perfil del usuario"
-             (error)="handleImageError($event)"
-             class="profile-image"/>
+        <img
+          [src]="user?.photo || 'assets/img/default-profile.png'"
+          alt="Foto de perfil del usuario"
+          (error)="handleImageError($event)"
+          class="profile-image"
+        />
       </div>
 
       <ion-card-content>
         <div class="ion-text-center">
           <h3>{{ user?.name || 'Nombre no disponible' }}</h3>
           <p><strong>Email:</strong> {{ user?.email }}</p>
-          <p *ngIf="userProfile?.edad"><strong>Edad:</strong> {{ userProfile.edad }}</p>
-          <p *ngIf="userProfile?.deporteFavorito"><strong>Deporte Favorito:</strong> {{ userProfile.deporteFavorito }}</p>
+          <p *ngIf="userProfile?.edad">
+            <strong>Edad:</strong> {{ userProfile.edad }}
+          </p>
+          <p *ngIf="userProfile?.deporteFavorito">
+            <strong>Deporte Favorito:</strong> {{ userProfile.deporteFavorito }}
+          </p>
         </div>
 
         <!-- Aquí puedes agregar las estadísticas más adelante -->
 
         <!-- Botón para editar el perfil -->
-        <ion-button expand="block" (click)="goToEditProfile()">
-          <ion-icon name="create-outline" slot="start"></ion-icon>
-          Editar Perfil
-        </ion-button>
+        <ion-row>
+          <ion-col size="6">
+            <ion-button expand="block" (click)="goToEditProfile()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar Perfil
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" (click)="goToCambiarContrasena()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Cambiar contraseña
+            </ion-button>
+          </ion-col>
+        </ion-row>
       </ion-card-content>
     </ion-card>
   </div>

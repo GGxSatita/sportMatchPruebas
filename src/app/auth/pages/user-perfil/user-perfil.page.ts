@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonCardContent, IonCardHeader, IonHeader, IonTitle,
         IonToolbar, IonButton, IonIcon, IonCard, IonItem, IonLabel,
-        IonSpinner, IonCardTitle, IonList, IonImg } from '@ionic/angular/standalone';
+        IonSpinner, IonCardTitle, IonList, IonImg, IonCol, IonRow } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
@@ -19,7 +19,7 @@ import { Deporte } from 'src/app/models/deporte';
   templateUrl: './user-perfil.page.html',
   styleUrls: ['./user-perfil.page.scss'],
   standalone: true,
-  imports: [IonImg, IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
+  imports: [IonRow, IonCol, IonImg, IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
     IonTitle, IonToolbar, CommonModule, ReactiveFormsModule, IonIcon, IonCard,
     IonCardHeader, IonCardContent, IonCardTitle, IonList, HeaderComponent, FooterComponent]
 })
@@ -162,5 +162,8 @@ export class UserPerfilPage implements OnInit {
 
   goToEditProfile() {
     this.router.navigate(['/editar-perfil']);
+  }
+  goToCambiarContrasena() {
+    this.router.navigate(['/cambiar-contrasena']);
   }
 }

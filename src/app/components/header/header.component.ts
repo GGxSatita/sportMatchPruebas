@@ -23,9 +23,11 @@ export class HeaderComponent implements OnInit {
   pageTitlesMap: { [key: string]: string } = {
     '/menu-principal': 'Menú Principal',
     '/user-perfil': 'Mi perfil',
-    '/settings': 'Configuraciones',
     '/eventos': 'Eventos',
     '/chat': 'Chat',
+    '/editar-perfil':'Editar perfil',
+    '/cambiar-contrasena': 'Cambiar contraseña',
+    '/settings': 'Configuraciones',
     // Agrega las rutas y nombres que necesites
   };
 

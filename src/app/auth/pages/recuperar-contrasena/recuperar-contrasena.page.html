@@ -1,0 +1,31 @@
+<ion-content class="ion-padding page-recuperar-contrasena">
+  <div class="reset-password-container">
+    <h1 class="ion-text-center">Recuperar Contraseña</h1>
+
+    <ion-card>
+      <ion-card-content>
+        <form [formGroup]="resetPasswordForm" (ngSubmit)="sendPasswordReset()">
+          <ion-item>
+            <ion-label position="floating">Correo Electrónico</ion-label>
+            <ion-input type="email" formControlName="email"></ion-input>
+          </ion-item>
+
+          <!-- Mostrar errores si el formulario es inválido -->
+          <ion-text color="danger" *ngIf="resetPasswordForm.get('email').invalid && resetPasswordForm.get('email').touched">
+            Ingresa un correo electrónico válido.
+          </ion-text>
+
+          <!-- Mostrar un spinner mientras se envía la solicitud -->
+          <ion-spinner *ngIf="cargando"></ion-spinner>
+
+          <ion-button expand="block" type="submit" color="primary" [disabled]="cargando">
+            Enviar Enlace de Recuperación
+          </ion-button>
+        </form>
+
+        <!-- Mensaje de éxito o error -->
+        <p *ngIf="mensaje">{{ mensaje }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

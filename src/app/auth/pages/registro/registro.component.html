@@ -53,6 +53,7 @@
 
           <!-- Deporte Favorito -->
           <ion-item>
+            <ion-label>Deporte Favorito</ion-label>
             <ion-select formControlName="deporteFavorito" placeholder="Selecciona tu deporte favorito">
               <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">{{ deporte.nombre }}</ion-select-option>
             </ion-select>
@@ -64,17 +65,17 @@
           <!-- Foto de Perfil -->
           <ion-item>
             <ion-label position="stacked">Foto de perfil</ion-label>
-            <input type="file" (change)="uploadFile($event)" accept="image/*">
+            <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
           </ion-item>
 
           <ion-row>
             <ion-col size="6" class="iconos-grandes">
-              <ion-button expand="block" fill="clear" class="boton-personalizado">
+              <ion-button expand="block" fill="clear" (click)="takePicture()">
                 <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
               </ion-button>
             </ion-col>
             <ion-col size="6" class="iconos-grandes">
-              <ion-button expand="block" fill="clear" class="boton-personalizado">
+              <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
                 <ion-icon slot="icon-only" name="image-outline"></ion-icon>
               </ion-button>
             </ion-col>

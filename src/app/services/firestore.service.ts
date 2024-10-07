@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Firestore, serverTimestamp , doc, collection, setDoc, updateDoc, docData} from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { ModelsAuth } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -43,12 +44,10 @@ export class FirestoreService {
    *  data Datos actualizados para el documento.
    *  Promesa que se resuelve cuando la actualización es exitosa.
    */
-  async updateDocument(path: string, data: any) {
-    // Referencia al documento
+  async updateDocument(path: string, data: Partial<ModelsAuth.UserProfile>) {
     const refDoc = doc(this.firestore, path);
-    // Agrega timestamp de actualización
-    data.updateAt = serverTimestamp();
-    return await updateDoc(refDoc, data);
+    const updateData = { ...data, updateAt: serverTimestamp() }; // Agregar updateAt dinámicamente
+    return await updateDoc(refDoc, updateData);
   }
 
   /**
