@@ -65,6 +65,7 @@ export class CambiarContrasenaPage implements OnInit {
       } catch (error) {
         this.showAlert('Error', 'Hubo un problema al cambiar la contraseña. Por favor, verifica tu contraseña actual.');
         console.error('Error al cambiar la contraseña:', error);
+        this.showAlert('Error', 'Error al cambiar la contraseña.');
       } finally {
         this.cargando = false;
       }
