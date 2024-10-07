@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonButton, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonBackButton, IonHeader, IonToolbar, IonTitle, IonButtons, IonContent, IonSpinner } from '@ionic/angular/standalone';
+import { IonButton, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonBackButton, IonHeader, IonToolbar, IonTitle, IonButtons, IonContent, IonSpinner, IonCol, IonRow } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -17,7 +17,7 @@ import { ModelsAuth } from 'src/app/models/auth.models';
   templateUrl: './editar-perfil.page.html',
   styleUrls: ['./editar-perfil.page.scss'],
   standalone: true,
-  imports: [IonSpinner,
+  imports: [IonRow, IonCol, IonSpinner,
     CommonModule,
     ReactiveFormsModule,
     IonButton,
@@ -58,7 +58,7 @@ export class EditarPerfilPage implements OnInit {
   ngOnInit() {
     this.profileForm = this.fb.group({
       newName: ['', [Validators.required, Validators.minLength(3)]],
-      nuevaEdad: ['', [Validators.required, Validators.min(1)]],
+      nuevaEdad: ['', [Validators.required, Validators.min(16), Validators.max(99)]],
       deporteFavorito: ['', Validators.required],
       newFoto: [null],
 

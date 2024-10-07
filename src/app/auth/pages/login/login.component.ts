@@ -103,4 +103,7 @@ export class LoginComponent implements OnInit {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   }
+  goToRecoverPassword() {
+    this.router.navigate(['/recuperar-contrasena']);
+  }
 }

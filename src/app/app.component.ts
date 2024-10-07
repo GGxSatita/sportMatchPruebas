@@ -20,8 +20,6 @@ export class AppComponent {
 
     // this.registrarse()
 
-
-
     //usar los iconos cuando no tengo internet
     this.ioniciconseService.loadAllIcons();
   }

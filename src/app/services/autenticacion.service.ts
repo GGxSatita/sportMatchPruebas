@@ -1,5 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut, updateProfile, fetchSignInMethodsForEmail } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
+        updateProfile, fetchSignInMethodsForEmail , EmailAuthProvider,
+        updatePassword, reauthenticateWithCredential, sendPasswordResetEmail} from '@angular/fire/auth';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -98,10 +100,33 @@ export class AutenticacionService {
       return false;
     }
   }
+  // Método para reautenticar al usuario con su contraseña actual
+  async reauthenticate(currentPassword: string) {
+    const user = this.auth.currentUser;
+    if (!user?.email) {
+      throw new Error('Usuario no autenticado.');
+    }
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    return await reauthenticateWithCredential(user, credential);
+  }
+
+  // Método para cambiar la contraseña
+  async updatePassword(newPassword: string) {
+    const user = this.auth.currentUser;
+    if (user) {
+      return await updatePassword(user, newPassword);
+    } else {
+      throw new Error('Usuario no autenticado.');
+    }
+  }
 
   // Validar formato de correo electrónico
   private validateEmail(email: string): boolean {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
+  }
+
+  resetPassword(email: string) {
+    return sendPasswordResetEmail(this.auth, email);
   }
 }

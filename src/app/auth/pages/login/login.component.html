@@ -1,8 +1,8 @@
-<ion-content class="ion-padding  page-login">
+<ion-content class="ion-padding page-login">
   <div class="login-container">
     <!-- Título de Login en la parte superior -->
     <div class="login-header">
-      <h1 class="ion-text-center">⚡ Iniciar Sesión ⚡</h1>
+      <h1 class="ion-text-center neon">⚡ Iniciar Sesión ⚡</h1>
     </div>
 
     <ion-card class="login-card">
@@ -41,6 +41,17 @@
               <ion-button expand="block" color="dark" (click)="login()">
                 <ion-icon name="log-in-outline" slot="end"></ion-icon>
                 Iniciar sesión
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="ion-margin-top ion-text-center">
+            <ion-col>
+              <!-- Botón para recuperar contraseña -->
+              <p>¿Olvidaste tu contraseña?</p>
+              <ion-button expand="block" color="warning" (click)="goToRecoverPassword()">
+                <ion-icon name="lock-closed-outline" slot="end"></ion-icon>
+                Recuperar Contraseña
               </ion-button>
             </ion-col>
           </ion-row>

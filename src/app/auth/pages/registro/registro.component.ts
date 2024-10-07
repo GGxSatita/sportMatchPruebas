@@ -3,11 +3,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from './../../../services/firestore.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { DeportesService } from 'src/app/services/deportes.service'; // Servicio de deportes
-import { Deporte } from 'src/app/models/deporte'; // Importar la interfaz Deporte
+import { DeportesService } from 'src/app/services/deportes.service';
+import { Deporte } from 'src/app/models/deporte';
 import { Models } from 'src/app/models/models';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; // Importar Capacitor Camera
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';  // Importar los elementos PWA
 
 @Component({
   selector: 'app-registro',
@@ -18,12 +21,12 @@ export class RegistroComponent implements OnInit {
   firestoreService: FirestoreService = inject(FirestoreService);
   autenticacionService: AutenticacionService = inject(AutenticacionService);
   storageService: StorageService = inject(StorageService);
-  deportesService: DeportesService = inject(DeportesService); // Inyectar servicio de deportes
+  deportesService: DeportesService = inject(DeportesService);
   alertController: AlertController = inject(AlertController);
   router: Router = inject(Router);
 
   // Lista de deportes disponibles
-  deportes: Deporte[] = []; // Cambiar a tipo Deporte[]
+  deportes: Deporte[] = [];
 
   // Formulario
   datosForm = this.fb.group({
@@ -32,23 +35,27 @@ export class RegistroComponent implements OnInit {
     name: ['', Validators.required],
     photo: ['', Validators.required],
     edad: [null, [Validators.required, Validators.min(16), Validators.max(99)]],
-    deporteFavorito: ['', Validators.required], // Deporte favorito, el ID será el valor seleccionado
+    deporteFavorito: ['', Validators.required],
   });
 
   cargando: boolean = false;
   errorMensaje: string | null = null;
   imageUrl: string = ''; // Para almacenar la URL de la foto de perfil
+  profileImage: SafeResourceUrl | null = null; // Para almacenar la imagen seleccionada
 
-  constructor(private fb: FormBuilder, private injector: Injector) {}
+  constructor(private fb: FormBuilder, private injector: Injector, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
+    // Registrar los elementos PWA cuando la aplicación cargue
+    defineCustomElements(window);
+
     // Inyectar los servicios cuando sea necesario
     this.firestoreService = this.injector.get(FirestoreService);
-  this.autenticacionService = this.injector.get(AutenticacionService);
-  this.storageService = this.injector.get(StorageService);
-  this.deportesService = this.injector.get(DeportesService);
-  this.router = this.injector.get(Router);
-  this.alertController = this.injector.get(AlertController);
+    this.autenticacionService = this.injector.get(AutenticacionService);
+    this.storageService = this.injector.get(StorageService);
+    this.deportesService = this.injector.get(DeportesService);
+    this.router = this.injector.get(Router);
+    this.alertController = this.injector.get(AlertController);
 
     // Cargar la lista de deportes desde Firestore
     this.deportesService.getDeportes().subscribe((deportes: Deporte[]) => {
@@ -117,15 +124,21 @@ export class RegistroComponent implements OnInit {
           edad: data.edad,
           id: res.user.uid,
           email: data.email,
-          deporteFavorito: deporteSeleccionado ? deporteSeleccionado.nombre : '', // Guardar el nombre del deporte
+          deporteFavorito: deporteSeleccionado ? deporteSeleccionado.nombre : '',
         };
 
         await this.firestoreService.createDocument(Models.Auth.PathUsers, datosUser, res.user.uid);
         console.log('Usuario creado con éxito');
+
+        // Limpiar los datos del formulario después del registro exitoso
+        this.datosForm.reset();
+        this.imageUrl = '';
+        this.profileImage = null;
+
         this.router.navigate(['/menu-principal']);
       } catch (error: any) {
         // Manejo de errores
-        if (error.message === 'auth/email-already-in-use') {
+        if (error instanceof Error && error.message === 'auth/email-already-in-use') {
           await this.showUserExistsAlert();
         } else {
           console.log('REGISTRARSE ERROR ->', error);
@@ -137,8 +150,7 @@ export class RegistroComponent implements OnInit {
   }
 
   // Subir la foto de perfil a Firebase Storage
-  async uploadFile(event: any) {
-    const file = event.target.files[0];
+  async uploadFile(file: File) {
     if (file) {
       const filePath = `profile_pictures/${new Date().getTime()}_${file.name}`;
       this.cargando = true;
@@ -154,6 +166,52 @@ export class RegistroComponent implements OnInit {
           this.cargando = false;
         },
       });
+    }
+  }
+
+  // Método para tomar una foto con la cámara
+  async takePicture() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+      });
+
+      // Convertir la imagen a un blob y subirla
+      const blob = await fetch(image.dataUrl).then(r => r.blob());
+      const file = new File([blob], `camera_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
+      this.uploadFile(file);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'User cancelled photos app') {
+        console.log('El usuario canceló la operación de la cámara');
+      } else {
+        console.error('Error al tomar la foto:', error);
+      }
+    }
+  }
+
+  // Método para seleccionar una imagen de la galería
+  async selectFromGallery() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Photos,
+      });
+
+      // Convertir la imagen a un blob y subirla
+      const blob = await fetch(image.dataUrl).then(r => r.blob());
+      const file = new File([blob], `gallery_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
+      this.uploadFile(file);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'User cancelled photos app') {
+        console.log('El usuario canceló la selección de la galería');
+      } else {
+        console.error('Error al seleccionar la foto:', error);
+      }
     }
   }
 }
