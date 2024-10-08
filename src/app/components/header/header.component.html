@@ -1,4 +1,4 @@
-<ion-header >
+<ion-header>
   <ion-toolbar class="gradient-header">
     <!-- Mostrar el botón de volver solo si no está en menu-principal -->
     <ion-buttons slot="start" *ngIf="currentPage !== '/menu-principal'">
@@ -10,9 +10,12 @@
       {{ pageTitle }}
     </ion-title>
     <ion-buttons slot="end">
-      <!-- Botón para cerrar sesión -->
-      <ion-button (click)="confirmLogout()" class="texto-logout">
-        <ion-icon name="log-out-outline" ></ion-icon>
+      <!-- Botón para cerrar sesión (oculto si está en la página de recuperar contraseña) -->
+      <ion-button
+        *ngIf="currentPage !== '/recuperar-contrasena'"
+        (click)="confirmLogout()"
+        class="texto-logout">
+        <ion-icon name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
