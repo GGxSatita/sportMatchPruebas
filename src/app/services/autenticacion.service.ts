@@ -83,9 +83,19 @@ export class AutenticacionService {
     return this.auth.currentUser;
   }
 
-  updateProfile(data: { displayName?: string, photoURL?: string }) {
+  // Actualizar el perfil del usuario
+  async updateProfile(data: { displayName?: string, photoURL?: string }) {
     if (this.auth.currentUser) {
-      return updateProfile(this.auth.currentUser, data);
+      await updateProfile(this.auth.currentUser, data);
+
+      // Recargar el usuario para asegurarnos de que los cambios se reflejan
+      await this.auth.currentUser.reload();  // Recargar la sesión del usuario después de la actualización
+
+      // Verifica que la URL de la foto haya sido actualizada correctamente
+      console.log('Usuario actualizado:', {
+        displayName: this.auth.currentUser.displayName,
+        photoURL: this.auth.currentUser.photoURL,
+      });
     } else {
       throw new Error('No hay usuario autenticado para actualizar el perfil');
     }

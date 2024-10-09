@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonContent, IonCardContent, IonCardHeader, IonHeader, IonTitle,
-        IonToolbar, IonButton, IonIcon, IonCard, IonItem, IonLabel,
-        IonSpinner, IonCardTitle, IonList, IonImg, IonCol, IonRow } from '@ionic/angular/standalone';
+import {
+  IonContent, IonCardContent, IonCardHeader, IonHeader, IonTitle,
+  IonToolbar, IonButton, IonIcon, IonCard, IonItem, IonLabel,
+  IonSpinner, IonCardTitle, IonList, IonImg, IonCol, IonRow
+} from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
@@ -19,9 +21,11 @@ import { Deporte } from 'src/app/models/deporte';
   templateUrl: './user-perfil.page.html',
   styleUrls: ['./user-perfil.page.scss'],
   standalone: true,
-  imports: [IonRow, IonCol, IonImg, IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
+  imports: [
+    IonRow, IonCol, IonImg, IonSpinner, IonLabel, IonItem, IonButton, IonContent, IonHeader,
     IonTitle, IonToolbar, CommonModule, ReactiveFormsModule, IonIcon, IonCard,
-    IonCardHeader, IonCardContent, IonCardTitle, IonList, HeaderComponent, FooterComponent]
+    IonCardHeader, IonCardContent, IonCardTitle, IonList, HeaderComponent, FooterComponent
+  ]
 })
 export class UserPerfilPage implements OnInit {
 
@@ -89,58 +93,71 @@ export class UserPerfilPage implements OnInit {
 
   // Método para manejar la selección de archivo
   onFileSelected(event: any) {
-    if (event.target.files.length > 0) {
-      this.profileForm.patchValue({ newFoto: event.target.files[0] });
+    const file = event.target.files?.[0]; // Verifica si el archivo existe
+    if (file) {
+      console.log('Archivo seleccionado:', file);
+      this.profileForm.patchValue({ newFoto: file });
+    } else {
+      console.error('No se ha seleccionado ningún archivo.');
     }
   }
-
   async actualizarPerfil() {
     if (this.profileForm.valid) {
-      let data: Models.Auth.UpdateProfileI = {};
       const formValues = this.profileForm.value;
 
       if (formValues.newFoto) {
-        const filePath = `users/${this.user.email}/profile_picture.jpg`;
-        this.storageService.uploadFile(filePath, formValues.newFoto).subscribe({
+        const file = formValues.newFoto as File;
+        const filePath = `users/${this.user.email}/profile_picture_${new Date().getTime()}.jpg`;
+
+        // Subir la imagen y obtener la URL
+        this.storageService.uploadFile(filePath, file).subscribe({
           next: async (downloadURL) => {
-            data.photoURL = downloadURL;
+            // Actualizar Firebase Authentication con la nueva URL
+            const data = { photoURL: downloadURL, displayName: formValues.newName };
             await this.actualizarDatosUsuario(data);
+
+            // Reflejar la nueva imagen en el perfil
+            this.user.photo = downloadURL;
           },
           error: (error) => console.error('Error al subir la imagen:', error)
         });
       } else {
+        const data = { displayName: formValues.newName };
         await this.actualizarDatosUsuario(data);
       }
     }
   }
 
-  private async actualizarDatosUsuario(data: Models.Auth.UpdateProfileI) {
-    const formValues = this.profileForm.value;
+  private async actualizarDatosUsuario(data: { displayName?: string, photoURL?: string }) {
+    if (this.user) {
+      // Actualizar perfil en Firebase Authentication
+      await this.autenticacionService.updateProfile(data);
 
-    if (formValues.newName) {
-      data.displayName = formValues.newName;
+      // Forzar la recarga de los datos del usuario en Firebase Authentication
+      const user = this.autenticacionService.getCurrentUser();
+      await user.reload();  // Verifica que los cambios se hayan reflejado
+
+      // Actualizar Firestore con la nueva información
+      const updateData = {
+        name: user.displayName,
+        photo: user.photoURL,  // Guardar la nueva URL de la imagen
+        edad: this.profileForm.value.nuevaEdad,
+        deporteFavorito: this.profileForm.value.deporteFavorito
+      };
+
+      await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
+
+      // Reflejar los cambios en la vista
+      this.user = {
+        email: user.email,
+        name: user.displayName,
+        photo: user.photoURL ? user.photoURL : 'assets/default-profile.png'
+      };
+
+      this.toggleEditMode();
     }
-
-    await this.autenticacionService.updateProfile(data);
-
-    const user = this.autenticacionService.getCurrentUser();
-    const updateData = {
-      name: user.displayName,
-      photo: user.photoURL,
-      edad: formValues.nuevaEdad,
-      deporteFavorito: formValues.deporteFavorito // Actualizar deporte favorito en Firestore
-    };
-
-    await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
-
-    this.user = {
-      email: user.email,
-      name: user.displayName,
-      photo: user.photoURL ? user.photoURL : 'assets/default-profile.png'
-    };
-
-    this.toggleEditMode();
   }
+
 
   async actualizarEdad() {
     if (this.profileForm.get('nuevaEdad').valid) {
@@ -163,6 +180,7 @@ export class UserPerfilPage implements OnInit {
   goToEditProfile() {
     this.router.navigate(['/editar-perfil']);
   }
+
   goToCambiarContrasena() {
     this.router.navigate(['/cambiar-contrasena']);
   }

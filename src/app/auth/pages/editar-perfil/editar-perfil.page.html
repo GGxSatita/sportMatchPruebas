@@ -1,11 +1,10 @@
-<app-header></app-header>
-
-<ion-content class="ion-padding">
+<ion-content class="ion-padding fondo-app">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
 
   <!-- Formulario para editar perfil -->
   <form [formGroup]="profileForm" *ngIf="!cargando">
+
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
       <ion-input formControlName="newName" placeholder="Ingresa tu nombre"></ion-input>
@@ -25,12 +24,27 @@
       </ion-select>
     </ion-item>
 
+    <!-- Vista previa de la foto de perfil -->
+
     <ion-item>
       <ion-label position="stacked">Foto de Perfil</ion-label>
-      <input type="file" (change)="onFileSelected($event)" />
+      <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
     </ion-item>
 
-    <ion-spinner *ngIf="subiendoImagen" ></ion-spinner>
+    <ion-row>
+      <ion-col size="6">
+        <ion-button expand="block" fill="clear" (click)="takePicture()">
+          <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
+          <ion-icon slot="icon-only" name="image-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ion-spinner *ngIf="subiendoImagen"></ion-spinner>
 
     <ion-button expand="block" color="primary" (click)="actualizarPerfil()">
       Guardar Cambios
@@ -40,5 +54,3 @@
     </ion-button>
   </form>
 </ion-content>
-
-<app-footer></app-footer>
