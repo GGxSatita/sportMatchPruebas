@@ -1,7 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
-        updateProfile, fetchSignInMethodsForEmail , EmailAuthProvider,
-        updatePassword, reauthenticateWithCredential, sendPasswordResetEmail} from '@angular/fire/auth';
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  authState,
+  signOut,
+  updateProfile,
+  fetchSignInMethodsForEmail,
+  EmailAuthProvider,
+  updatePassword,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail
+} from '@angular/fire/auth';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -88,17 +98,22 @@ export class AutenticacionService {
     if (this.auth.currentUser) {
       await updateProfile(this.auth.currentUser, data);
 
-      // Recargar el usuario para asegurarnos de que los cambios se reflejan
-      await this.auth.currentUser.reload();  // Recargar la sesión del usuario después de la actualización
+      // Recargar el usuario después de la actualización
+      await this.reloadUser();
 
-      // Verifica que la URL de la foto haya sido actualizada correctamente
-      console.log('Usuario actualizado:', {
-        displayName: this.auth.currentUser.displayName,
-        photoURL: this.auth.currentUser.photoURL,
-      });
+      // Devolver el usuario actualizado
+      return this.auth.currentUser;
     } else {
       throw new Error('No hay usuario autenticado para actualizar el perfil');
     }
+  }
+
+  async reloadUser() {
+    if (this.auth.currentUser) {
+      await this.auth.currentUser.reload(); // Recargar los datos del usuario
+      return this.auth.currentUser; // Retornar el usuario actualizado
+    }
+    throw new Error('No se pudo recargar el usuario');
   }
 
   async isEmailRegistered(email: string): Promise<boolean> {
@@ -110,6 +125,7 @@ export class AutenticacionService {
       return false;
     }
   }
+
   // Método para reautenticar al usuario con su contraseña actual
   async reauthenticate(currentPassword: string) {
     const user = this.auth.currentUser;
