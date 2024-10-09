@@ -1,8 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
-        updateProfile, fetchSignInMethodsForEmail , EmailAuthProvider,
-        updatePassword, reauthenticateWithCredential, sendPasswordResetEmail} from '@angular/fire/auth';
+import { FirebaseApp } from '@angular/fire/app';
+import {
+  Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
+  updateProfile, fetchSignInMethodsForEmail, EmailAuthProvider,
+  updatePassword, reauthenticateWithCredential, sendPasswordResetEmail
+} from '@angular/fire/auth';
+import { collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +18,7 @@ export class AutenticacionService {
   authState = authState(this.auth);
   router: Router = inject(Router);
 
-  constructor() {}
+  constructor(private firestore: Firestore) { }
 
   async createUser(email: string, password: string) {
     try {
@@ -44,6 +49,16 @@ export class AutenticacionService {
 
       // Intentar el login
       const user = await signInWithEmailAndPassword(this.auth, email, password);
+      const userID = user.user;
+      if (user) {
+        const userDoc = doc(this.firestore, `Users/${userID.uid}`);
+        await updateDoc(userDoc, {
+          lastLogin: new Date(),
+          isLoggedIn: true,
+          messagingToken: await getToken(getMessaging())
+        });
+      }
+
       return user;
     } catch (error: any) {
       // Capturar los códigos de error específicos de Firebase
@@ -69,9 +84,56 @@ export class AutenticacionService {
       console.error('Error al iniciar sesión:', error);
       throw error;
     }
+
   }
 
-  logout() {
+  // async sendSimpleNotification(opponentId: string) {
+  //   const opponentDoc = doc(this.firestore, `Users/${opponentId}`);
+  //   const opponent = await getDoc(opponentDoc);
+  //   if (opponent.exists()) {
+  //     const opponentData = opponent.data();
+  //     const payload = {
+  //       notification: {
+  //         title: '¡Has sido desafiado!',
+  //         body: 'Tienes un nuevo desafío pendiente.'
+  //       }
+  //     };
+  //     if (opponentData['messagingToken']) {
+  //       await fetch('https://fcm.googleapis.com/fcm/send', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': 'key=YOUR_SERVER_KEY'
+  //         },
+  //         body: JSON.stringify({
+  //           to: opponentData['messagingToken'],
+  //           ...payload
+  //         })
+  //       });
+  //     }
+  //   }
+  // }
+
+
+  async getLoggedInUsers() {
+    const currentUser = this.auth.currentUser;
+    const usersCollection = collection(this.firestore, 'Users');
+    const q = query(usersCollection, where('isLoggedIn', '==', true));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs
+      .map(doc => doc.data())
+      .filter(user => user['uid'] !== currentUser?.uid);
+  }
+
+  async logout() {
+    const user = this.auth.currentUser;
+    if (user) {
+      const userDoc = doc(this.firestore, `Users/${user.uid}`);
+      await updateDoc(userDoc, {
+        isLoggedIn: false
+      });
+    }
     signOut(this.auth).then(() => {
       this.router.navigate(['/login']);
     }).catch(error => {
@@ -129,4 +191,5 @@ export class AutenticacionService {
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }
+
 }
