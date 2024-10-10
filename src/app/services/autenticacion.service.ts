@@ -55,7 +55,7 @@ export class AutenticacionService {
         await updateDoc(userDoc, {
           lastLogin: new Date(),
           isLoggedIn: true,
-          messagingToken: await getToken(getMessaging())
+          // messagingToken: await getToken(getMessaging())
         });
       }
 
