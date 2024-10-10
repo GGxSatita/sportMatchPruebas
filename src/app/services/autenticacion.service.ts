@@ -145,12 +145,27 @@ export class AutenticacionService {
     return this.auth.currentUser;
   }
 
-  updateProfile(data: { displayName?: string, photoURL?: string }) {
+  // Actualizar el perfil del usuario
+  async updateProfile(data: { displayName?: string, photoURL?: string }) {
     if (this.auth.currentUser) {
-      return updateProfile(this.auth.currentUser, data);
+      await updateProfile(this.auth.currentUser, data);
+
+      // Recargar el usuario después de la actualización
+      await this.reloadUser();
+
+      // Devolver el usuario actualizado
+      return this.auth.currentUser;
     } else {
       throw new Error('No hay usuario autenticado para actualizar el perfil');
     }
+  }
+
+  async reloadUser() {
+    if (this.auth.currentUser) {
+      await this.auth.currentUser.reload(); // Recargar los datos del usuario
+      return this.auth.currentUser; // Retornar el usuario actualizado
+    }
+    throw new Error('No se pudo recargar el usuario');
   }
 
   async isEmailRegistered(email: string): Promise<boolean> {
@@ -162,6 +177,7 @@ export class AutenticacionService {
       return false;
     }
   }
+
   // Método para reautenticar al usuario con su contraseña actual
   async reauthenticate(currentPassword: string) {
     const user = this.auth.currentUser;

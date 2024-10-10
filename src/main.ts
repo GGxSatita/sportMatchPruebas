@@ -18,6 +18,11 @@ import { getDatabase, provideDatabase } from '@angular/fire/database'; // Import
 import { Capacitor } from '@capacitor/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { environment } from './environments/environment';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+
+//Eleemndos PWA
+defineCustomElements(window);
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -61,4 +66,5 @@ bootstrapApplication(AppComponent, {
     // Animations (opcional)
     provideAnimationsAsync(),
   ],
+
 });

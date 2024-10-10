@@ -28,6 +28,7 @@ export class HeaderComponent implements OnInit {
     '/editar-perfil':'Editar perfil',
     '/cambiar-contrasena': 'Cambiar contraseña',
     '/settings': 'Configuraciones',
+    '/recuperar-contrasena' : 'Recuperar contraseña'
     // Agrega las rutas y nombres que necesites
   };
 
