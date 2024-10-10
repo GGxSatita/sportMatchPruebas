@@ -1,12 +1,12 @@
-export interface eventos{
-  idEventosAdmin: string;
-  idSector: string;
+export interface eventosAlumnos{
+
+  idEventosAlumnos: string;
   titulo: string;
   descripcion: string;
-  creator: string;
-  status: boolean;
+  espera: boolean;
   image: string;
   fechaReservada: string;
   sectorNombre?:string;
   capacidadAlumnos?: number;
+
 }

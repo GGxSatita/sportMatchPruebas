@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonThumbnail, IonLabel, IonSpinner, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
-import { eventos } from 'src/app/models/evento';
+import { eventosAlumnos } from 'src/app/models/evento';
 import { EventoService } from 'src/app/services/evento.service';
 import { Observable } from 'rxjs';
 
@@ -35,7 +35,7 @@ import { Observable } from 'rxjs';
   ]
 })
 export class EventoListPage implements OnInit {
-  eventos$: Observable<eventos[]>;
+  eventos$: Observable<eventosAlumnos[]>;
 
   constructor(private eventosService: EventoService) {}
 
