@@ -9,6 +9,7 @@ import { PerfilComponent } from './pages/perfil/perfil.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import{ IonicModule }from'@ionic/angular'
+import { UserPerfilPage } from './pages/user-perfil/user-perfil.page';
 
 
 
@@ -17,7 +18,6 @@ import{ IonicModule }from'@ionic/angular'
   declarations: [
     LoginComponent,
     RegistroComponent,
-    PerfilComponent
   ],
   imports: [
     CommonModule,

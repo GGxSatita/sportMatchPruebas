@@ -1,0 +1,12 @@
+.gradient-toolbar {
+  --background: linear-gradient(to top, #000000, #161313); /* Degradado de gris oscuro a gris claro */
+
+  ion-icon {
+    color: yellow; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
+    font-size: 30px; /* Ajusta el tamaño del ícono si es necesario */
+  }
+
+  ion-button {
+    color: #ffffff; /* El texto del botón también será blanco */
+  }
+}
