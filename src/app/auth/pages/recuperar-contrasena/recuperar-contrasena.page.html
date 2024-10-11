@@ -1,30 +1,44 @@
 <app-header></app-header>
-<ion-content class="ion-padding page-recuperar-contrasena fondo-app" >
-  <div class="reset-password-container">
-    <ion-card>
-      <ion-card-content>
-        <form [formGroup]="resetPasswordForm" (ngSubmit)="sendPasswordReset()">
-          <ion-item>
-            <ion-label position="floating">Correo Electrónico</ion-label>
-            <ion-input type="email" formControlName="email"></ion-input>
-          </ion-item>
+<ion-content class="ion-padding page-recuperar-contrasena">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3"> <!-- Columnas centradas y ajustadas -->
+        <div class="reset-password-container">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Recuperar Contraseña</ion-card-title>
+            </ion-card-header>
 
-          <!-- Mostrar errores si el formulario es inválido -->
-          <ion-text color="danger" *ngIf="resetPasswordForm.get('email').invalid && resetPasswordForm.get('email').touched">
-            Ingresa un correo electrónico válido.
-          </ion-text>
+            <ion-card-content>
+              <form [formGroup]="resetPasswordForm" (ngSubmit)="sendPasswordReset()">
+                <!-- Correo Electrónico -->
+                <ion-item class="input-item">
+                  <ion-label position="floating">Correo Electrónico</ion-label>
+                  <ion-input type="email" formControlName="email"></ion-input>
+                </ion-item>
 
-          <!-- Mostrar un spinner mientras se envía la solicitud -->
-          <ion-spinner *ngIf="cargando"></ion-spinner>
+                <!-- Errores de validación -->
+                <ion-text color="danger" class="error-message" *ngIf="resetPasswordForm.get('email').invalid && resetPasswordForm.get('email').touched">
+                  Ingresa un correo electrónico válido.
+                </ion-text>
 
-          <ion-button expand="block" type="submit" color="primary" [disabled]="cargando">
-            Enviar Enlace de Recuperación
-          </ion-button>
-        </form>
+                <!-- Spinner de carga -->
+                <div class="loading-container" *ngIf="cargando">
+                  <ion-spinner name="dots"></ion-spinner>
+                </div>
 
-        <!-- Mensaje de éxito o error -->
-        <p *ngIf="mensaje">{{ mensaje }}</p>
-      </ion-card-content>
-    </ion-card>
-  </div>
+                <!-- Botón de enviar -->
+                <ion-button expand="block" type="submit" class="btn-enviar-enlace" [disabled]="cargando" [color]="null">
+                  Enviar Enlace de Recuperación
+                </ion-button>
+              </form>
+
+              <!-- Mensaje de éxito o error -->
+              <ion-text color="success" *ngIf="mensaje">{{ mensaje }}</ion-text>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

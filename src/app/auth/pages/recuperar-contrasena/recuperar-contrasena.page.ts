@@ -15,7 +15,12 @@ import {
   IonText,
   IonInput,
   IonSpinner,
-  AlertController // Importamos AlertController
+  IonCardHeader,
+  IonCardTitle,
+  IonGrid,
+  IonRow,
+  IonCol,
+  AlertController, // Importamos AlertController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
@@ -42,13 +47,18 @@ import { Router } from '@angular/router';
     IonButton,
     IonText,
     IonInput,
-    IonSpinner
+    IonCardHeader,
+    IonCardTitle,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonSpinner,
   ],
 })
 export class RecuperarContrasenaPage implements OnInit {
   resetPasswordForm: FormGroup;
   mensaje: string;
-  cargando: boolean = false;  // Indicador de carga
+  cargando: boolean = false; // Indicador de carga
 
   constructor(
     private fb: FormBuilder,
@@ -66,7 +76,7 @@ export class RecuperarContrasenaPage implements OnInit {
 
   async sendPasswordReset() {
     this.mensaje = '';
-    this.cargando = true;  // Activa el indicador de carga
+    this.cargando = true; // Activa el indicador de carga
 
     if (this.resetPasswordForm.invalid) {
       this.mensaje = 'Por favor, ingresa un correo electrónico válido.';
@@ -78,16 +88,17 @@ export class RecuperarContrasenaPage implements OnInit {
 
     try {
       await this.authService.resetPassword(email);
-      this.mensaje = 'Revisa tu correo electrónico para restablecer la contraseña.';
+      this.mensaje =
+        'Revisa tu correo electrónico para restablecer la contraseña.';
 
       // Muestra el alert antes de redirigir al login
       await this.presentAlert();
-
     } catch (error: any) {
       console.error('Error al enviar el enlace de recuperación:', error);
-      this.mensaje = 'Hubo un error al enviar el enlace de recuperación. Intenta nuevamente.';
+      this.mensaje =
+        'Hubo un error al enviar el enlace de recuperación. Intenta nuevamente.';
     } finally {
-      this.cargando = false;  // Desactiva el indicador de carga
+      this.cargando = false; // Desactiva el indicador de carga
     }
   }
 
@@ -95,16 +106,17 @@ export class RecuperarContrasenaPage implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Enlace Enviado',
-      message: 'El enlace de recuperación ha sido enviado a tu correo. Serás redirigido al login',
+      message:
+        'El enlace de recuperación ha sido enviado a tu correo. Serás redirigido al login',
       buttons: [
         {
           text: 'Ir al Login',
           handler: () => {
             // Redirige al usuario al login
             this.router.navigate(['/login']);
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();

@@ -4,3 +4,11 @@
 :root{
   --ion-font-family:"Montserrat",sans-serif;
 }
+:root {
+  --ion-color-primary: #ff724c;      /* Color principal (Naranja) */
+  --ion-color-secondary: #fdbf50;    /* Color secundario (Amarillo mostaza) */
+  --ion-color-light: #f4f4f8;        /* Fondo claro */
+  --ion-color-dark: #2a2c41;         /* Texto oscuro */
+  --ion-color-white: #ffffff;        /* Blanco */
+  --ion-color-tertiary: #3A7A91;     /* Azul adicional si es necesario */
+}
