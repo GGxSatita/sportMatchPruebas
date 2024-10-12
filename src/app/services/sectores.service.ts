@@ -1,67 +1,55 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Firestore, collection, addDoc, deleteDoc, updateDoc, collectionData, doc, DocumentReference } from '@angular/fire/firestore';
+import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
-import { Sectores } from '../models/sector';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { finalize } from 'rxjs/operators';
-import { map } from 'rxjs/operators';
-
+import { Sectores } from '../models/sector';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SectoresService {
-
   private collectionName = 'sectores';
 
-  constructor(
-    private firestore: AngularFirestore,
-    private storage: AngularFireStorage
-  ) { }
+  constructor(private firestore: Firestore, private storage: Storage) {}
 
-  addSector(sector: Sectores, file?: File): Promise<any> {
-    const id = this.firestore.createId();
-    sector.idSector = id;
+  addSector(sector: Sectores, file?: File): Promise<void> {
+    const sectoresRef = collection(this.firestore, this.collectionName);
 
-    if (file) {
-      const filePath = `sectores/${id}/${file.name}`;
-      const fileRef = this.storage.ref(filePath);
-      const task = this.storage.upload(filePath, file);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const docRef: DocumentReference = await addDoc(sectoresRef, { ...sector });
 
-      return new Promise((resolve, reject) => {
-        task.snapshotChanges().pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe(url => {
-              sector.image = url;
-              this.firestore.collection(this.collectionName).doc(id).set({ ...sector })
-                .then(() => resolve(null))
-                .catch(err => reject(err));
-            }, err => reject(err));
-          })
-        ).subscribe();
-      });
-    } else {
-      return this.firestore.collection(this.collectionName).doc(id).set({ ...sector });
-    }
+        if (file) {
+          const filePath = `sectores/${docRef.id}/${file.name}`;
+          const fileRef = ref(this.storage, filePath);
+          const uploadTask = await uploadBytes(fileRef, file);
+          const url = await getDownloadURL(uploadTask.ref);
+
+          // Corregir la referencia al documento
+          const sectorDoc = doc(this.firestore, `${this.collectionName}/${docRef.id}`);
+          await updateDoc(sectorDoc, { image: url });
+        }
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   deleteSector(idSector: string): Promise<void> {
-    return this.firestore.collection(this.collectionName).doc(idSector).delete();
+    const sectorDoc = doc(this.firestore, `${this.collectionName}/${idSector}`);
+    return deleteDoc(sectorDoc);
   }
 
   updateSector(idSector: string, sector: Sectores): Promise<void> {
-    return this.firestore.collection(this.collectionName).doc(idSector).update({ ...sector });
+    const sectorDoc = doc(this.firestore, `${this.collectionName}/${idSector}`);
+    return updateDoc(sectorDoc, { ...sector });
   }
 
   getSectores(): Observable<Sectores[]> {
-    return this.firestore.collection<Sectores>(this.collectionName).snapshotChanges().pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data() as Sectores;
-        const id = a.payload.doc.id;
-        return { ...data, idSector: id };
-      }))
-    );
+    const sectoresRef = collection(this.firestore, this.collectionName);
+    return collectionData(sectoresRef, { idField: 'id' }) as Observable<Sectores[]>;
   }
-
-
 }

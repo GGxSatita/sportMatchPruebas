@@ -1,216 +1,105 @@
 <app-header></app-header>
 <ion-content>
-  <div class="form-stepper-container">
-    <!-- Stepper vertical -->
-    <ion-grid>
-      <ion-row>
-        <ion-col size="2">
-          <div class="stepper">
-            <div class="step">
-              <div class="circle">1</div>
-            </div>
-            <div class="line"></div>
-            <div class="step">
-              <div class="circle">2</div>
-            </div>
-            <div class="line"></div>
-            <div class="step">
-              <div class="circle">3</div>
-            </div>
-          </div>
-        </ion-col>
+  <ion-header>
+    <ion-toolbar color="dark">
+      <ion-title>Eventos</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-        <!-- Contenedor del formulario -->
-        <ion-col size="10">
-          <form (ngSubmit)="onSubmit()" #eventForm="ngForm">
-            <!-- Paso 1: Selección de sector -->
-            <div class="step-content" [ngClass]="{'active-step': currentStep === 1}">
-              <ion-card>
-                <ion-card-header>
-                  <ion-card-title>Sectores</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <ion-item>
-                    <ion-label>Seleccione un sector</ion-label>
-                    <ion-select [(ngModel)]="newEvento.idSector" name="idSector" (ionChange)="onSectorChange($event)" required>
-                      <ion-select-option *ngFor="let sector of sectores" [value]="sector.idSector">
-                        {{ sector.nombre }}
-                      </ion-select-option>
-                    </ion-select>
-                  </ion-item>
+  <ion-grid>
+    <!-- Selección de Sector -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Seleccionar Sector</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label>Sector</ion-label>
+              <ion-select (ionChange)="onSectorChange($event)">
+                <ion-select-option *ngFor="let sector of sectores" [value]="sector.idSector">
+                  {{ sector.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-                  <ion-item>
-                    <ion-label>Seleccione una fecha</ion-label>
-                    <ion-datetime
-                      [(ngModel)]="selectedDate"
-                      name="fecha"
-                      [min]="minDate"
-                      [max]="maxDate"
-                      placeholder="Seleccionar fecha"
-                      (ionChange)="onDateChange()"
-                      required
-                    ></ion-datetime>
-                  </ion-item>
+            <ion-item *ngIf="selectedSectorImage">
+              <ion-thumbnail>
+                <img [src]="selectedSectorImage" alt="Imagen del sector" />
+              </ion-thumbnail>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
 
-                  <div *ngIf="horariosDisponibles.length > 0">
-                    <ion-list>
-                      <ion-item *ngFor="let horario of horariosDisponibles" [disabled]="!horario.disponible">
-                        <ion-label>{{ horario.inicio }} - {{ horario.fin }}</ion-label>
-                        <ion-button
-                          fill="outline"
-                          [ngClass]="{'selected': horario === selectedHorario}"
-                          (click)="selectHorario(horario)"
-                        >
-                          Seleccionar
-                        </ion-button>
-                      </ion-item>
-                    </ion-list>
-                  </div>
+    <!-- Selección de Fecha -->
+    <ion-row *ngIf="selectedSectorId">
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Seleccionar Fecha</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-datetime
+              display-format="DD MMM YYYY"
+              (ionChange)="onDateChange()"
+              [(ngModel)]="selectedDate"
+              [min]="minDate"
+              [max]="maxDate"
+              selection-mode="single"
+            ></ion-datetime>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
 
-                  <div *ngIf="selectedSectorImage" class="sector-image-container">
-                    <img [src]="selectedSectorImage" alt="Imagen del sector" />
-                  </div>
-                </ion-card-content>
-              </ion-card>
-            </div>
-
-            <!-- Paso 2: Título, Descripción, Creador, Estado -->
-            <div class="step-content" [ngClass]="{'active-step': currentStep === 2}">
-              <ion-card>
-                <ion-card-header>
-                  <ion-card-title>Planificar evento</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <ion-item>
-                    <ion-label>Título</ion-label>
-                    <ion-input [(ngModel)]="newEvento.titulo" name="titulo" placeholder="Título" required></ion-input>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>Descripción</ion-label>
-                    <ion-textarea [(ngModel)]="newEvento.descripcion" name="descripcion" placeholder="Descripción" required></ion-textarea>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>Organizador</ion-label>
-                    <ion-input [(ngModel)]="newEvento.creator" name="creator" placeholder="Organizador" required></ion-input>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>Visible</ion-label>
-                    <ion-toggle [(ngModel)]="newEvento.status" name="status"></ion-toggle>
-                  </ion-item>
-                </ion-card-content>
-              </ion-card>
-            </div>
-
-            <!-- Paso 3: Visualización del Evento -->
-            <div class="step-content" [ngClass]="{'active-step': currentStep === 3}">
-              <ion-card>
-                <ion-card-header>
-                  <ion-card-title>Visualización de evento</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <div *ngIf="selectedSectorImage" class="sector-image-preview">
-                    <img [src]="selectedSectorImage" alt="Imagen del sector seleccionado" />
-                  </div>
-
-                  <ion-list>
-                    <ion-item>
-                      <ion-label><strong>Sector:</strong> {{ getSectorNombre(newEvento.idSector) }}</ion-label>
-                    </ion-item>
-                    <ion-item>
-                      <ion-label><strong>Horario:</strong> {{ selectedHorario ? (selectedHorario.inicio + ' - ' + selectedHorario.fin) : 'No seleccionado' }}</ion-label>
-                    </ion-item>
-                  </ion-list>
-
-                  <ion-item>
-                    <ion-label><strong>Descripción:</strong></ion-label>
-                    <ion-textarea disabled>{{ newEvento.descripcion }}</ion-textarea>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label><strong>Organizador:</strong> {{ newEvento.creator }}</ion-label>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label><strong>Visible:</strong> {{ newEvento.status ? 'Sí' : 'No' }}</ion-label>
-                  </ion-item>
-                </ion-card-content>
-              </ion-card>
-            </div>
-
-            <!-- Botones de navegación -->
-            <div class="step-navigation">
-              <ion-button (click)="previousStep()" [disabled]="currentStep === 1">Anterior</ion-button>
-              <ion-button (click)="nextStep()" [disabled]="!canProceedToNextStep()">Siguiente</ion-button>
-              <ion-button type="submit" [disabled]="eventForm.invalid || currentStep !== 3">Crear Evento</ion-button>
-            </div>
-          </form>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
-
-  <br><br>
-
-  <ion-list>
-    <ion-item-divider>
-      <ion-label>Lista de eventos</ion-label>
-    </ion-item-divider>
-    <ion-card *ngFor="let evento of eventos">
-      <ion-card-content>
-        <ion-thumbnail>
-          <img [src]="evento.image" alt="{{ evento.titulo }}" />
-        </ion-thumbnail>
-        <ion-card-title>{{ evento.titulo }}</ion-card-title>
-        <ion-button expand="full" (click)="showDetails(evento)">Más información</ion-button>
-      </ion-card-content>
-    </ion-card>
-  </ion-list>
-
-  <!-- Pop-up de detalles del evento -->
-  <ion-modal *ngIf="selectedEvento">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ selectedEvento?.titulo }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeDetails()">Cerrar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-      <div class="details-container">
-        <ion-img [src]="selectedEvento?.image || 'placeholder-image-url.jpg'" alt="{{ selectedEvento?.titulo }}"></ion-img>
+    <!-- Lista de Horarios Disponibles -->
+    <ion-row *ngIf="horariosDisponibles.length > 0">
+      <ion-col size="12">
         <ion-list>
-          <ion-item>
-            <ion-label><strong>Creador:</strong> {{ selectedEvento?.creator }}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label><strong>Sector:</strong> {{ selectedEvento?.sectorNombre }}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label><strong>Fecha Reservada:</strong> {{ selectedEvento?.fechaReservada }}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label><strong>Descripción:</strong> {{ selectedEvento?.descripcion }}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label><strong>Visible:</strong> {{ selectedEvento?.status ? 'Sí' : 'No' }}</ion-label>
+          <ion-item-divider>Horarios Disponibles</ion-item-divider>
+          <ion-item *ngFor="let horario of horariosDisponibles">
+            <ion-label>{{ horario.inicio }} - {{ horario.fin }}</ion-label>
+            <ion-button
+              color="primary"
+              (click)="selectHorario(horario)"
+              [disabled]="!horario.disponible"
+            >
+              {{ horario.disponible ? 'Seleccionar' : 'Ocupado' }}
+            </ion-button>
           </ion-item>
         </ion-list>
+      </ion-col>
+    </ion-row>
 
-        <!-- Botones de acción en el pop-up -->
-        <ion-button expand="full" (click)="editEvent(selectedEvento)">Editar</ion-button>
-        <ion-button expand="full" color="danger" *ngIf="selectedEvento.idSector || selectedEvento.fechaReservada" (click)="removeReservation(selectedEvento)">Eliminar Reserva</ion-button>
-      </div>
-    </ion-content>
-  </ion-modal>
+    <!-- Botón para Crear Evento -->
+    <ion-row *ngIf="selectedHorario">
+      <ion-col size="12">
+        <ion-button expand="block" (click)="onSubmit()">Crear Evento</ion-button>
+      </ion-col>
+    </ion-row>
+
+    <!-- Lista de Eventos Existentes -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-list>
+          <ion-item-divider>Lista de Eventos</ion-item-divider>
+          <ion-item *ngFor="let evento of eventos">
+            <ion-label>
+              <h2>{{ evento.titulo }}</h2>
+              <p>{{ evento.descripcion }}</p>
+              <p>Sector: {{ evento.sectorNombre }}</p>
+              <p>Fecha: {{ evento.fechaReservada }}</p>
+            </ion-label>
+            <ion-button color="danger" (click)="removeReservation(evento)">
+              Eliminar
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
-
 <app-footer></app-footer>
-
-
-
-

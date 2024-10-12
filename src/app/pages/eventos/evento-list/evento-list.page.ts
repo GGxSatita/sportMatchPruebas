@@ -79,21 +79,16 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   ]
 })
 export class EventoListPage implements OnInit {
-  selectedEvento: any = null;
+
   sectores: Sectores[] = [];
   horariosDisponibles: Horario[] = [];
-  newEvento: eventos = new eventos('', '', '', '', false, '', '', '', 0);
-  selectedHorario: Horario | null = null;
   selectedDate: string | null = null;
   selectedSectorId: string | null = null;
-  availableDays: Set<string> = new Set();
+  selectedSectorImage: string | null = null;
+  selectedHorario: Horario | null = null;
+  eventos: eventos[] = [];
   minDate: string;
   maxDate: string;
-  currentStep: number = 1;
-  eventos: eventos[] = [];
-  isEditing: boolean = false;
-  eventoEditando: eventos | null = null;
-  selectedSectorImage: string | null = null;
 
   constructor(
     private eventosService: EventosService,
@@ -101,167 +96,102 @@ export class EventoListPage implements OnInit {
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
-    const nextYear = new Date(today.setFullYear(today.getFullYear() + 1));
-    this.maxDate = nextYear.toISOString().split('T')[0];
+    this.maxDate = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
   }
 
   ngOnInit(): void {
     this.loadSectores();
-    this.sectoresService.getSectores().subscribe(sectores => {
-      this.sectores = sectores;
-    });
-    this.loadEvento();
-  }
-
-  loadEvento(): void {
-    this.eventosService.getEventos().subscribe(eventos => {
-      this.eventos = eventos;
-      this.populateAvailableDays();
-    });
-  }
-
-  nextStep(): void {
-    if (this.canProceedToNextStep() && this.currentStep < 3) {
-      this.currentStep++;
-    }
-  }
-
-  previousStep(): void {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
+    this.loadEventos();
   }
 
   loadSectores(): void {
-    this.sectoresService.getSectores().subscribe(sectores => {
+    this.sectoresService.getSectores().subscribe((sectores) => {
       this.sectores = sectores;
-      this.populateAvailableDays();
     });
   }
 
-  populateAvailableDays(): void {
-    this.sectores.forEach(sector => {
-      sector.horarios.forEach(horario => {
-        if (horario.disponible) {
-          const dayWithAvailableHours = horario.fechasReservadas || [];
-          dayWithAvailableHours.forEach(fecha => {
-            this.availableDays.add(fecha);
-          });
-        }
-      });
+  loadEventos(): void {
+    this.eventosService.getEventos().subscribe((eventos) => {
+      this.eventos = eventos;
     });
   }
 
   onSectorChange(event: any): void {
-    this.selectedSectorId = event.target.value;
-    this.filterHorarios();
+    this.selectedSectorId = event.detail.value;
     const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
-    if (selectedSector) {
-      this.newEvento.sectorNombre = selectedSector.nombre;
-      this.selectedSectorImage = selectedSector.image || null;
-      this.newEvento.image = selectedSector.image || '';
-    }
-  }
 
-  onDateChange(): void {
-    if (this.selectedDate) {
-      const formattedDate = new Date(this.selectedDate + 'T00:00:00');
-      this.selectedDate = formattedDate.toISOString().split('T')[0];
+    if (selectedSector) {
+      this.selectedSectorImage = selectedSector.image || null;
       this.filterHorarios();
     }
   }
 
+  onDateChange(): void {
+    this.filterHorarios();
+  }
+
+  normalizeDayName(day: string): string {
+    return day.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+
+
+
   filterHorarios(): void {
     if (this.selectedSectorId && this.selectedDate) {
       const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
-      const dayOfWeek = new Date(this.selectedDate).getDay();
+      const dayOfWeek = this.getDayOfWeek(this.selectedDate);
+
       if (selectedSector) {
-        this.horariosDisponibles = selectedSector.horarios.filter(horario => {
-          const isSameDay = new Date(horario.dia).getDay() === dayOfWeek;
-          const isDateReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
-          return isSameDay && !isDateReserved;
-        });
+        this.horariosDisponibles = selectedSector.horarios.map(horario => {
+          const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
+          const isReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
+          return { ...horario, disponible: isSameDayOfWeek && !isReserved };
+        }).filter(horario => horario.dia === dayOfWeek);
       }
     }
   }
+
+  getDayOfWeek(dateString: string): string {
+    const date = new Date(dateString);
+    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    return this.normalizeDayName(days[date.getDay()]);
+  }
+
 
   selectHorario(horario: Horario): void {
     this.selectedHorario = horario;
   }
 
-  getSectorNombre(idSector: string): string {
-    const sector = this.sectores.find(s => s.idSector === idSector);
-    return sector ? sector.nombre : 'Desconocido';
-  }
-
   onSubmit(): void {
-    if (this.selectedHorario && this.selectedDate) {
-      const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
-      if (selectedSector) {
-        this.newEvento.sectorNombre = selectedSector.nombre;
-        this.newEvento.fechaReservada = this.selectedDate;
-        this.newEvento.descripcion += `\nHorario: ${this.selectedHorario?.inicio} - ${this.selectedHorario?.fin}`;
-        this.eventosService.createEvento(this.newEvento).then(() => {
-          alert('Evento creado exitosamente');
-          this.loadEvento();
-          this.resetForm();
-        });
-      }
+    if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
+      const nuevoEvento: eventos = {
+        idEventosAlumnos: '',
+        idSector: this.selectedSectorId,
+        titulo: 'Nuevo Evento',
+        descripcion: `Evento en ${this.selectedHorario.dia} de ${this.selectedHorario.inicio} a ${this.selectedHorario.fin}`,
+        espera: false,
+        image: this.selectedSectorImage || '',
+        fechaReservada: this.selectedDate,
+        sectorNombre: this.getSectorNombre(this.selectedSectorId),
+        capacidadAlumnos: 0
+      };
+
+      this.eventosService.createEvento(nuevoEvento).then(() => {
+        alert('Evento creado exitosamente.');
+        this.loadEventos();
+      });
     }
   }
 
-  showDetails(evento: any): void {
-    this.selectedEvento = evento;
+  removeReservation(evento: eventos): void {
+    this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
+      alert('Reserva eliminada.');
+      this.loadEventos();
+    });
   }
 
-  closeDetails(): void {
-    this.selectedEvento = null;
-  }
-
-  editEvent(evento: eventos): void {
-    this.isEditing = true;
-    this.eventoEditando = evento;
-    this.newEvento = { ...evento };
-    this.selectedSectorId = evento.idSector;
-    this.selectedDate = evento.fechaReservada;
-    this.filterHorarios();
-    this.selectedHorario = this.horariosDisponibles.find(
-      horario => horario.fechasReservadas?.includes(evento.fechaReservada)
-    ) || null;
-  }
-
-  removeReservation(evento: any): void {
-    const selectedSector = this.sectores.find(sector => sector.nombre === evento.sectorNombre);
-    if (selectedSector && evento.fechaReservada) {
-      const horario = selectedSector.horarios.find(h => h.fechasReservadas?.includes(evento.fechaReservada));
-      if (horario && horario.fechasReservadas) {
-        const index = horario.fechasReservadas.indexOf(evento.fechaReservada);
-        if (index !== -1) {
-          horario.fechasReservadas.splice(index, 1);
-          horario.disponible = true;
-          this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
-            alert('Reserva y evento eliminados exitosamente.');
-            this.loadEvento();
-          });
-        }
-      }
-    }
-  }
-
-  resetForm(): void {
-    this.newEvento = new eventos('', '', '', '', false, '', '', '', 0);
-    this.selectedHorario = null;
-    this.horariosDisponibles = [];
-    this.selectedDate = null;
-    this.selectedSectorId = null;
-    this.selectedSectorImage = null;
-  }
-
-  canProceedToNextStep(): boolean {
-    return this.currentStep === 1
-      ? !!this.newEvento.sectorNombre && !!this.selectedDate && !!this.selectedHorario
-      : this.currentStep === 2
-      ? !!this.newEvento.titulo && !!this.newEvento.descripcion && !!this.newEvento.creator
-      : true;
+  getSectorNombre(sectorId: string): string {
+    const sector = this.sectores.find(s => s.idSector === sectorId);
+    return sector ? sector.nombre : 'Sector no encontrado';
   }
 }
