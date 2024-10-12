@@ -1,13 +1,29 @@
-.gradient-header {
-  --background: linear-gradient(to top, #000000, #000000);
-}
-.titulo {
-  color: #ffffff; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
-  font-size: 20px; /* Ajusta el tamaño del ícono si es necesario */
-}
-ion-icon{
-  color: white;
-}
-.texto-logout{
-  color: white;
+.solid-header {
+  background-color:  #2a2c41; // Fondo oscuro para mejorar legibilidad
+  color: var(--ion-color-white); // Texto e íconos en blanco para alto contraste
+
+  ion-button {
+    color: var(--ion-color-white); // Los botones serán blancos
+  }
+
+  ion-title {
+    color: var(--ion-color-white); // Título en blanco
+    font-weight: bold;
+    font-size: 1.8rem; // Tamaño por defecto del título
+  }
+
+  ion-icon {
+    font-size: 1.5rem; // Tamaño de los iconos
+  }
+
+  // Ajustes para pantallas pequeñas
+  @media (max-width: 768px) {
+    ion-title {
+      font-size: 1.4rem; // Ajustar tamaño del título en pantallas pequeñas
+    }
+
+    ion-icon {
+      font-size: 1.2rem; // Reducir tamaño de iconos en pantallas pequeñas
+    }
+  }
 }

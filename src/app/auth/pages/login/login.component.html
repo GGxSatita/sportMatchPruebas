@@ -1,13 +1,10 @@
 <ion-content class="ion-padding page-login">
   <div class="login-container">
     <!-- Título de Login en la parte superior -->
-
-
     <ion-card class="login-card">
-      <!-- Imagen dentro de un div en el card -->
       <div class="image-container">
         <div class="login-header">
-          <h1 class="ion-text-center neon">⚡ Iniciar Sesión ⚡</h1>
+          <h1 class="ion-text-center">Iniciar Sesión</h1>
         </div>
       </div>
 
@@ -19,50 +16,66 @@
             <p><strong>Nombre:</strong> {{ user.name }}</p>
           </div>
           <div class="ion-margin-top">
-            <ion-button expand="block" color="dark">Salir</ion-button>
+            <ion-button expand="block" class="btn-salir">Salir</ion-button>
           </div>
         </div>
 
         <ng-template #loginForm>
-          <ion-item>
+          <!-- Campos de Correo y Contraseña -->
+          <ion-item class="input-item">
             <ion-label position="floating">Correo electrónico</ion-label>
-            <ion-input type="text" [(ngModel)]="form.email" class="input-email-password"></ion-input>
+            <ion-input type="text" [(ngModel)]="form.email"></ion-input>
           </ion-item>
 
-          <ion-item>
+          <!-- Mensaje de error para el email -->
+          <ion-text color="danger" class="error-message" *ngIf="form.email == null || form.email == ''">
+            Ingresa un correo electrónico válido.
+          </ion-text>
+
+          <ion-item class="input-item">
             <ion-label position="floating">Contraseña</ion-label>
             <ion-input type="password" [(ngModel)]="form.password"></ion-input>
           </ion-item>
 
+          <!-- Mensaje de error para la contraseña -->
+          <ion-text color="danger" class="error-message" *ngIf="form.password == null || form.password == ''">
+            Ingresa una contraseña válida.
+          </ion-text>
+
+          <!-- Botón Iniciar Sesión -->
           <ion-row class="ion-margin-top">
             <ion-col>
-              <ion-button expand="block" color="dark" (click)="login()">
+              <ion-button expand="block" class="btn-iniciar-sesion" (click)="login()">
                 <ion-icon name="log-in-outline" slot="end"></ion-icon>
                 Iniciar sesión
               </ion-button>
             </ion-col>
           </ion-row>
 
+          <!-- Recuperar Contraseña -->
           <ion-row class="ion-margin-top ion-text-center">
             <ion-col>
-              <!-- Botón para recuperar contraseña -->
               <p>¿Olvidaste tu contraseña?</p>
-              <ion-button expand="block" color="warning" (click)="goToRecoverPassword()">
+              <ion-button expand="block" class="btn-recuperar" (click)="goToRecoverPassword()">
                 <ion-icon name="lock-closed-outline" slot="end"></ion-icon>
                 Recuperar Contraseña
               </ion-button>
             </ion-col>
           </ion-row>
 
+          <!-- Registrarse -->
           <ion-row class="ion-margin-top ion-text-center">
             <ion-col>
               <p>¿No tienes una cuenta?</p>
-              <ion-button expand="block" color="dark" [routerLink]="['/registro']">
+              <ion-button expand="block" class="btn-registrarse" [routerLink]="['/registro']" color="primary">
                 <ion-icon name="person-add-outline" slot="end"></ion-icon>
                 Registrarse
               </ion-button>
             </ion-col>
           </ion-row>
+
+          <!-- Mensaje de éxito al iniciar sesión -->
+          <!-- <ion-text color="success" *ngIf="loginSuccessMessage">{{ loginSuccessMessage }}</ion-text> -->
         </ng-template>
       </ion-card-content>
     </ion-card>

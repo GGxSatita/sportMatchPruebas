@@ -2,104 +2,105 @@
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
-        <div class="registro-header">
-          <h1 class="ion-text-center">⚡ Registro de usuario ⚡</h1>
-        </div>
-      </ion-col>
-    </ion-row>
+        <!-- Todo el contenido del formulario dentro de una tarjeta -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title class="ion-text-center">Registro de usuario</ion-card-title>
+          </ion-card-header>
 
-    <ion-row>
-      <ion-col size="12" size-md="8" offset-md="2" size-lg="6" offset-lg="3">
-        <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
+          <ion-card-content>
+            <form [formGroup]="datosForm" (ngSubmit)="registrarse()">
 
-          <!-- Mensaje de error -->
-          <ion-text color="danger" *ngIf="errorMensaje">{{ errorMensaje }}</ion-text>
+              <!-- Mensaje de error -->
+              <ion-text color="danger" *ngIf="errorMensaje">{{ errorMensaje }}</ion-text>
 
-          <!-- Email -->
-          <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" formControlName="email"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required') && datosForm.controls['email'].touched">
-              Este campo es <strong>requerido</strong>
-            </ion-note>
-          </ion-item>
+              <!-- Email -->
+              <ion-item>
+                <ion-label position="floating">Email</ion-label>
+                <ion-input type="email" formControlName="email"></ion-input>
+                <ion-note class="error-message" *ngIf="datosForm.controls['email'].hasError('required') && datosForm.controls['email'].touched">
+                  Este campo es <strong>requerido</strong>
+                </ion-note>
+              </ion-item>
 
-          <!-- Password -->
-          <ion-item>
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input type="password" formControlName="password"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required') && datosForm.controls['password'].touched">
-              Este campo es <strong>requerido</strong>
-            </ion-note>
-          </ion-item>
+              <!-- Password -->
+              <ion-item>
+                <ion-label position="floating">Contraseña</ion-label>
+                <ion-input type="password" formControlName="password"></ion-input>
+                <ion-note class="error-message" *ngIf="datosForm.controls['password'].hasError('required') && datosForm.controls['password'].touched">
+                  Este campo es <strong>requerido</strong>
+                </ion-note>
+              </ion-item>
 
-          <!-- Nombre -->
-          <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" formControlName="name"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['name'].hasError('required') && datosForm.controls['name'].touched">
-              Este campo es <strong>requerido</strong>
-            </ion-note>
-          </ion-item>
+              <!-- Nombre -->
+              <ion-item>
+                <ion-label position="floating">Nombre</ion-label>
+                <ion-input type="text" formControlName="name"></ion-input>
+                <ion-note class="error-message" *ngIf="datosForm.controls['name'].hasError('required') && datosForm.controls['name'].touched">
+                  Este campo es <strong>requerido</strong>
+                </ion-note>
+              </ion-item>
 
-          <!-- Edad -->
-          <ion-item>
-            <ion-label position="floating">Edad</ion-label>
-            <ion-input type="number" formControlName="edad"></ion-input>
-            <ion-note class="error-message" *ngIf="datosForm.controls['edad'].hasError('required') && datosForm.controls['edad'].touched">
-              Este campo es <strong>requerido</strong>
-            </ion-note>
-          </ion-item>
+              <!-- Edad -->
+              <ion-item>
+                <ion-label position="floating">Edad</ion-label>
+                <ion-input type="number" formControlName="edad"></ion-input>
+                <ion-note class="error-message" *ngIf="datosForm.controls['edad'].hasError('required') && datosForm.controls['edad'].touched">
+                  Este campo es <strong>requerido</strong>
+                </ion-note>
+              </ion-item>
 
-          <!-- Deporte Favorito -->
-          <ion-item>
-            <ion-label>Deporte Favorito</ion-label>
-            <ion-select formControlName="deporteFavorito" placeholder="Selecciona tu deporte favorito">
-              <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">{{ deporte.nombre }}</ion-select-option>
-            </ion-select>
-            <ion-note class="error-message" *ngIf="datosForm.controls['deporteFavorito'].hasError('required') && datosForm.controls['deporteFavorito'].touched">
-              Selecciona un <strong>deporte favorito</strong>
-            </ion-note>
-          </ion-item>
+              <!-- Deporte Favorito -->
+              <ion-item>
+                <ion-label>Deporte Favorito</ion-label>
+                <ion-select formControlName="deporteFavorito" placeholder="Selecciona tu deporte favorito">
+                  <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">{{ deporte.nombre }}</ion-select-option>
+                </ion-select>
+                <ion-note class="error-message" *ngIf="datosForm.controls['deporteFavorito'].hasError('required') && datosForm.controls['deporteFavorito'].touched">
+                  Selecciona un <strong>deporte favorito</strong>
+                </ion-note>
+              </ion-item>
 
-          <!-- Foto de Perfil -->
-          <ion-item>
-            <ion-label position="stacked">Foto de perfil</ion-label>
-            <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
-          </ion-item>
+              <!-- Foto de Perfil -->
+              <ion-item>
+                <ion-label position="stacked">Foto de perfil</ion-label>
+                <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
+              </ion-item>
 
-          <ion-row>
-            <ion-col size="6" class="iconos-grandes">
-              <ion-button expand="block" fill="clear" (click)="takePicture()">
-                <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-            <ion-col size="6" class="iconos-grandes">
-              <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
-                <ion-icon slot="icon-only" name="image-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+              <ion-row>
+                <ion-col size="6" class="iconos-grandes">
+                  <ion-button expand="block" fill="clear" (click)="takePicture()">
+                    <ion-icon slot="icon-only" name="camera-outline" color="dark"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col size="6" class="iconos-grandes">
+                  <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
+                    <ion-icon slot="icon-only" name="image-outline" color="dark"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
 
-          <!-- Botón de Registro -->
-          <ion-row>
-            <ion-col size="12" class="ion-padding">
-              <ion-button expand="block" type="submit" [disabled]="cargando" color="dark">
-                <strong>Registrarse</strong>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+              <!-- Botón de Registro -->
+              <ion-row>
+                <ion-col size="12" class="ion-padding">
+                  <ion-button expand="block" type="submit" [disabled]="cargando" color="primary">
+                    <strong>Registrarse</strong>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
 
-          <!-- Ya tienes cuenta -->
-          <ion-row>
-            <ion-col size="12" class="ion-padding ion-text-center">
-              <p>¿Ya tienes un usuario?</p>
-              <ion-button expand="block" [routerLink]="['/login']" color="dark">
-                Ingresar
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </form>
+              <!-- Ya tienes cuenta -->
+              <ion-row>
+                <ion-col size="12" class="ion-padding ion-text-center">
+                  <p>¿Ya tienes un usuario?</p>
+                  <ion-button expand="block" [routerLink]="['/login']" color="primary">
+                    Ingresar
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </form>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>

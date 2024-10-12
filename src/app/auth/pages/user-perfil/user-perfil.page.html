@@ -1,4 +1,5 @@
 <app-header></app-header>
+
 <ion-content class="ion-padding login-container fondo-app">
   <!-- Spinner de carga mientras se obtienen los datos -->
   <ion-spinner *ngIf="cargando"></ion-spinner>
@@ -48,14 +49,14 @@
         <ion-row>
           <ion-col size="6">
             <ion-button expand="block" color="primary" (click)="goToEditProfile()">
-              <ion-icon name="create-outline" slot="start"></ion-icon>
-              Editar Perfil
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              <span>Editar Perfil</span>
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button expand="block" color="secondary" (click)="goToCambiarContrasena()">
-              <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-              Cambiar contraseña
+            <ion-button expand="block" color="secondary" class="cambiar-contrasena" (click)="goToCambiarContrasena()">
+              <ion-icon name="lock-closed-outline" slot="icon-only"></ion-icon>
+              <span>Cambiar Contraseña</span>
             </ion-button>
           </ion-col>
         </ion-row>
@@ -63,4 +64,5 @@
     </ion-card>
   </div>
 </ion-content>
+
 <app-footer></app-footer>

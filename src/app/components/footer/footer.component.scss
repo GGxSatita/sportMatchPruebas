@@ -1,12 +1,23 @@
 .gradient-toolbar {
-  --background: linear-gradient(to top, #000000, #161313); /* Degradado de gris oscuro a gris claro */
-
-  ion-icon {
-    color: yellow; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
-    font-size: 30px; /* Ajusta el tamaño del ícono si es necesario */
-  }
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary)); // Fondo gradiente
+  color: var(--ion-color-white);
 
   ion-button {
-    color: #ffffff; /* El texto del botón también será blanco */
+    color: var(--ion-color-white);
+  }
+
+  ion-icon {
+    font-size: 1.5rem; // Tamaño predeterminado del icono
+  }
+
+  // Ajustes para pantallas pequeñas
+  @media (max-width: 768px) {
+    ion-icon {
+      font-size: 1.3rem; // Ajuste de tamaño para pantallas más pequeñas
+    }
+
+    ion-button {
+      padding: 5px; // Ajuste de padding en botones
+    }
   }
 }
