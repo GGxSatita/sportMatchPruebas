@@ -22,7 +22,7 @@
   margin-bottom: 20px;
   font-size: 28px;
   font-weight: bold;
-  color: #FF724C; /* Naranja personalizado */
+  color: #FF724C;
 }
 
 .login-card {
@@ -33,7 +33,7 @@
   backdrop-filter: blur(10px);
   border: 2px solid #2A2C41;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   transition: transform 0.3s ease;
 
   &:hover {
@@ -63,12 +63,12 @@
   justify-content: center;
   margin: 10px 0;
   font-size: 18px;
-  color: #F4F4F8; /* Texto claro */
+  color: #2a2c41;
   font-weight: 500;
 
   ion-icon {
     margin-right: 10px;
-    color: #FF724C; /* Íconos naranjas */
+    color: #FF724C;
     font-size: 20px;
   }
 }
@@ -79,19 +79,18 @@ ion-button {
   justify-content: center;
   align-items: center;
   text-align: center;
-  white-space: normal;
   font-size: 0.85rem;
   padding: 12px 15px;
   border-radius: 10px;
   width: 100%;
-  background: linear-gradient(135deg, #FF724C, #FDBF50); /* Gradiente naranja */
-  color: #F4F4F8; /* Texto claro */
+  background: linear-gradient(135deg, #FF724C, #FDBF50);
+  color: #F4F4F8;
   box-shadow: 0 4px 10px rgba(255, 114, 76, 0.4);
   transition: transform 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    background: #FDBF50; /* Fondo amarillo en hover */
+    background: #FDBF50;
   }
 
   ion-icon {
@@ -105,20 +104,53 @@ ion-button {
   }
 }
 
-h3 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #FF724C;
-  margin: 0;
+.boton-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #FF724C, #FDBF50);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 85%;
+  max-width: 350px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(255, 114, 76, 0.3);
+  }
+
+  ion-card-content {
+    color: #F4F4F8;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  ion-icon {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 4px 6px;
+
+    ion-icon {
+      font-size: 1.1rem;
+    }
+
+    ion-card-content {
+      font-size: 0.65rem;
+      gap: 1px;
+    }
+  }
 }
 
-.user-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2A2C41;
-}
-
-/* Responsividad */
 @media (max-width: 768px) {
   .login-card {
     padding: 20px;
@@ -160,7 +192,6 @@ h3 {
   margin: 5px 0;
 }
 
-/* Estilo para pantallas pequeñas */
 @media (max-width: 480px) {
   ion-button {
     flex-direction: row;
@@ -181,47 +212,4 @@ h3 {
   align-items: center;
   text-align: center;
   font-size: 0.85rem;
-}
-.boton-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 6px 8px; /* Reducción de padding */
-  border-radius: 6px; /* Bordes más pequeños */
-  background: linear-gradient(135deg, #FF724C, #FDBF50); /* Gradiente Naranja */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra aún más sutil */
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 2px 4px rgba(255, 114, 76, 0.3); /* Sombra ligera en hover */
-  }
-
-  ion-card-content {
-    color: #F4F4F8;
-    text-align: center;
-    font-weight: 500;
-    font-size: 0.7rem; /* Texto más compacto */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px; /* Espacio entre ícono y texto */
-  }
-
-  ion-icon {
-    font-size: 1.3rem; /* Ícono más pequeño */
-    margin-bottom: 2px; /* Margen reducido */
-  }
-
-  /* Ajustes para pantallas pequeñas */
-  @media (max-width: 480px) {
-    padding: 4px 6px;
-    ion-icon {
-      font-size: 1.1rem;
-    }
-    ion-card-content {
-      font-size: 0.65rem;
-      gap: 1px; /* Menor espacio entre ícono y texto */
-    }
-  }
 }
