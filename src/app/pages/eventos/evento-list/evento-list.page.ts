@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { eventos } from 'src/app/models/evento';
 import { EventosService } from 'src/app/services/evento.service';
 import { SectoresService } from 'src/app/services/sectores.service';
@@ -43,7 +43,6 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   templateUrl: './evento-list.page.html',
   styleUrls: ['./evento-list.page.scss'],
   standalone: true,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     IonContent,
     IonHeader,

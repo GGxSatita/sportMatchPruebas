@@ -1,13 +1,100 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>evento-add</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">evento-add</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-grid>
+    <!-- Selección de Sector -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Seleccionar Sector</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label>Sector</ion-label>
+              <ion-select (ionChange)="onSectorChange($event)">
+                <ion-select-option *ngFor="let sector of sectores" [value]="sector.idSector">
+                  {{ sector.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item *ngIf="selectedSectorImage">
+              <ion-thumbnail>
+                <img [src]="selectedSectorImage" alt="Imagen del sector" />
+              </ion-thumbnail>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- Selección de Fecha -->
+    <ion-row *ngIf="selectedSectorId">
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Seleccionar Fecha</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-datetime
+            display-format="DD MMM YYYY"
+            (ionChange)="onDateChange()"
+            [(ngModel)]="selectedDate"
+            [min]="minDate"
+            [max]="maxDate"
+            presentation="date"
+            selection-mode="single"
+          ></ion-datetime>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- Lista de Horarios Disponibles -->
+    <ion-row *ngIf="horariosDisponibles.length > 0">
+      <ion-col size="12">
+        <ion-list>
+          <ion-item-divider>Horarios Disponibles</ion-item-divider>
+          <ion-item *ngFor="let horario of horariosDisponibles">
+            <ion-label>{{ horario.inicio }} - {{ horario.fin }}</ion-label>
+            <ion-button
+              color="primary"
+              (click)="selectHorario(horario)"
+              [disabled]="!horario.disponible"
+            >
+              {{ horario.disponible ? 'Seleccionar' : 'Ocupado' }}
+            </ion-button>
+          </ion-item>
+
+        </ion-list>
+      </ion-col>
+    </ion-row>
+
+    <!-- Formulario para Título y Descripción -->
+    <ion-row *ngIf="selectedHorario">
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Detalles del Evento</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="floating">Título</ion-label>
+              <ion-input [(ngModel)]="newEvento.titulo" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="floating">Descripción</ion-label>
+              <ion-textarea [(ngModel)]="newEvento.descripcion" required></ion-textarea>
+            </ion-item>
+
+            <ion-button expand="block" (click)="onSubmit()">Crear Evento</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+
+<app-footer></app-footer>
