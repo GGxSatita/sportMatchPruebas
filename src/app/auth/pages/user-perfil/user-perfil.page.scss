@@ -6,12 +6,15 @@
   height: 100vh;
   background: none;
 
-  /* Animación de entrada suave */
   animation: fadeIn 1s ease-in-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
@@ -19,23 +22,23 @@
   margin-bottom: 20px;
   font-size: 28px;
   font-weight: bold;
-  color: var(--ion-color-primary); /* Naranja */
+  color: #FF724C; /* Naranja personalizado */
 }
 
 .login-card {
   padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra sutil */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
-  backdrop-filter: blur(10px); /* Difuminado */
-  border: 2px solid var(--ion-color-dark); /* Borde oscuro */
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid #2A2C41;
   width: 100%;
   max-width: 400px;
   transition: transform 0.3s ease;
 
   &:hover {
-    transform: translateY(-10px); /* Efecto de elevación */
-    box-shadow: 0 8px 16px rgba(42, 44, 65, 0.5); /* Sombra con el color oscuro */
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(42, 44, 65, 0.5);
   }
 }
 
@@ -48,10 +51,10 @@
 .profile-image {
   width: 120px;
   height: 120px;
-  border-radius: 50%; /* Foto circular */
+  border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--ion-color-dark); /* Borde oscuro */
-  box-shadow: 0 0 15px rgba(42, 44, 65, 0.7); /* Sombra oscura */
+  border: 3px solid #2A2C41;
+  box-shadow: 0 0 15px rgba(42, 44, 65, 0.7);
 }
 
 .data-item {
@@ -60,59 +63,59 @@
   justify-content: center;
   margin: 10px 0;
   font-size: 18px;
-  color: var(--ion-color-light); /* Texto claro */
+  color: #F4F4F8; /* Texto claro */
   font-weight: 500;
 
   ion-icon {
     margin-right: 10px;
-    color: var(--ion-color-primary); /* Íconos naranjas */
+    color: #FF724C; /* Íconos naranjas */
     font-size: 20px;
   }
 }
 
 ion-button {
   display: flex;
-  flex-direction: column; /* Colocar el ícono y el texto en líneas separadas */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  white-space: normal; /* Permitir que el texto se ajuste si es necesario */
-  font-size: 0.85rem; /* Reducir ligeramente el tamaño del texto */
-  padding: 12px 15px; /* Aumentar el padding para más espacio */
+  white-space: normal;
+  font-size: 0.85rem;
+  padding: 12px 15px;
   border-radius: 10px;
-  max-width: 100%;
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary)); /* Gradiente de naranja a amarillo */
-  color: #1e1e1e;
-  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+  width: 100%;
+  background: linear-gradient(135deg, #FF724C, #FDBF50); /* Gradiente naranja */
+  color: #F4F4F8; /* Texto claro */
+  box-shadow: 0 4px 10px rgba(255, 114, 76, 0.4);
   transition: transform 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px); /* Efecto de elevación */
-    background: var(--ion-color-secondary); /* Fondo amarillo al hacer hover */
+    transform: translateY(-2px);
+    background: #FDBF50; /* Fondo amarillo en hover */
   }
 
   ion-icon {
-    font-size: 1.5rem; /* Aumentar el tamaño del icono */
-    margin-bottom: 5px; /* Margen entre el ícono y el texto */
+    font-size: 1.4rem;
+    margin-bottom: 5px;
   }
 
-  /* Estilo específico para el botón de "Cambiar Contraseña" */
   &.cambiar-contrasena {
-    font-size: 0.8rem; /* Reducir un poco más el texto para "Cambiar Contraseña" */
-    padding: 14px 15px; /* Aumentar el padding vertical */
+    font-size: 0.8rem;
+    padding: 14px 15px;
   }
 }
+
 h3 {
-  font-size: 28px; /* Tamaño grande para destacar el nombre */
+  font-size: 28px;
   font-weight: bold;
-  color: var(--ion-color-primary); /* Naranja brillante */
+  color: #FF724C;
   margin: 0;
 }
 
 .user-name {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--ion-color-dark); /* Texto oscuro */
+  color: #2A2C41;
 }
 
 /* Responsividad */
@@ -152,7 +155,73 @@ h3 {
 }
 
 .data-item p {
-  color: #333; /* Texto oscuro */
+  color: #333;
   font-size: 1rem;
   margin: 5px 0;
+}
+
+/* Estilo para pantallas pequeñas */
+@media (max-width: 480px) {
+  ion-button {
+    flex-direction: row;
+    justify-content: space-evenly;
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  ion-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+}
+
+.button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.boton-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 8px; /* Reducción de padding */
+  border-radius: 6px; /* Bordes más pequeños */
+  background: linear-gradient(135deg, #FF724C, #FDBF50); /* Gradiente Naranja */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra aún más sutil */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(255, 114, 76, 0.3); /* Sombra ligera en hover */
+  }
+
+  ion-card-content {
+    color: #F4F4F8;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.7rem; /* Texto más compacto */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px; /* Espacio entre ícono y texto */
+  }
+
+  ion-icon {
+    font-size: 1.3rem; /* Ícono más pequeño */
+    margin-bottom: 2px; /* Margen reducido */
+  }
+
+  /* Ajustes para pantallas pequeñas */
+  @media (max-width: 480px) {
+    padding: 4px 6px;
+    ion-icon {
+      font-size: 1.1rem;
+    }
+    ion-card-content {
+      font-size: 0.65rem;
+      gap: 1px; /* Menor espacio entre ícono y texto */
+    }
+  }
 }

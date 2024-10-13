@@ -1,0 +1,77 @@
+.odd-item {
+  --background: #FF724C;  /* Fondo para los elementos impares */
+}
+
+.even-item {
+  --background: #FDBF50;  /* Fondo para los elementos pares */
+}
+
+ion-item {
+  --color: white;  /* Color del texto */
+  margin: 5px 0;
+  border-radius: 10px;
+}
+
+/* Contenedor principal */
+ion-content.responsive-content {
+  background-color: var(--background-color);
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Personalización de ion-item */
+.custom-item {
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.85); /* Fondo semitransparente */
+  border: 1px solid var(--text-dark-color);
+  transition: background-color 0.3s ease;
+}
+
+.custom-item:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Avatar circular */
+.avatar-container img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+}
+
+/* Label */
+ion-label h2 {
+  font-size: 20px;
+  color: var(--text-dark-color);
+  margin: 0;
+  font-weight: bold;
+}
+
+ion-label p {
+  font-size: 16px;
+  color: var(--secondary-color);
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+  .custom-item {
+    margin-bottom: 8px;
+  }
+
+  .avatar-container img {
+    width: 50px;
+    height: 50px;
+  }
+
+  ion-label h2 {
+    font-size: 18px;
+  }
+
+  ion-label p {
+    font-size: 14px;
+  }
+}

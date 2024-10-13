@@ -66,13 +66,11 @@ export class UserPerfilPage implements OnInit {
       deporteFavorito: ['', Validators.required]
     });
 
-    // Cargar deportes desde Firestore
     this.deportesService.getDeportes().subscribe((deportes: Deporte[]) => {
       this.deportes = deportes;
     });
   }
 
-  // Método para alternar el modo de edición
   toggleEditMode() {
     this.isEditing = !this.isEditing;
   }
@@ -86,23 +84,18 @@ export class UserPerfilPage implements OnInit {
           deporteFavorito: this.userProfile.deporteFavorito
         });
 
-        // Actualizar inmediatamente la imagen del perfil cuando cambia
         this.user.photo = this.userProfile.photo || 'assets/default-profile.png';
       }
       this.cargando = false;
     });
   }
 
-
-  // Mostrar la imagen seleccionada temporalmente
   onFileSelected(event: any) {
     const file = event.target.files?.[0];
     if (file) {
       const objectURL = URL.createObjectURL(file);
-      this.user.photo = objectURL; // Mostrar imagen temporal
+      this.user.photo = objectURL;
       this.profileForm.patchValue({ newFoto: file });
-    } else {
-      console.error('No se ha seleccionado ningún archivo.');
     }
   }
 
@@ -114,7 +107,6 @@ export class UserPerfilPage implements OnInit {
         const file = formValues.newFoto as File;
         const filePath = `users/${this.user.email}/profile_picture_${new Date().getTime()}.jpg`;
 
-        // Subir la imagen y obtener la URL
         this.storageService.uploadFile(filePath, file).subscribe({
           next: async (downloadURL) => {
             const data = { photoURL: downloadURL, displayName: formValues.newName };
@@ -134,7 +126,6 @@ export class UserPerfilPage implements OnInit {
 
   private async actualizarDatosUsuario(data: { displayName?: string, photoURL?: string }) {
     if (this.user) {
-      // Actualizar perfil en Firebase Authentication
       await this.autenticacionService.updateProfile(data);
 
       const user = this.autenticacionService.getCurrentUser();
@@ -157,13 +148,36 @@ export class UserPerfilPage implements OnInit {
     }
   }
 
-  private redirigirPerfilActualizado() {
-    this.router.navigate(['/user-perfil']).then(() => {
-      window.location.reload(); // Forzar la recarga completa de la página para ver la nueva imagen
-    });
+  async refrescarDatos() {
+    try {
+      this.cargando = true;
+
+      // Recargar el usuario autenticado desde Firebase Auth
+      await this.autenticacionService.reloadUser();
+
+      const user = this.autenticacionService.getCurrentUser();
+      if (user) {
+        this.user = {
+          email: user.email,
+          name: user.displayName || 'Nombre no disponible',
+          photo: user.photoURL || 'assets/default-profile.png'
+        };
+
+        // Obtener los datos del perfil desde Firestore y sincronizarlos
+        this.getDatosProfile(user.uid);
+      }
+
+    } catch (error) {
+      console.error('Error al refrescar los datos del usuario:', error);
+    } finally {
+      this.cargando = false;
+    }
   }
 
-  // Manejador de errores de carga de imagen
+  redirigirPerfilActualizado() {
+    this.router.navigate(['/user-perfil']);
+  }
+
   handleImageError(event: any) {
     event.target.src = 'assets/img/default-profile.png';
   }

@@ -45,21 +45,43 @@
           </div>
         </div>
 
-        <!-- Botones para editar perfil y cambiar contraseña -->
-        <ion-row>
-          <ion-col size="6">
-            <ion-button expand="block" color="primary" (click)="goToEditProfile()">
-              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-              <span>Editar Perfil</span>
-            </ion-button>
-          </ion-col>
-          <ion-col size="6">
-            <ion-button expand="block" color="secondary" class="cambiar-contrasena" (click)="goToCambiarContrasena()">
-              <ion-icon name="lock-closed-outline" slot="icon-only"></ion-icon>
-              <span>Cambiar Contraseña</span>
+        <!-- Botón para refrescar los datos -->
+        <ion-row class="ion-margin-top">
+          <ion-col size="12">
+            <ion-button expand="block" color="primary" (click)="refrescarDatos()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+              <span>Refrescar Datos</span>
             </ion-button>
           </ion-col>
         </ion-row>
+
+        <!-- Botones para editar perfil y cambiar contraseña -->
+        <ion-row class="ion-justify-content-center ion-margin-top">
+          <ion-col size="6" size-md="4" class="ion-margin-bottom">
+            <ion-card button (click)="goToEditProfile()" class="boton-card">
+              <ion-card-content>
+                <ion-icon name="create" color="light"></ion-icon>
+                <div class="button-text">
+                  <span>Editar</span>
+                  <span>Perfil</span>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <ion-col size="6" size-md="4" class="ion-margin-bottom">
+            <ion-card button (click)="goToCambiarContrasena()" class="boton-card">
+              <ion-card-content>
+                <ion-icon name="lock-closed" color="light"></ion-icon>
+                <div class="button-text">
+                  <span>Cambiar</span>
+                  <span>Contraseña</span>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+
       </ion-card-content>
     </ion-card>
   </div>
