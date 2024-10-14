@@ -38,14 +38,14 @@
           </ion-card-header>
           <ion-card-content>
             <ion-datetime
-            display-format="DD MMM YYYY"
-            (ionChange)="onDateChange()"
-            [(ngModel)]="selectedDate"
-            [min]="minDate"
-            [max]="maxDate"
-            presentation="date"
-            selection-mode="single"
-          ></ion-datetime>
+              display-format="DD MMM YYYY"
+              [(ngModel)]="selectedDate"
+              (ionChange)="onDateChange()"
+              [min]="minDate"
+              [max]="maxDate"
+              presentation="date"
+              selection-mode="single">
+            </ion-datetime>
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -61,12 +61,10 @@
             <ion-button
               color="primary"
               (click)="selectHorario(horario)"
-              [disabled]="!horario.disponible"
-            >
+              [disabled]="!horario.disponible">
               {{ horario.disponible ? 'Seleccionar' : 'Ocupado' }}
             </ion-button>
           </ion-item>
-
         </ion-list>
       </ion-col>
     </ion-row>
@@ -81,7 +79,11 @@
           <ion-card-content>
             <ion-item>
               <ion-label position="floating">Título</ion-label>
-              <ion-input [(ngModel)]="newEvento.titulo" required></ion-input>
+              <ion-input
+                [(ngModel)]="newEvento.titulo"
+                required
+                (ionChange)="onTitleChange($event)">
+              </ion-input>
             </ion-item>
 
             <ion-item>

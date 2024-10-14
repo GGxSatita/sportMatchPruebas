@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { eventos } from 'src/app/models/evento';
 import { EventosService } from 'src/app/services/evento.service';
 import { SectoresService } from 'src/app/services/sectores.service';
@@ -18,7 +18,6 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   IonGrid,
   IonRow,
@@ -27,7 +26,6 @@ import {
   IonSelectOption,
   IonDatetime,
   IonButton,
-  IonToggle,
   IonTextarea,
   IonModal,
   IonButtons,
@@ -43,37 +41,33 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   styleUrls: ['./evento-add.page.scss'],
   standalone: true,
   imports: [
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
-    IonSpinner,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
     CommonModule,
     FormsModule,
-    FooterComponent,
     HeaderComponent,
+    FooterComponent,
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonGrid,
     IonRow,
     IonCol,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonLabel,
     IonSelect,
     IonSelectOption,
     IonDatetime,
     IonButton,
-    IonToggle,
     IonTextarea,
-    IonModal,
+    IonList,
+    IonItemDivider,
+    IonThumbnail,
     IonButtons,
-    IonImg,
-    IonItemDivider
+    IonImg
   ]
 })
 export class EventoAddPage implements OnInit {
@@ -85,7 +79,6 @@ export class EventoAddPage implements OnInit {
   selectedHorario: Horario | null = null;
   eventos: eventos[] = [];
   newEvento: eventos = new eventos();
-
   minDate: string;
   maxDate: string;
 
@@ -117,35 +110,68 @@ export class EventoAddPage implements OnInit {
 
   onSectorChange(event: any): void {
     this.selectedSectorId = event.detail.value;
-    const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
-
-    if (selectedSector) {
-      this.selectedSectorImage = selectedSector.image || null;
-      this.filterHorarios();
-    }
+    const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
+    this.selectedSectorImage = sector?.image || null;
+    this.filterHorarios();
   }
-
 
   onDateChange(): void {
     this.filterHorarios();
   }
 
-  normalizeDayName(day: string): string {
-    return day.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  selectHorario(horario: Horario): void {
+    this.selectedHorario = horario;
+    this.newEvento.hora = `${horario.inicio} - ${horario.fin}`;
+  }
+
+  onTitleChange(event: any): void {
+    this.newEvento.titulo = event.detail.value;
+    console.log('Título actualizado:', this.newEvento.titulo); // Depuración
+  }
+
+  onSubmit(): void {
+    if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
+      const nuevoEvento: eventos = {
+        ...this.newEvento,
+        idSector: this.selectedSectorId,
+        espera: false,
+        image: this.selectedSectorImage || '',
+        fechaReservada: this.selectedDate,
+        sectorNombre: this.getSectorNombre(this.selectedSectorId),
+        capacidadAlumnos: this.newEvento.capacidadAlumnos || 0,
+        hora: this.newEvento.hora
+      };
+
+      console.log('Evento a guardar:', nuevoEvento); // Depuración
+
+      this.eventosService.createEvento(nuevoEvento).then(() => {
+        alert('Evento creado exitosamente.');
+        this.resetForm();
+      });
+    }
+  }
+
+  resetForm(): void {
+    this.newEvento = new eventos();
+    this.selectedHorario = null;
+    this.selectedDate = null;
+    this.selectedSectorId = null;
+    this.selectedSectorImage = null;
+  }
+
+  getSectorNombre(sectorId: string): string {
+    return this.sectores.find(s => s.idSector === sectorId)?.nombre || 'Desconocido';
   }
 
   filterHorarios(): void {
     if (this.selectedSectorId && this.selectedDate) {
-      const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
+      const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
       const dayOfWeek = this.normalizeDayName(this.getDayOfWeek(this.selectedDate));
 
-      if (selectedSector) {
-        this.horariosDisponibles = selectedSector.horarios.filter(horario => {
+      if (sector) {
+        this.horariosDisponibles = sector.horarios.filter(horario => {
           const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
-          let isDateReserved = false;
-          if (this.selectedDate) {
-            isDateReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
-          }
+          const isDateReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
           horario.disponible = !isDateReserved;
           return isSameDayOfWeek;
         });
@@ -159,52 +185,7 @@ export class EventoAddPage implements OnInit {
     return this.normalizeDayName(days[date.getDay()]);
   }
 
-  selectHorario(horario: Horario): void {
-    this.selectedHorario = horario;
-    this.newEvento.hora = `${horario.inicio} - ${horario.fin}`;
-  }
-
-
-  onSubmit(): void {
-    if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
-      const nuevoEvento: eventos = {
-        ...this.newEvento,
-        idSector: this.selectedSectorId,
-        espera: false,
-        image: this.selectedSectorImage || '',
-        fechaReservada: this.selectedDate,
-        sectorNombre: this.getSectorNombre(this.selectedSectorId),
-        capacidadAlumnos: this.newEvento.capacidadAlumnos || 0, // Valor predeterminado
-        hora: this.newEvento.hora // Incluye el horario seleccionado
-      };
-
-      this.eventosService.createEvento(nuevoEvento).then(() => {
-        alert('Evento creado exitosamente.');
-        this.loadEventos();
-        this.resetForm();
-      });
-    }
-  }
-
-
-  resetForm(): void {
-    this.newEvento = new eventos();
-
-    this.selectedHorario = null;
-    this.selectedDate = null;
-    this.selectedSectorId = null;
-    this.selectedSectorImage = null;
-  }
-
-  removeReservation(evento: eventos): void {
-    this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
-      alert('Reserva eliminada.');
-      this.loadEventos();
-    });
-  }
-
-  getSectorNombre(sectorId: string): string {
-    const sector = this.sectores.find(s => s.idSector === sectorId);
-    return sector ? sector.nombre : 'Sector no encontrado';
+  normalizeDayName(day: string): string {
+    return day.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 }

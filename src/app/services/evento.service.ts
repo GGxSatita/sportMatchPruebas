@@ -7,12 +7,13 @@ import { eventos } from '../models/evento';
   providedIn: 'root'
 })
 export class EventosService {
-  private collectionName = 'eventosAdmin';
+  private collectionName = 'eventosAlumnos';
 
   constructor(private firestore: Firestore) {}
 
   createEvento(evento: eventos): Promise<void> {
     const eventosRef = collection(this.firestore, this.collectionName);
+    console.log('Guardando evento en Firestore:', evento);
     return addDoc(eventosRef, { ...evento }).then();
   }
 
