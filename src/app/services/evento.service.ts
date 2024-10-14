@@ -13,10 +13,17 @@ export class EventosService {
 
   createEvento(evento: eventos): Promise<void> {
     const eventosRef = collection(this.firestore, this.collectionName);
-    console.log('Guardando evento en Firestore:', evento);
-    return addDoc(eventosRef, { ...evento }).then();
+    return addDoc(eventosRef, { ...evento })
+      .then((docRef) => {
+        console.log('Evento creado con ID:', docRef.id);
+        // Actualizar el evento con el ID generado
+        return updateDoc(docRef, { idEventosAlumnos: docRef.id });
+      })
+      .catch((error) => {
+        console.error('Error al crear evento:', error);
+        throw error;
+      });
   }
-
   getEventos(): Observable<eventos[]> {
     const eventosRef = collection(this.firestore, this.collectionName);
     return collectionData(eventosRef, { idField: 'id' }) as Observable<eventos[]>;

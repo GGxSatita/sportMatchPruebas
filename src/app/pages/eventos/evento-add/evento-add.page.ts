@@ -105,6 +105,8 @@ export class EventoAddPage implements OnInit {
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
       this.eventos = eventos;
+      console.log('Eventos cargados:', this.eventos);
+      this.filterHorarios(); // Asegurar que los horarios se filtren después de cargar eventos
     });
   }
 
@@ -117,6 +119,47 @@ export class EventoAddPage implements OnInit {
 
   onDateChange(): void {
     this.filterHorarios();
+  }
+
+  filterHorarios(): void {
+    if (this.selectedSectorId && this.selectedDate) {
+      const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
+      const dayOfWeek = this.getDayOfWeek(this.selectedDate);
+
+      if (sector) {
+        this.horariosDisponibles = sector.horarios.map(horario => {
+          const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
+
+          const eventoAprobado = this.eventos.some(evento => {
+            const coincideSector = evento.idSector === this.selectedSectorId;
+            const coincideFecha = new Date(evento.fechaReservada).toDateString() === new Date(this.selectedDate).toDateString();
+            const coincideHora = evento.hora === `${horario.inicio} - ${horario.fin}`;
+            const estaAprobado = evento.espera === true;
+
+            console.log('Verificando horario:', {
+              coincideSector,
+              coincideFecha,
+              coincideHora,
+              estaAprobado,
+            });
+
+            return coincideSector && coincideFecha && coincideHora && estaAprobado;
+          });
+
+          return { ...horario, disponible: isSameDayOfWeek && !eventoAprobado };
+        }).filter(horario => this.normalizeDayName(horario.dia) === dayOfWeek);
+      }
+    }
+  }
+
+  getDayOfWeek(dateString: string): string {
+    const date = new Date(dateString);
+    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    return this.normalizeDayName(days[date.getDay()]);
+  }
+
+  normalizeDayName(day: string): string {
+    return day.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
   selectHorario(horario: Horario): void {
@@ -147,6 +190,7 @@ export class EventoAddPage implements OnInit {
       this.eventosService.createEvento(nuevoEvento).then(() => {
         alert('Evento creado exitosamente.');
         this.resetForm();
+        this.loadEventos(); // Recargar eventos después de crear uno nuevo
       });
     }
   }
@@ -161,31 +205,5 @@ export class EventoAddPage implements OnInit {
 
   getSectorNombre(sectorId: string): string {
     return this.sectores.find(s => s.idSector === sectorId)?.nombre || 'Desconocido';
-  }
-
-  filterHorarios(): void {
-    if (this.selectedSectorId && this.selectedDate) {
-      const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
-      const dayOfWeek = this.normalizeDayName(this.getDayOfWeek(this.selectedDate));
-
-      if (sector) {
-        this.horariosDisponibles = sector.horarios.filter(horario => {
-          const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
-          const isDateReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
-          horario.disponible = !isDateReserved;
-          return isSameDayOfWeek;
-        });
-      }
-    }
-  }
-
-  getDayOfWeek(dateString: string): string {
-    const date = new Date(dateString);
-    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-    return this.normalizeDayName(days[date.getDay()]);
-  }
-
-  normalizeDayName(day: string): string {
-    return day.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 }
