@@ -1,81 +1,68 @@
-import { Component, OnInit } from '@angular/core';
-import { eventos } from 'src/app/models/evento';
-import { EventosService } from 'src/app/services/evento.service';
-import { SectoresService } from 'src/app/services/sectores.service';
-import { Sectores } from 'src/app/models/sector';
-import { Horario } from 'src/app/models/sector';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
 import {
+  chevronDownCircle,
+  chevronForwardCircle,
+  chevronUpCircle,
+  colorPalette,
+  document,
+  globe,
+} from 'ionicons/icons';
+import {
+  IonFab,
+  IonFabButton,
+  IonFabList,
+  IonIcon,
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
   IonList,
   IonItem,
-  IonThumbnail,
   IonLabel,
-  IonSpinner,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonGrid,
   IonRow,
   IonCol,
-  IonSelect,
-  IonSelectOption,
-  IonDatetime,
   IonButton,
-  IonToggle,
-  IonTextarea,
-  IonModal,
-  IonButtons,
-  IonImg,
-  IonItemDivider
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { EventosService } from 'src/app/services/evento.service';
+import { SectoresService } from 'src/app/services/sectores.service';
+import { eventos } from 'src/app/models/evento';
+import { Sectores, Horario } from 'src/app/models/sector';
+import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-evento-list',
   templateUrl: './evento-list.page.html',
   styleUrls: ['./evento-list.page.scss'],
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Add this line
   imports: [
+    CommonModule,
+    FormsModule,
+    IonFab,        // Ensure you import all necessary Ionic components
+    IonFabButton,
+    IonFabList,
+    IonIcon,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
     IonList,
     IonItem,
-    IonThumbnail,
     IonLabel,
-    IonSpinner,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    CommonModule,
-    FormsModule,
-    FooterComponent,
-    HeaderComponent,
     IonGrid,
     IonRow,
     IonCol,
-    IonSelect,
-    IonSelectOption,
-    IonDatetime,
     IonButton,
-    IonToggle,
-    IonTextarea,
-    IonModal,
-    IonButtons,
-    IonImg,
-    IonItemDivider
-  ]
+    HeaderComponent,
+    FooterComponent,
+  ],
 })
 export class EventoListPage implements OnInit {
 
@@ -88,10 +75,16 @@ export class EventoListPage implements OnInit {
   eventos: eventos[] = [];
   minDate: string;
   maxDate: string;
+  eventosExpandido: { [key: string]: boolean } = {};
+
+  eventosFiltrados: eventos[] = []; // Eventos que se mostrarán filtrados
+  idAlumno: string | null = null;   // ID del alumno autenticado
 
   constructor(
     private eventosService: EventosService,
-    private sectoresService: SectoresService
+    private sectoresService: SectoresService,
+    private router: Router,
+    private auth: Auth,
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
@@ -101,6 +94,41 @@ export class EventoListPage implements OnInit {
   ngOnInit(): void {
     this.loadSectores();
     this.loadEventos();
+    this.obtenerAlumnoId();
+  }
+
+
+  toggleEventoExpandido(eventoId: string): void {
+    this.eventosExpandido[eventoId] = !this.eventosExpandido[eventoId];
+  }
+
+  loadEventos(): void {
+    this.eventosService.getEventos().subscribe((eventos) => {
+      this.eventos = eventos;
+      this.filtrarEventos(); // Filtrar los eventos después de cargarlos
+    });
+  }
+
+  filtrarEventos(): void {
+    this.eventosFiltrados = this.eventos.filter(evento =>
+      evento.espera === true // Filtrar solo los eventos aprobados
+    );
+  }
+
+
+
+
+  async obtenerAlumnoId() {
+    const user = this.auth.currentUser;
+    if (user) {
+      this.idAlumno = user.uid;
+      this.loadEventos(); // Cargar eventos después de obtener el ID del alumno
+    } else {
+      console.error('No hay usuario autenticado.');
+    }
+  }
+  navigateTo(route: string) {
+    this.router.navigate([`/${route}`]);
   }
 
   loadSectores(): void {
@@ -109,11 +137,7 @@ export class EventoListPage implements OnInit {
     });
   }
 
-  loadEventos(): void {
-    this.eventosService.getEventos().subscribe((eventos) => {
-      this.eventos = eventos;
-    });
-  }
+
 
   onSectorChange(event: any): void {
     this.selectedSectorId = event.detail.value;
@@ -161,26 +185,53 @@ export class EventoListPage implements OnInit {
     this.selectedHorario = horario;
   }
 
-  onSubmit(): void {
-    if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
-      const nuevoEvento: eventos = {
-        idEventosAlumnos: '',
-        idSector: this.selectedSectorId,
-        titulo: 'Nuevo Evento',
-        descripcion: `Evento en ${this.selectedHorario.dia} de ${this.selectedHorario.inicio} a ${this.selectedHorario.fin}`,
-        espera: false,
-        image: this.selectedSectorImage || '',
-        fechaReservada: this.selectedDate,
-        sectorNombre: this.getSectorNombre(this.selectedSectorId),
-        capacidadAlumnos: 0
-      };
 
-      this.eventosService.createEvento(nuevoEvento).then(() => {
-        alert('Evento creado exitosamente.');
-        this.loadEventos();
-      });
+  inscribirseEnEvento(evento: eventos): void {
+    if (!this.idAlumno) return;
+
+    // Verificar que participantesActuales sea un array
+    if (!Array.isArray(evento.participantesActuales)) {
+      evento.participantesActuales = [];
     }
+
+    // Verificar si el creador está intentando inscribirse
+    if (evento.idAlumno === this.idAlumno) {
+      alert('El creador del evento no puede inscribirse.');
+      return;
+    }
+
+    // Verificar si el usuario ya está inscrito
+    if (evento.participantesActuales.includes(this.idAlumno)) {
+      alert('Ya estás inscrito en este evento.');
+      return;
+    }
+
+    // Verificar si hay cupo disponible
+    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+      alert('El evento ya ha alcanzado su capacidad máxima.');
+      return;
+    }
+
+
+
+    // Agregar el ID del usuario a los participantes actuales
+    evento.participantesActuales.push(this.idAlumno);
+
+    // Actualizar el evento en Firebase
+    this.eventosService.updateEvento(evento.idEventosAlumnos, {
+      participantesActuales: evento.participantesActuales
+    }).then(() => {
+      alert('Te has inscrito en el evento exitosamente.');
+      this.loadEventos(); // Recargar la lista de eventos
+    }).catch(error => {
+      console.error('Error al inscribirse en el evento:', error);
+    });
   }
+
+
+
+
+
 
   removeReservation(evento: eventos): void {
     this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
