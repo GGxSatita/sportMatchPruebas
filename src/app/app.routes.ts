@@ -34,6 +34,16 @@ export const routes: Routes = [
   {
     path: 'recuperar-contrasena',
     loadComponent: () => import('./auth/pages/recuperar-contrasena/recuperar-contrasena.page').then( m => m.RecuperarContrasenaPage)
+  },
+  {
+    path: 'evento-list',
+    loadComponent: () => import('./pages/eventos/evento-list/evento-list.page').then( m => m.EventoListPage),
+    canActivate:[authGuard]
+  },
+  {
+    path: 'evento-add',
+    loadComponent: () => import('./pages/eventos/evento-add/evento-add.page').then( m => m.EventoAddPage),
+    canActivate:[authGuard]
   }
   ,
   {
@@ -47,6 +57,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/match-perfil/match-perfil.page').then( m=> m.MatchPerfilPage),
     canActivate:[authGuard]
   }
+
+
 
 
 ];

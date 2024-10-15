@@ -1,0 +1,31 @@
+<app-header></app-header>
+<ion-content>
+  <ion-grid>
+    <!-- Lista de Eventos Existentes -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-list>
+          <ion-item-divider>Lista de Eventos</ion-item-divider>
+          <ion-item *ngFor="let evento of eventos">
+            <ion-label>
+              <h2>{{ evento.titulo }}</h2>
+              <p>{{ evento.descripcion }}</p>
+              <p>Sector: {{ evento.sectorNombre }}</p>
+              <p>Fecha: {{ evento.fechaReservada }}</p>
+              <p>
+                Estado:
+                <span [ngClass]="evento.espera ? 'aprobado' : 'en-espera'">
+                  {{ evento.espera ? 'Aprobado' : 'En espera' }}
+                </span>
+              </p>
+            </ion-label>
+            <ion-button color="danger" (click)="removeReservation(evento)">
+              Eliminar
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<app-footer></app-footer>
