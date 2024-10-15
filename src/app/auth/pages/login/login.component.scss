@@ -12,8 +12,7 @@
     margin-bottom: 30px;
     font-size: 28px;
     font-weight: bold;
-    color: #ffdd57;
-    text-shadow: 0px 0px 10px #ffdd57;
+    color: #FF6F00; /* Naranja Intenso */
   }
 
   .login-card {
@@ -23,7 +22,7 @@
     background: rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 420px;
-    border: 3px solid #ffdd57; /* Borde amarillo */
+    border: 3px solid #2A2C41; /* Borde Naranja Intenso */
   }
 
   .image-container {
@@ -52,28 +51,28 @@
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     margin-bottom: 20px;
-    --highlight-color-focused: #ffdd57; /* Color de resaltado para el borde */
+    --highlight-color-focused: #004080; /* Azul Marino */
     --highlight-background-focused: transparent;
-    --color-focused: inherit; /* El color del texto no se cambia */
+    --color-focused: inherit;
   }
 
   ion-item.ion-focused,
   ion-item.ion-has-value {
-    --highlight-color-focused: #ffdd57; /* Mantener el borde amarillo si tiene valor */
+    --highlight-color-focused: #004080; /* Mantener el borde Azul Marino si tiene valor */
     --highlight-background-focused: transparent;
-    --color-focused: inherit; /* Color de texto sin cambios */
+    --color-focused: inherit;
   }
 
   ion-input {
-    color: #1e1e1e; /* Color de texto */
+    color: #2F4F4F; /* Gris Pizarra */
   }
 
   ion-button {
     margin-top: 10px;
-    background: linear-gradient(135deg, #ffdd57, #ffb700);
-    color: #1e1e1e;
+    background: linear-gradient(135deg, #FF6F00, #FFB300); /* Naranja Intenso a Mostaza */
+    color: #F5F5F5; /* Blanco Crema */
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 4px 10px rgba(255, 111, 0, 0.4);
     transition: transform 0.2s ease;
     width: 100%;
   }
@@ -83,24 +82,15 @@
   }
 
   ion-row p {
-    color: #ffdd57;
+    color: #FF6F00; /* Naranja Intenso */
     margin-bottom: 10px;
   }
 
   .input-email-password {
-    color: #1e1e1e;
+    color: #2F4F4F; /* Gris Pizarra */
   }
 
   ion-input::placeholder {
     color: #999;  /* Color del placeholder */
   }
-}
-.neon{
-  color: #ffff00; /* Color amarillo */
-  text-shadow:
-    0 0 5px rgba(255, 255, 0, 0.7),
-    0 0 10px rgba(255, 255, 0, 0.7),
-    0 0 20px rgba(255, 255, 0, 0.7),
-    0 0 40px rgba(255, 255, 0, 0.7),
-    0 0 80px rgba(255, 255, 0, 0.7);
 }

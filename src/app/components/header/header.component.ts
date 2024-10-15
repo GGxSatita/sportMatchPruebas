@@ -6,6 +6,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { Location } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
 
 @Component({
   selector: 'app-header',
@@ -31,6 +32,8 @@ export class HeaderComponent implements OnInit {
     '/recuperar-contrasena' : 'Recuperar contraseña',
     '/evento-list': 'Listado de eventos',
     '/evento-add': 'Agendar evento'
+    '/match':'Match',
+    '/match-perfil': 'Datos del jugador'
     // Agrega las rutas y nombres que necesites
   };
 

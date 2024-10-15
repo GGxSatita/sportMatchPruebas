@@ -1,8 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
-        updateProfile, fetchSignInMethodsForEmail , EmailAuthProvider,
-        updatePassword, reauthenticateWithCredential, sendPasswordResetEmail} from '@angular/fire/auth';
+import { FirebaseApp } from '@angular/fire/app';
+import {
+  Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, authState, signOut,
+  updateProfile, fetchSignInMethodsForEmail, EmailAuthProvider,
+  updatePassword, reauthenticateWithCredential, sendPasswordResetEmail
+} from '@angular/fire/auth';
+import { collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +17,9 @@ export class AutenticacionService {
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
   router: Router = inject(Router);
+  http: any;
 
-  constructor() {}
+  constructor(private firestore: Firestore) { }
 
   async createUser(email: string, password: string) {
     try {
@@ -44,6 +50,15 @@ export class AutenticacionService {
 
       // Intentar el login
       const user = await signInWithEmailAndPassword(this.auth, email, password);
+      const userID = user.user;
+      if (user) {
+        const userDoc = doc(this.firestore, `Users/${userID.uid}`);
+        await updateDoc(userDoc, {
+          lastLogin: new Date(),
+          isLoggedIn: true,
+          messagingToken: await getToken(getMessaging())
+        });
+      }
       return user;
     } catch (error: any) {
       // Capturar los códigos de error específicos de Firebase
@@ -65,13 +80,43 @@ export class AutenticacionService {
           throw new Error('Credenciales inválidas.');
         }
       }
-
       console.error('Error al iniciar sesión:', error);
       throw error;
     }
+
+  }
+  async sendChallengeNotification(userId: string) {
+    const payload = {
+      userId: userId,
+      title: '¡Has sido desafiado!',
+      body: 'Acepta o rechaza el desafío.'
+    };
+    this.http.post('URL_DEL_SERVIDOR/api/send-notification', payload).subscribe((response: any) => {
+      console.log('Notificación enviada:', response);
+    }, (error: any) => {
+      console.log('Error enviando notificación:', error);
+    });
   }
 
-  logout() {
+  async getLoggedInUsersExcludingCurrentUser() {
+    const currentUser = this.auth.currentUser;
+    const usersCollection = collection(this.firestore, 'Users');
+    const q = query(usersCollection, where('isLoggedIn', '==', true));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs
+      .map(doc => ({ ...doc.data(), uid: doc.id }))
+      .filter(user => user.uid !== currentUser.uid);
+  }
+
+  async logout() {
+    const user = this.auth.currentUser;
+    if (user) {
+      const userDoc = doc(this.firestore, `Users/${user.uid}`);
+      await updateDoc(userDoc, {
+        isLoggedIn: false
+      });
+    }
     signOut(this.auth).then(() => {
       this.router.navigate(['/login']);
     }).catch(error => {
@@ -88,17 +133,22 @@ export class AutenticacionService {
     if (this.auth.currentUser) {
       await updateProfile(this.auth.currentUser, data);
 
-      // Recargar el usuario para asegurarnos de que los cambios se reflejan
-      await this.auth.currentUser.reload();  // Recargar la sesión del usuario después de la actualización
+      // Recargar el usuario después de la actualización
+      await this.reloadUser();
 
-      // Verifica que la URL de la foto haya sido actualizada correctamente
-      console.log('Usuario actualizado:', {
-        displayName: this.auth.currentUser.displayName,
-        photoURL: this.auth.currentUser.photoURL,
-      });
+      // Devolver el usuario actualizado
+      return this.auth.currentUser;
     } else {
       throw new Error('No hay usuario autenticado para actualizar el perfil');
     }
+  }
+
+  async reloadUser() {
+    if (this.auth.currentUser) {
+      await this.auth.currentUser.reload(); // Recargar los datos del usuario
+      return this.auth.currentUser; // Retornar el usuario actualizado
+    }
+    throw new Error('No se pudo recargar el usuario');
   }
 
   async isEmailRegistered(email: string): Promise<boolean> {
@@ -110,6 +160,7 @@ export class AutenticacionService {
       return false;
     }
   }
+
   // Método para reautenticar al usuario con su contraseña actual
   async reauthenticate(currentPassword: string) {
     const user = this.auth.currentUser;
@@ -139,4 +190,5 @@ export class AutenticacionService {
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }
+
 }

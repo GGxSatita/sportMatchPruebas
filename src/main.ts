@@ -20,7 +20,21 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { environment } from './environments/environment';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
+// if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('/firebase-messaging-sw.js')
+//   .then((registration) => {
+//     console.log('Service Worker registrado con éxito:', registration);
+//   })
+//   .catch((error) => {
+//     console.error('Error al registrar el Service Worker:', error);
+//   });
+// }
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then((registration) => {
+      console.log('Service Worker registrado con éxito:', registration);
+    })}
 //Eleemndos PWA
 defineCustomElements(window);
 
@@ -46,7 +60,6 @@ bootstrapApplication(AppComponent, {
         initializeFirestore(app, {}); // Firestore para la web
         initializeAuth(app, {}); // Auth para la web
       }
-
       // Devuelve la app inicializada
       return app;
     }),

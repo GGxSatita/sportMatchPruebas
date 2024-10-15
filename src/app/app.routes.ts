@@ -45,6 +45,18 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/eventos/evento-add/evento-add.page').then( m => m.EventoAddPage),
     canActivate:[authGuard]
   }
+  ,
+  {
+    path: 'match',
+    loadComponent: () => import('./pages/match/match.page').then( m => m.MatchPage),
+    canActivate:[authGuard]
+  }
+  ,
+  {
+    path: 'match-perfil',
+    loadComponent: () => import('./pages/match-perfil/match-perfil.page').then( m=> m.MatchPerfilPage),
+    canActivate:[authGuard]
+  }
 
 
 
