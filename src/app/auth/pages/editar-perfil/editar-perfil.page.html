@@ -1,0 +1,56 @@
+<ion-content class="ion-padding fondo-app">
+  <!-- Spinner de carga mientras se obtienen los datos -->
+  <ion-spinner *ngIf="cargando"></ion-spinner>
+
+  <!-- Formulario para editar perfil -->
+  <form [formGroup]="profileForm" *ngIf="!cargando">
+
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input formControlName="newName" placeholder="Ingresa tu nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Edad</ion-label>
+      <ion-input formControlName="nuevaEdad" type="number" placeholder="Ingresa tu edad"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Deporte Favorito</ion-label>
+      <ion-select formControlName="deporteFavorito" placeholder="Selecciona un deporte">
+        <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
+          {{ deporte.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Vista previa de la foto de perfil -->
+
+    <ion-item>
+      <ion-label position="stacked">Foto de Perfil</ion-label>
+      <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
+    </ion-item>
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-button expand="block" fill="clear" (click)="takePicture()">
+          <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
+          <ion-icon slot="icon-only" name="image-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ion-spinner *ngIf="subiendoImagen"></ion-spinner>
+
+    <ion-button expand="block" color="primary" (click)="actualizarPerfil()">
+      Guardar Cambios
+    </ion-button>
+    <ion-button expand="block" color="medium" (click)="cancelar()">
+      Cancelar
+    </ion-button>
+  </form>
+</ion-content>

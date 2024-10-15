@@ -29,6 +29,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "firebase-messaging-sw.js",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -39,8 +44,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "2.5mb",
+                  "maximumError": "6mb"
                 },
                 {
                   "type": "anyComponentStyle",

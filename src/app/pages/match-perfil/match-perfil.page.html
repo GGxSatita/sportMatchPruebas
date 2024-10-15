@@ -1,0 +1,18 @@
+<app-header></app-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-content>
+      <img [src]="player?.photo || 'assets/img/default-profile.png'" alt="Foto de perfil del usuario" (error)="handleImageError($event)"/>
+      <ion-card-header>
+        <ion-card-title>{{ player?.name || 'Nombre no disponible' }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngIf="player?.edad">Edad: {{ player.edad }}</p>
+      </ion-card-content>
+    </ion-card-content>
+  </ion-card>
+  <ion-button (click)="challengePlayer()">Desafiar</ion-button>
+</ion-content>
+
+<app-footer></app-footer>

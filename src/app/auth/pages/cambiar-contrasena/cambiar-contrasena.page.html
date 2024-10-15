@@ -1,0 +1,42 @@
+<app-header></app-header>
+
+  <ion-content class="ion-padding fondo-app">
+    <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <!-- Contraseña Actual -->
+      <ion-item lines="full">
+        <ion-label position="floating">Contraseña Actual</ion-label>
+        <ion-input type="password" formControlName="currentPassword"></ion-input>
+      </ion-item>
+      <ion-note *ngIf="passwordForm.get('currentPassword').hasError('required') && passwordForm.get('currentPassword').touched" color="danger" class="ion-padding-start">
+        Este campo es obligatorio.
+      </ion-note>
+
+      <!-- Nueva Contraseña -->
+      <ion-item lines="full">
+        <ion-label position="floating">Nueva Contraseña</ion-label>
+        <ion-input type="password" formControlName="newPassword"></ion-input>
+      </ion-item>
+      <ion-note *ngIf="passwordForm.get('newPassword').hasError('minlength') && passwordForm.get('newPassword').touched" color="danger" class="ion-padding-start">
+        La contraseña debe tener al menos 6 caracteres.
+      </ion-note>
+
+      <!-- Confirmar Contraseña -->
+      <ion-item lines="full">
+        <ion-label position="floating">Confirmar Contraseña</ion-label>
+        <ion-input type="password" formControlName="confirmPassword"></ion-input>
+      </ion-item>
+      <ion-note *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('confirmPassword').touched" color="danger" class="ion-padding-start">
+        Las contraseñas no coinciden.
+      </ion-note>
+
+      <!-- Botón de Cambiar Contraseña -->
+      <div class="ion-padding">
+        <ion-button expand="block" type="submit" [disabled]="cargando || passwordForm.invalid" color="primary">
+          Cambiar Contraseña
+          <ion-spinner *ngIf="cargando" slot="end"></ion-spinner>
+        </ion-button>
+      </div>
+    </form>
+  </ion-content>
+
+<app-footer></app-footer>
