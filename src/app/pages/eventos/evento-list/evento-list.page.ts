@@ -1,81 +1,68 @@
-import { Component, OnInit } from '@angular/core';
-import { eventos } from 'src/app/models/evento';
-import { EventosService } from 'src/app/services/evento.service';
-import { SectoresService } from 'src/app/services/sectores.service';
-import { Sectores } from 'src/app/models/sector';
-import { Horario } from 'src/app/models/sector';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
 import {
+  chevronDownCircle,
+  chevronForwardCircle,
+  chevronUpCircle,
+  colorPalette,
+  document,
+  globe,
+} from 'ionicons/icons';
+import {
+  IonFab,
+  IonFabButton,
+  IonFabList,
+  IonIcon,
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
   IonList,
   IonItem,
-  IonThumbnail,
   IonLabel,
-  IonSpinner,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonGrid,
   IonRow,
   IonCol,
-  IonSelect,
-  IonSelectOption,
-  IonDatetime,
   IonButton,
-  IonToggle,
-  IonTextarea,
-  IonModal,
-  IonButtons,
-  IonImg,
-  IonItemDivider
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { EventosService } from 'src/app/services/evento.service';
+import { SectoresService } from 'src/app/services/sectores.service';
+import { eventos } from 'src/app/models/evento';
+import { Sectores, Horario } from 'src/app/models/sector';
+import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-evento-list',
   templateUrl: './evento-list.page.html',
   styleUrls: ['./evento-list.page.scss'],
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Add this line
   imports: [
+    CommonModule,
+    FormsModule,
+    IonFab,        // Ensure you import all necessary Ionic components
+    IonFabButton,
+    IonFabList,
+    IonIcon,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
     IonList,
     IonItem,
-    IonThumbnail,
     IonLabel,
-    IonSpinner,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    CommonModule,
-    FormsModule,
-    FooterComponent,
-    HeaderComponent,
     IonGrid,
     IonRow,
     IonCol,
-    IonSelect,
-    IonSelectOption,
-    IonDatetime,
     IonButton,
-    IonToggle,
-    IonTextarea,
-    IonModal,
-    IonButtons,
-    IonImg,
-    IonItemDivider
-  ]
+    HeaderComponent,
+    FooterComponent,
+  ],
 })
 export class EventoListPage implements OnInit {
 
@@ -89,9 +76,14 @@ export class EventoListPage implements OnInit {
   minDate: string;
   maxDate: string;
 
+  eventosFiltrados: eventos[] = []; // Eventos que se mostrarán filtrados
+  idAlumno: string | null = null;   // ID del alumno autenticado
+
   constructor(
     private eventosService: EventosService,
-    private sectoresService: SectoresService
+    private sectoresService: SectoresService,
+    private router: Router,
+    private auth: Auth,
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
@@ -101,6 +93,36 @@ export class EventoListPage implements OnInit {
   ngOnInit(): void {
     this.loadSectores();
     this.loadEventos();
+    this.obtenerAlumnoId();
+  }
+
+
+  loadEventos(): void {
+    this.eventosService.getEventos().subscribe((eventos) => {
+      this.eventos = eventos;
+      this.filtrarEventos(); // Filtrar los eventos después de cargarlos
+    });
+  }
+
+  filtrarEventos(): void {
+    this.eventosFiltrados = this.eventos.filter(evento =>
+      evento.espera || evento.idAlumno === this.idAlumno
+    );
+  }
+
+
+
+  async obtenerAlumnoId() {
+    const user = this.auth.currentUser;
+    if (user) {
+      this.idAlumno = user.uid;
+      this.loadEventos(); // Cargar eventos después de obtener el ID del alumno
+    } else {
+      console.error('No hay usuario autenticado.');
+    }
+  }
+  navigateTo(route: string) {
+    this.router.navigate([`/${route}`]);
   }
 
   loadSectores(): void {
@@ -109,11 +131,7 @@ export class EventoListPage implements OnInit {
     });
   }
 
-  loadEventos(): void {
-    this.eventosService.getEventos().subscribe((eventos) => {
-      this.eventos = eventos;
-    });
-  }
+
 
   onSectorChange(event: any): void {
     this.selectedSectorId = event.detail.value;

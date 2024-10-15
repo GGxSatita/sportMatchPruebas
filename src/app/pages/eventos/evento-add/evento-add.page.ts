@@ -5,6 +5,9 @@ import { SectoresService } from 'src/app/services/sectores.service';
 import { Sectores, Horario } from 'src/app/models/sector';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Auth } from '@angular/fire/auth';
+import { User } from 'firebase/auth';
+
 import {
   IonContent,
   IonHeader,
@@ -82,9 +85,12 @@ export class EventoAddPage implements OnInit {
   minDate: string;
   maxDate: string;
 
+  idAlumno: string | null = null;
+
   constructor(
     private eventosService: EventosService,
-    private sectoresService: SectoresService
+    private sectoresService: SectoresService,
+    private auth: Auth
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
@@ -94,6 +100,16 @@ export class EventoAddPage implements OnInit {
   ngOnInit(): void {
     this.loadSectores();
     this.loadEventos();
+    this.loadAlumnoId();
+  }
+
+  async loadAlumnoId() {
+    const user = this.auth.currentUser;
+    if (user) {
+      this.idAlumno = user.uid;
+    } else {
+      console.error('No hay usuario autenticado.');
+    }
   }
 
   loadSectores(): void {
@@ -187,22 +203,21 @@ export class EventoAddPage implements OnInit {
     if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
       const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
 
-      // Si el sector es público (visible: true), el evento queda en espera (espera: true).
-      // Si es privado (visible: false), el evento se aprueba (espera: false).
       const enEspera = sector?.visible === true;
 
       const nuevoEvento: eventos = {
         ...this.newEvento,
         idSector: this.selectedSectorId,
-        espera: enEspera, // Asignación clara
+        espera: enEspera,
         image: this.selectedSectorImage || '',
         fechaReservada: this.selectedDate,
         sectorNombre: this.getSectorNombre(this.selectedSectorId),
         capacidadAlumnos: this.newEvento.capacidadAlumnos || 0,
-        hora: this.newEvento.hora
+        hora: this.newEvento.hora,
+        idAlumno: this.idAlumno // Agregar el ID del alumno al evento
       };
 
-      console.log('Evento a guardar:', nuevoEvento); // Depuración
+      console.log('Evento a guardar:', nuevoEvento);
 
       this.eventosService.createEvento(nuevoEvento).then(() => {
         if (enEspera) {
@@ -211,13 +226,14 @@ export class EventoAddPage implements OnInit {
           alert('Evento creado exitosamente y hora bloqueada.');
         }
         this.resetForm();
-        this.loadEventos(); // Recargar eventos después de crear uno nuevo
+        this.loadEventos();
       }).catch((error) => {
         console.error('Error al crear evento:', error);
         alert('Ocurrió un error al crear el evento.');
       });
     }
   }
+
 
 
 

@@ -9,6 +9,7 @@ export class eventos {
     public fechaReservada: string = '',
     public hora?: string,
     public sectorNombre?: string,
-    public capacidadAlumnos?: number
+    public capacidadAlumnos?: number,
+    public idAlumno?: string // Nuevo campo para el id del alumno
   ) {}
 }
