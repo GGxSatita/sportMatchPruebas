@@ -31,7 +31,7 @@ export class HeaderComponent implements OnInit {
     '/settings': 'Configuraciones',
     '/recuperar-contrasena' : 'Recuperar contraseña',
     '/evento-list': 'Listado de eventos',
-    '/evento-add': 'Agendar evento'
+    '/evento-add': 'Agendar evento',
     '/match':'Match',
     '/match-perfil': 'Datos del jugador'
     // Agrega las rutas y nombres que necesites
