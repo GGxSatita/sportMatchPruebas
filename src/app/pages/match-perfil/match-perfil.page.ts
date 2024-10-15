@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonCardContent, IonCardTitle, IonCardHeader, IonCard } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
@@ -19,7 +19,7 @@ export class MatchPerfilPage implements OnInit {
   player: any;
   autentication: any;
   http: any;
-  constructor(private route: ActivatedRoute, private autenticationService: AutenticacionService) { }
+  constructor(private route: ActivatedRoute, private autenticationService: AutenticacionService, private router: Router) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -35,34 +35,41 @@ export class MatchPerfilPage implements OnInit {
           }
         });
     }
+
   }
 
   handleImageError(event: any) {
     event.target.src = 'assets/img/default-profile.png'; // Cambia a imagen por defecto si hay un error
   }
 
+
   sendNotification() {
-    if ('Notification' in window) {
+    if ('Notification' in window && Notification.permission === 'granted') {
       const notification = new Notification('¡Has sido desafiado!', {
         body: 'Acepta o rechaza el desafío.',
         icon: '/assets/icon.png'
       });
 
-      notification.onclick = event => {
+      notification.onclick = (event) => {
         event.preventDefault(); // Previene que el navegador maneje el clic por defecto
-        window.location.href = '/events'; // Redirige a la vista de eventos
+        window.location.href = '/desafios'; // Redirige a la vista de eventos
       };
 
-      notification.onclose = event => {
+      notification.onclose = (event) => {
         console.log('Notificación cerrada');
       };
+    } else {
+      console.log('Permiso para notificaciones no concedido');
     }
   }
 
 
   challengePlayer() {
     this.sendNotification(); // Enviar notificación
-    window.location.href = '/events'; // Redirigir a la vista de eventos
+    this.router.navigate(['/evento-list'], {
+
+    });
   }
+
 
 }

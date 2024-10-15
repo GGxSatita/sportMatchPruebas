@@ -8,6 +8,7 @@ import {
 import { collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -86,13 +87,26 @@ export class AutenticacionService {
     }
 
   }
+  getDesafiosDelJugador(): Observable<any> {
+    const currentUser = this.auth.currentUser;
+    return this.http.get(`http://localhost:4200/api/desafios?userId=${currentUser?.uid}`);
+  }
+
+  aceptarDesafio(desafioId: string): Observable<any> {
+    return this.http.post(`http://localhost:4200/api/aceptar-desafio`, { desafioId });
+  }
+
+  rechazarDesafio(desafioId: string): Observable<any> {
+    return this.http.post(`http://localhost:4200/api/rechazar-desafio`, { desafioId });
+  }
+
   async sendChallengeNotification(userId: string) {
     const payload = {
       userId: userId,
       title: '¡Has sido desafiado!',
       body: 'Acepta o rechaza el desafío.'
     };
-    this.http.post('URL_DEL_SERVIDOR/api/send-notification', payload).subscribe((response: any) => {
+    this.http.post('http://localhost:4200/api/send-notification', payload).subscribe((response: any) => {
       console.log('Notificación enviada:', response);
     }, (error: any) => {
       console.log('Error enviando notificación:', error);

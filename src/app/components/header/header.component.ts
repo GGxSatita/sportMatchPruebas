@@ -13,7 +13,7 @@ import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [IonTitle, IonToolbar, IonHeader, CommonModule, IonButtons, IonButton, IonIcon],
+  imports: [CommonModule, IonButtons, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle],
 })
 export class HeaderComponent implements OnInit {
 
@@ -31,9 +31,9 @@ export class HeaderComponent implements OnInit {
     '/settings': 'Configuraciones',
     '/recuperar-contrasena' : 'Recuperar contraseña',
     '/evento-list': 'Listado de eventos',
-    '/evento-add': 'Agendar evento'
+    '/evento-add': 'Agendar evento',
     '/match':'Match',
-    '/match-perfil': 'Datos del jugador'
+    '/match-perfil': "Datos del jugador",
     // Agrega las rutas y nombres que necesites
   };
 

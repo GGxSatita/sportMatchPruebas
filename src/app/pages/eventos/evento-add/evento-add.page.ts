@@ -14,7 +14,6 @@ import {
   IonItem,
   IonThumbnail,
   IonLabel,
-  IonSpinner,
   IonCard,
   IonCardHeader,
   IonCardTitle,
@@ -27,7 +26,6 @@ import {
   IonDatetime,
   IonButton,
   IonTextarea,
-  IonModal,
   IonButtons,
   IonImg,
   IonItemDivider
@@ -40,35 +38,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   templateUrl: './evento-add.page.html',
   styleUrls: ['./evento-add.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    HeaderComponent,
-    FooterComponent,
-    IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonItem,
-    IonLabel,
-    IonSelect,
-    IonSelectOption,
-    IonDatetime,
-    IonButton,
-    IonTextarea,
-    IonList,
-    IonItemDivider,
-    IonThumbnail,
-    IonButtons,
-    IonImg
-  ]
+  imports: [CommonModule, FormsModule, HeaderComponent, FooterComponent, IonContent, IonHeader, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonSelect, IonSelectOption, IonDatetime, IonButton, IonTextarea, IonList, IonItemDivider, IonThumbnail, IonButtons, IonImg]
 })
 export class EventoAddPage implements OnInit {
   sectores: Sectores[] = [];
