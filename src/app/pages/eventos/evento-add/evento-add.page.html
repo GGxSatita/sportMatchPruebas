@@ -2,9 +2,11 @@
 
 <ion-content>
   <ion-grid>
-    <!-- Selección de Sector -->
-    <ion-row>
-      <ion-col size="12">
+
+    <!-- PASO 1: Selección de Sector y Fecha/Horario -->
+    <ion-row *ngIf="step === 1">
+      <!-- Selección de Sector -->
+      <ion-col size-md="6" size-sm="12">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Seleccionar Sector</ion-card-title>
@@ -19,21 +21,20 @@
               </ion-select>
             </ion-item>
 
-            <ion-item *ngIf="selectedSectorImage">
-              <ion-thumbnail>
-                <img [src]="selectedSectorImage" alt="Imagen del sector" />
-              </ion-thumbnail>
-            </ion-item>
+
+            <div *ngIf="selectedSectorImage" class="sector-image-container">
+              <img [src]="selectedSectorImage" alt="Imagen del sector" />
+            </div>
           </ion-card-content>
         </ion-card>
       </ion-col>
-    </ion-row>
 
 
 
-    <!-- Selección de Fecha -->
-    <ion-row *ngIf="selectedSectorId">
-      <ion-col size="12">
+
+      <!-- Selección de Fecha y Horario -->
+
+      <ion-col size-md="6" size-sm="12">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Seleccionar Fecha</ion-card-title>
@@ -50,13 +51,8 @@
             </ion-datetime>
           </ion-card-content>
         </ion-card>
-      </ion-col>
-    </ion-row>
 
-    <!-- Lista de Horarios Disponibles -->
-    <ion-row *ngIf="horariosDisponibles.length > 0">
-      <ion-col size="12">
-        <ion-list>
+        <ion-list *ngIf="horariosDisponibles.length > 0">
           <ion-item-divider>Horarios Disponibles</ion-item-divider>
           <ion-item *ngFor="let horario of horariosDisponibles">
             <ion-label>{{ horario.inicio }} - {{ horario.fin }}</ion-label>
@@ -67,14 +63,23 @@
               {{ horario.disponible ? 'Seleccionar' : 'Ocupado' }}
             </ion-button>
           </ion-item>
-
         </ion-list>
       </ion-col>
     </ion-row>
 
+    <!-- Botón para Avanzar al Paso 2 -->
+    <ion-row *ngIf="step === 1">
+      <ion-col size="12">
+        <ion-button expand="block"
+                    [disabled]="!selectedSectorId || !selectedHorario"
+                    (click)="nextStep()">
+          Siguiente
+        </ion-button>
+      </ion-col>
+    </ion-row>
 
-    <!-- Formulario para Título y Descripción -->
-    <ion-row *ngIf="selectedHorario">
+    <!-- PASO 2: Formulario para Título, Descripción y Jugadores -->
+    <ion-row *ngIf="step === 2">
       <ion-col size="12">
         <ion-card>
           <ion-card-header>
@@ -83,11 +88,11 @@
           <ion-card-content>
             <ion-item>
               <ion-label position="floating">Título</ion-label>
-              <ion-input
+              <ion-textarea
                 [(ngModel)]="newEvento.titulo"
                 required
                 (ionChange)="onTitleChange($event)">
-              </ion-input>
+              </ion-textarea>
             </ion-item>
 
             <ion-item>
@@ -95,11 +100,28 @@
               <ion-textarea [(ngModel)]="newEvento.descripcion" required></ion-textarea>
             </ion-item>
 
+            <ion-item>
+              <ion-label position="floating">Jugadores</ion-label>
+              <ion-textarea
+                type="number"
+                [(ngModel)]="newEvento.capacidadMaxima"
+                required
+                (ionChange)="onCapacityChange($event)">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-col size="6">
+              <ion-button expand="block" color="medium" (click)="previousStep()">
+                Volver
+              </ion-button>
+            </ion-col>
+
             <ion-button expand="block" (click)="onSubmit()">Crear Evento</ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
+
   </ion-grid>
 </ion-content>
 

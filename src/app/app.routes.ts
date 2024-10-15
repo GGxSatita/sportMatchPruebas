@@ -56,7 +56,14 @@ export const routes: Routes = [
     path: 'match-perfil',
     loadComponent: () => import('./pages/match-perfil/match-perfil.page').then( m=> m.MatchPerfilPage),
     canActivate:[authGuard]
+  },
+  {
+    path: 'evento-alumno',
+    loadComponent: () => import('./pages/eventos/evento-alumno/evento-alumno.page').then( m => m.EventoAlumnoPage),
+    canActivate:[authGuard]
+
   }
+
 
 
 

@@ -9,6 +9,10 @@ export class eventos {
     public fechaReservada: string = '',
     public hora?: string,
     public sectorNombre?: string,
-    public capacidadAlumnos?: number
+    public capacidadMaxima: number = 0,
+    public participantesActuales: string[] = [],
+    public idAlumno?: string,
+    public informacionAdicional?: string
+
   ) {}
 }
