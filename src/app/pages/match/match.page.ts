@@ -20,9 +20,12 @@ export class MatchPage implements OnInit {
 
   constructor(private autenticationService: AutenticacionService, private router: Router) { }
 
-  async ngOnInit() {
-    // this.fetchPlayers()
-    this.players = await this.autenticationService.getLoggedInUsers();
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    this.players = await this.autenticationService.getLoggedInUsersExcludingCurrentUser();
   }
 
   goToPlayerDetails(player: any) {

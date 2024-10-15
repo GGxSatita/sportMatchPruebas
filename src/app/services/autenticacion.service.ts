@@ -17,6 +17,7 @@ export class AutenticacionService {
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
   router: Router = inject(Router);
+  http: any;
 
   constructor(private firestore: Firestore) { }
 
@@ -55,10 +56,9 @@ export class AutenticacionService {
         await updateDoc(userDoc, {
           lastLogin: new Date(),
           isLoggedIn: true,
-          // messagingToken: await getToken(getMessaging())
+          messagingToken: await getToken(getMessaging())
         });
       }
-
       return user;
     } catch (error: any) {
       // Capturar los códigos de error específicos de Firebase
@@ -80,50 +80,33 @@ export class AutenticacionService {
           throw new Error('Credenciales inválidas.');
         }
       }
-
       console.error('Error al iniciar sesión:', error);
       throw error;
     }
 
   }
+  async sendChallengeNotification(userId: string) {
+    const payload = {
+      userId: userId,
+      title: '¡Has sido desafiado!',
+      body: 'Acepta o rechaza el desafío.'
+    };
+    this.http.post('URL_DEL_SERVIDOR/api/send-notification', payload).subscribe((response: any) => {
+      console.log('Notificación enviada:', response);
+    }, (error: any) => {
+      console.log('Error enviando notificación:', error);
+    });
+  }
 
-  // async sendSimpleNotification(opponentId: string) {
-  //   const opponentDoc = doc(this.firestore, `Users/${opponentId}`);
-  //   const opponent = await getDoc(opponentDoc);
-  //   if (opponent.exists()) {
-  //     const opponentData = opponent.data();
-  //     const payload = {
-  //       notification: {
-  //         title: '¡Has sido desafiado!',
-  //         body: 'Tienes un nuevo desafío pendiente.'
-  //       }
-  //     };
-  //     if (opponentData['messagingToken']) {
-  //       await fetch('https://fcm.googleapis.com/fcm/send', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'Authorization': 'key=YOUR_SERVER_KEY'
-  //         },
-  //         body: JSON.stringify({
-  //           to: opponentData['messagingToken'],
-  //           ...payload
-  //         })
-  //       });
-  //     }
-  //   }
-  // }
-
-
-  async getLoggedInUsers() {
+  async getLoggedInUsersExcludingCurrentUser() {
     const currentUser = this.auth.currentUser;
     const usersCollection = collection(this.firestore, 'Users');
     const q = query(usersCollection, where('isLoggedIn', '==', true));
     const querySnapshot = await getDocs(q);
 
     return querySnapshot.docs
-      .map(doc => doc.data())
-      .filter(user => user['uid'] !== currentUser?.uid);
+      .map(doc => ({ ...doc.data(), uid: doc.id }))
+      .filter(user => user.uid !== currentUser.uid);
   }
 
   async logout() {
