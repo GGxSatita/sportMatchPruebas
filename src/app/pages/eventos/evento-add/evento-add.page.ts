@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
 
+
 import {
   IonContent,
   IonHeader,
@@ -37,6 +38,7 @@ import {
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-evento-add',
@@ -74,6 +76,8 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   ]
 })
 export class EventoAddPage implements OnInit {
+
+  step: number = 1;
   sectores: Sectores[] = [];
   horariosDisponibles: Horario[] = [];
   selectedDate: string | null = null;
@@ -90,11 +94,20 @@ export class EventoAddPage implements OnInit {
   constructor(
     private eventosService: EventosService,
     private sectoresService: SectoresService,
-    private auth: Auth
+    private auth: Auth,
+    private router: Router
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
     this.maxDate = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
+  }
+
+  nextStep(): void {
+    this.step++;
+  }
+
+  previousStep(): void {
+    this.step--;
   }
 
   ngOnInit(): void {
@@ -114,9 +127,16 @@ export class EventoAddPage implements OnInit {
 
   loadSectores(): void {
     this.sectoresService.getSectores().subscribe((sectores) => {
-      this.sectores = sectores;
+      // Asegurar que 'visible' siempre sea booleano
+      this.sectores = sectores.map(sector => ({
+        ...sector,
+        visible: sector.visible === true // Convertimos a booleano si es necesario
+      }));
+      console.log('Sectores después de la conversión:', this.sectores); // Verificación
     });
   }
+
+
 
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
@@ -147,26 +167,25 @@ export class EventoAddPage implements OnInit {
         this.horariosDisponibles = sector.horarios.map(horario => {
           const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
 
-          // Verificamos si hay un evento aprobado (espera: false) que bloquee el horario
+          // Verificamos si hay un evento aprobado que bloquee el horario
           const eventoBloqueado = this.eventos.some(evento => {
             const coincideSector = evento.idSector === this.selectedSectorId;
             const coincideFecha = this.compararFechas(evento.fechaReservada, this.selectedDate);
             const coincideHora = evento.hora === `${horario.inicio} - ${horario.fin}`;
-
-            // La hora solo debe estar ocupada si el evento fue aprobado (espera: false)
             const estaAprobado = evento.espera === true;
 
             console.log(`Verificando evento: ${evento.titulo}, Aprobado: ${estaAprobado}`);
-
             return coincideSector && coincideFecha && coincideHora && estaAprobado;
           });
 
-          // El horario estará disponible si no hay eventos aprobados para esa hora
-          return { ...horario, disponible: isSameDayOfWeek && !eventoBloqueado };
+          // Si es privado, debe pasar por aprobación (en espera: true)
+          const disponible = isSameDayOfWeek && !eventoBloqueado;
+          return { ...horario, disponible };
         }).filter(horario => this.normalizeDayName(horario.dia) === dayOfWeek);
       }
     }
   }
+
 
   // Función para comparar fechas sin horas
   compararFechas(fecha1: string, fecha2: string): boolean {
@@ -199,40 +218,69 @@ export class EventoAddPage implements OnInit {
     console.log('Título actualizado:', this.newEvento.titulo); // Depuración
   }
 
+  onCapacityChange(event: any): void {
+    this.newEvento.capacidadMaxima = event.detail.value;
+    console.log('Capacidad Máxima:', this.newEvento.capacidadMaxima); // Depuración
+  }
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses empiezan en 0
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+
   onSubmit(): void {
     if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
       const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
 
-      const enEspera = sector?.visible === true;
+      if (!sector) {
+        console.error('Sector no encontrado.');
+        return;
+      }
+
+      const enEspera = sector.visible === true;
+
+      // Extraer solo la fecha en formato YYYY-MM-DD
+      const fechaReservada = this.formatDate(this.selectedDate);
 
       const nuevoEvento: eventos = {
         ...this.newEvento,
         idSector: this.selectedSectorId,
         espera: enEspera,
         image: this.selectedSectorImage || '',
-        fechaReservada: this.selectedDate,
+        fechaReservada: fechaReservada, // Guardar solo la fecha
         sectorNombre: this.getSectorNombre(this.selectedSectorId),
-        capacidadAlumnos: this.newEvento.capacidadAlumnos || 0,
         hora: this.newEvento.hora,
-        idAlumno: this.idAlumno // Agregar el ID del alumno al evento
+        idAlumno: this.idAlumno,
+        capacidadMaxima: this.newEvento.capacidadMaxima,
+        participantesActuales: [],
+        informacionAdicional: this.newEvento.informacionAdicional || '',
       };
 
       console.log('Evento a guardar:', nuevoEvento);
 
       this.eventosService.createEvento(nuevoEvento).then(() => {
-        if (enEspera) {
-          alert('El evento ha sido creado y está en espera de confirmación.');
-        } else {
-          alert('Evento creado exitosamente y hora bloqueada.');
-        }
+        const message = enEspera
+          ? 'El evento ha sido creado y está en espera de confirmación.'
+          : 'Evento creado exitosamente y hora bloqueada.';
+        alert(message);
         this.resetForm();
         this.loadEventos();
-      }).catch((error) => {
-        console.error('Error al crear evento:', error);
+
+        // Redirigir a la página eventos-list después de crear el evento
+        this.router.navigate(['/evento-list']);
+      }).catch(error => {
+        console.error('Error al crear el evento:', error);
         alert('Ocurrió un error al crear el evento.');
       });
     }
   }
+
+
+
+
 
 
 

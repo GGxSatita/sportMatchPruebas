@@ -8,3 +8,37 @@ ion-card {
   border: 1px solid #2a2c41;
   border-radius: 8px;
 }
+
+.evento-info-row {
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+ion-label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ion-text-color);
+}
+
+.event-title {
+  font-size: 24px;          /* Tamaño más grande */
+  font-weight: bold;        /* Texto más fuerte */
+  color: #000000;           /* Cambia el color a blanco o el que prefieras */
+  text-align: center;
+}
+
+.event-divider {
+  display: flex;
+  justify-content: center;  /* Centrar horizontalmente */
+  align-items: center;      /* Centrar verticalmente */
+  background-color: transparent; /* Cambia el fondo a transparente */
+  padding: 16px;            /* Espacio interno */
+  border-radius: 8px;       /* Bordes redondeados */
+  margin-bottom: 16px;      /* Separación del contenido */
+}
+

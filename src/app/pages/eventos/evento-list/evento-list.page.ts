@@ -75,6 +75,7 @@ export class EventoListPage implements OnInit {
   eventos: eventos[] = [];
   minDate: string;
   maxDate: string;
+  eventosExpandido: { [key: string]: boolean } = {};
 
   eventosFiltrados: eventos[] = []; // Eventos que se mostrarán filtrados
   idAlumno: string | null = null;   // ID del alumno autenticado
@@ -97,6 +98,10 @@ export class EventoListPage implements OnInit {
   }
 
 
+  toggleEventoExpandido(eventoId: string): void {
+    this.eventosExpandido[eventoId] = !this.eventosExpandido[eventoId];
+  }
+
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
       this.eventos = eventos;
@@ -106,9 +111,10 @@ export class EventoListPage implements OnInit {
 
   filtrarEventos(): void {
     this.eventosFiltrados = this.eventos.filter(evento =>
-      evento.espera || evento.idAlumno === this.idAlumno
+      evento.espera === true // Filtrar solo los eventos aprobados
     );
   }
+
 
 
 
@@ -179,26 +185,53 @@ export class EventoListPage implements OnInit {
     this.selectedHorario = horario;
   }
 
-  onSubmit(): void {
-    if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
-      const nuevoEvento: eventos = {
-        idEventosAlumnos: '',
-        idSector: this.selectedSectorId,
-        titulo: 'Nuevo Evento',
-        descripcion: `Evento en ${this.selectedHorario.dia} de ${this.selectedHorario.inicio} a ${this.selectedHorario.fin}`,
-        espera: false,
-        image: this.selectedSectorImage || '',
-        fechaReservada: this.selectedDate,
-        sectorNombre: this.getSectorNombre(this.selectedSectorId),
-        capacidadAlumnos: 0
-      };
 
-      this.eventosService.createEvento(nuevoEvento).then(() => {
-        alert('Evento creado exitosamente.');
-        this.loadEventos();
-      });
+  inscribirseEnEvento(evento: eventos): void {
+    if (!this.idAlumno) return;
+
+    // Verificar que participantesActuales sea un array
+    if (!Array.isArray(evento.participantesActuales)) {
+      evento.participantesActuales = [];
     }
+
+    // Verificar si el creador está intentando inscribirse
+    if (evento.idAlumno === this.idAlumno) {
+      alert('El creador del evento no puede inscribirse.');
+      return;
+    }
+
+    // Verificar si el usuario ya está inscrito
+    if (evento.participantesActuales.includes(this.idAlumno)) {
+      alert('Ya estás inscrito en este evento.');
+      return;
+    }
+
+    // Verificar si hay cupo disponible
+    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+      alert('El evento ya ha alcanzado su capacidad máxima.');
+      return;
+    }
+
+
+
+    // Agregar el ID del usuario a los participantes actuales
+    evento.participantesActuales.push(this.idAlumno);
+
+    // Actualizar el evento en Firebase
+    this.eventosService.updateEvento(evento.idEventosAlumnos, {
+      participantesActuales: evento.participantesActuales
+    }).then(() => {
+      alert('Te has inscrito en el evento exitosamente.');
+      this.loadEventos(); // Recargar la lista de eventos
+    }).catch(error => {
+      console.error('Error al inscribirse en el evento:', error);
+    });
   }
+
+
+
+
+
 
   removeReservation(evento: eventos): void {
     this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
