@@ -1,128 +1,114 @@
-.form-title {
-  font-size: 2rem;
-  margin-bottom: 20px;
+.fondo-app {
+  background-color: var(--ion-color-light); // Fondo claro para la aplicación
 }
 
-input-content {
-  margin-bottom: 15px;
-}
+.page-login {
+  .registro-header {
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--ion-color-primary); // Naranja
+    text-shadow: 0px 0px 10px var(--ion-color-primary);
+  }
 
-.error-message {
-  color: red;
-  font-size: 0.9rem;
-}
+  ion-item {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
 
+  ion-label {
+    color: var(--ion-color-primary); // Naranja
+    font-weight: 500;
+  }
 
-.register-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  padding: 20px;
-}
+  ion-input, ion-select {
+    color: var(--ion-color-dark); // Texto oscuro
+  }
 
-.register-header {
-  margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #ffdd57;
-  text-shadow: 0px 0px 10px #ffdd57;
-}
+  ion-button {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary)); // Gradiente de naranja a amarillo
+    color: var(--ion-color-white); // Texto blanco
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 111, 0, 0.4);
+    transition: transform 0.2s ease;
+    width: 100%;
+  }
 
-.register-card {
-  padding: 30px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  width: 100%;
-  max-width: 420px;
-}
+  ion-button:hover {
+    transform: translateY(-2px);
+  }
 
-.image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 10px auto;
+    display: block;
+  }
 
-.image-wrapper {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
-}
-
-.register-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-ion-item {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-ion-label {
-  color: #ffdd57;
-  font-weight: 500;
-}
-
-ion-input {
-  color: #1e1e1e;
-}
-
-ion-button {
-  background: linear-gradient(135deg, #ffdd57, #ffb700);
-  color: #1e1e1e;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
-  transition: transform 0.2s ease;
-}
-
-ion-button:hover {
-  transform: translateY(-2px);
-}
-
-ion-row p {
-  color: #ffdd57;
-  margin-bottom: 10px;
-}
-.input-email-password {
-  color: #1e1e1e;
-}
-
-.registro-header {
-  margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #ffdd57;
-  text-shadow: 0px 0px 10px #ffdd57;
-}
-
-.iconos-grandes{
-    color: yellow; /* Los íconos se mostrarán en blanco para contrastar con el fondo degradado */
-    font-size: 30px; /* Ajusta el tamaño del ícono si es necesario */
+  .iconos-grandes {
     display: flex;
     justify-content: center;
-    align-items: center; // Asegúrate de que el tamaño del ícono sea adecuado.
-    text-align: center;
-}
+    align-items: center;
 
-.boton-personalizado {
-  --width: 80px;
-  --height: 80px;
-  width: 80px; /* Aumenta el tamaño del botón */
-  height: 80px; /* Aumenta el tamaño del botón */
-  border-radius: 50%; /* Hacemos que los botones sean circulares */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    ion-button {
+      --width: 80px;
+      --height: 80px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-.boton-personalizado ion-icon {
-  font-size: 50px; /* Aumenta el tamaño del ícono */
+    ion-icon {
+      font-size: 50px;
+      color: var(--ion-color-primary); // Naranja para los íconos
+    }
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    padding-left: 5px;
+  }
+
+  @media (max-width: 768px) {
+    .registro-header {
+      font-size: 1.5rem;
+    }
+
+    ion-item {
+      margin-bottom: 10px;
+    }
+
+    ion-button {
+      font-size: 1rem;
+    }
+
+    ion-icon {
+      font-size: 30px; // Íconos más pequeños en pantallas pequeñas
+    }
+  }
+
+  @media (min-width: 769px) {
+    .registro-header {
+      font-size: 2rem;
+    }
+
+    ion-button {
+      font-size: 1.2rem;
+    }
+
+    ion-icon {
+      font-size: 50px; // Tamaño de íconos más grandes en pantallas grandes
+      color: #2a2c41 !important;
+    }
+  }
+}
+ion-card {
+  border: 2px solid #2a2c41; // Borde de color oscuro
+  border-radius: 12px; // Bordes redondeados para mantener el estilo
 }

@@ -1,56 +1,81 @@
 <ion-content class="ion-padding fondo-app">
-  <!-- Spinner de carga mientras se obtienen los datos -->
-  <ion-spinner *ngIf="cargando"></ion-spinner>
+  <ion-card class="perfil-card">
+    <ion-card-header>
+      <ion-card-title class="ion-text-center">Editar Perfil</ion-card-title>
+    </ion-card-header>
 
-  <!-- Formulario para editar perfil -->
-  <form [formGroup]="profileForm" *ngIf="!cargando">
+    <ion-card-content>
+      <form [formGroup]="profileForm">
+        <!-- Nombre -->
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input
+            formControlName="newName"
+            placeholder="Ingresa tu nombre"
+          ></ion-input>
+        </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input formControlName="newName" placeholder="Ingresa tu nombre"></ion-input>
-    </ion-item>
+        <!-- Edad -->
+        <ion-item>
+          <ion-label position="floating">Edad</ion-label>
+          <ion-input
+            formControlName="nuevaEdad"
+            type="number"
+            placeholder="Ingresa tu edad"
+          ></ion-input>
+        </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Edad</ion-label>
-      <ion-input formControlName="nuevaEdad" type="number" placeholder="Ingresa tu edad"></ion-input>
-    </ion-item>
+        <!-- Deporte Favorito -->
+        <ion-item>
+          <ion-label position="floating">Deporte Favorito</ion-label>
+          <ion-select
+            formControlName="deporteFavorito"
+            placeholder="Selecciona un deporte"
+          >
+            <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
+              {{ deporte.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Deporte Favorito</ion-label>
-      <ion-select formControlName="deporteFavorito" placeholder="Selecciona un deporte">
-        <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
-          {{ deporte.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+        <!-- Previsualización de Foto de Perfil -->
+        <ion-item>
+          <ion-label position="stacked">Foto de Perfil</ion-label>
+          <img
+            *ngIf="profileImage"
+            [src]="profileImage"
+            alt="Previsualización de la foto"
+            class="profile-image"
+          />
+        </ion-item>
 
-    <!-- Vista previa de la foto de perfil -->
+        <!-- Botones de Cámara y Galería -->
+        <ion-row>
+          <ion-col size="6">
+            <ion-button expand="block" fill="clear" class="boton-personalizado" (click)="takePicture()">
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>Cámara</span>
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" fill="clear" class="boton-personalizado" (click)="selectFromGallery()">
+              <ion-icon name="image-outline"></ion-icon>
+              <span>Galería</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
 
-    <ion-item>
-      <ion-label position="stacked">Foto de Perfil</ion-label>
-      <img *ngIf="imageUrl" [src]="imageUrl" alt="Foto de perfil" class="profile-image" />
-    </ion-item>
+        <!-- Spinner de carga al subir imagen -->
+        <ion-spinner *ngIf="subiendoImagen"></ion-spinner>
 
-    <ion-row>
-      <ion-col size="6">
-        <ion-button expand="block" fill="clear" (click)="takePicture()">
-          <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+        <!-- Botones Guardar y Cancelar -->
+        <ion-button expand="block" color="primary" (click)="actualizarPerfil()">
+          Guardar Cambios
         </ion-button>
-      </ion-col>
-      <ion-col size="6">
-        <ion-button expand="block" fill="clear" (click)="selectFromGallery()">
-          <ion-icon slot="icon-only" name="image-outline"></ion-icon>
+        <ion-button expand="block" color="medium" (click)="cancelar()">
+          Cancelar
         </ion-button>
-      </ion-col>
-    </ion-row>
-
-    <ion-spinner *ngIf="subiendoImagen"></ion-spinner>
-
-    <ion-button expand="block" color="primary" (click)="actualizarPerfil()">
-      Guardar Cambios
-    </ion-button>
-    <ion-button expand="block" color="medium" (click)="cancelar()">
-      Cancelar
-    </ion-button>
-  </form>
+      </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

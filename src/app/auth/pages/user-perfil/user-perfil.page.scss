@@ -4,14 +4,17 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: none; /* Mantener sin fondo */
+  background: none;
 
-  /* Animación sutil al cargar */
   animation: fadeIn 1s ease-in-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
@@ -19,24 +22,23 @@
   margin-bottom: 20px;
   font-size: 28px;
   font-weight: bold;
-  color: #ffdd57;
-  text-shadow: 0px 0px 10px #ffdd57; /* Efecto neon */
+  color: #FF724C;
 }
 
 .login-card {
   padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra sutil */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
-  backdrop-filter: blur(10px); /* Efecto de difuminado */
-  border: 2px solid #ffdd57; /* Borde neón */
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid #2A2C41;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   transition: transform 0.3s ease;
 
   &:hover {
-    transform: translateY(-10px); /* Efecto de elevación en hover */
-    box-shadow: 0 8px 16px rgba(255, 221, 87, 0.5); /* Sombra amarilla */
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(42, 44, 65, 0.5);
   }
 }
 
@@ -49,10 +51,10 @@
 .profile-image {
   width: 120px;
   height: 120px;
-  border-radius: 50%; /* Hace la foto circular */
+  border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #ffdd57; /* Borde amarillo brillante */
-  box-shadow: 0 0 15px rgba(255, 221, 87, 0.7); /* Sombra luminosa */
+  border: 3px solid #2A2C41;
+  box-shadow: 0 0 15px rgba(42, 44, 65, 0.7);
 }
 
 .data-item {
@@ -61,39 +63,153 @@
   justify-content: center;
   margin: 10px 0;
   font-size: 18px;
-  color: #ffffff;
+  color: #2a2c41;
   font-weight: 500;
 
   ion-icon {
     margin-right: 10px;
-    color: #ffdd57; /* Iconos amarillos */
+    color: #FF724C;
     font-size: 20px;
   }
 }
 
 ion-button {
-  background: linear-gradient(135deg, #ffdd57, #ffb700); /* Degradado amarillo */
-  color: #1e1e1e;
-  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 12px 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
   width: 100%;
+  background: linear-gradient(135deg, #FF724C, #FDBF50);
+  color: #F4F4F8;
+  box-shadow: 0 4px 10px rgba(255, 114, 76, 0.4);
   transition: transform 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px); /* Efecto de levantamiento */
-    background: #ffb700;
+    transform: translateY(-2px);
+    background: #FDBF50;
+  }
+
+  ion-icon {
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+  }
+
+  &.cambiar-contrasena {
+    font-size: 0.8rem;
+    padding: 14px 15px;
   }
 }
-h3 {
-  font-size: 28px; /* Tamaño más grande para destacar el nombre */
-  font-weight: bold;
-  color: #ffdd57; /* Color amarillo brillante */
-  text-shadow: 2px 2px 5px rgba(255, 221, 87, 0.7); /* Sombra luminosa */
-  margin: 0;
+
+.boton-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #FF724C, #FDBF50);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 85%;
+  max-width: 350px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(255, 114, 76, 0.3);
+  }
+
+  ion-card-content {
+    color: #F4F4F8;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  ion-icon {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 4px 6px;
+
+    ion-icon {
+      font-size: 1.1rem;
+    }
+
+    ion-card-content {
+      font-size: 0.65rem;
+      gap: 1px;
+    }
+  }
 }
-.user-name {
-  font-size: 1.5rem;
-  font-weight: bold;
+
+@media (max-width: 768px) {
+  .login-card {
+    padding: 20px;
+    max-width: 300px;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  ion-button {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  h3 {
+    font-size: 1.8rem;
+  }
+
+  ion-button {
+    font-size: 1rem;
+  }
+}
+
+.data-item p {
   color: #333;
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+@media (max-width: 480px) {
+  ion-button {
+    flex-direction: row;
+    justify-content: space-evenly;
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  ion-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+}
+
+.button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
 }

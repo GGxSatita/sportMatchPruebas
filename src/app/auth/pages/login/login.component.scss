@@ -1,4 +1,16 @@
+// Variables de la paleta de colores
+:root {
+  --ion-color-primary: #ff724c;
+  --ion-color-secondary: #fdbf50;
+  --ion-color-light: #f4f4f8;
+  --ion-color-dark: #2a2c41;
+  --ion-color-white: #ffffff;
+}
+
+// Estilos generales
 .page-login {
+  background-color: var(--ion-color-light);
+
   .login-container {
     display: flex;
     flex-direction: column;
@@ -12,7 +24,7 @@
     margin-bottom: 30px;
     font-size: 28px;
     font-weight: bold;
-    color: #FF6F00; /* Naranja Intenso */
+    color: var(--ion-color-primary); // Naranja principal
   }
 
   .login-card {
@@ -22,75 +34,54 @@
     background: rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 420px;
-    border: 3px solid #2A2C41; /* Borde Naranja Intenso */
+    border: 3px solid var(--ion-color-dark); // Borde oscuro
   }
 
-  .image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .image-wrapper {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
-  }
-
-  .login-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-
-  ion-item {
-    background: rgba(255, 255, 255, 0.2);
+  .input-item {
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     margin-bottom: 20px;
-    --highlight-color-focused: #004080; /* Azul Marino */
-    --highlight-background-focused: transparent;
-    --color-focused: inherit;
+
+    ion-label {
+      color: var(--ion-color-dark); // Texto oscuro
+    }
+
+    ion-input {
+      color: var(--ion-color-dark); // Texto oscuro
+    }
   }
 
-  ion-item.ion-focused,
-  ion-item.ion-has-value {
-    --highlight-color-focused: #004080; /* Mantener el borde Azul Marino si tiene valor */
-    --highlight-background-focused: transparent;
-    --color-focused: inherit;
-  }
-
-  ion-input {
-    color: #2F4F4F; /* Gris Pizarra */
-  }
-
-  ion-button {
-    margin-top: 10px;
-    background: linear-gradient(135deg, #FF6F00, #FFB300); /* Naranja Intenso a Mostaza */
-    color: #F5F5F5; /* Blanco Crema */
+  // Estilo de botones
+  .btn-iniciar-sesion {
+    background-color: var(--ion-color-primary); // Botón principal
+    color: var(--ion-color-white);
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(255, 111, 0, 0.4);
     transition: transform 0.2s ease;
     width: 100%;
   }
 
+  .btn-salir {
+    background-color: var(--ion-color-dark); // Botón salir
+    color: var(--ion-color-white);
+  }
+
+  .btn-recuperar {
+    background-color: var(--ion-color-secondary); // Botón recuperar contraseña
+    color: var(--ion-color-white);
+  }
+
+  .btn-registrarse {
+    background-color: var(--ion-color-dark); // Botón registrarse
+    color: var(--ion-color-white);
+  }
+
   ion-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px); // Efecto hover
   }
 
   ion-row p {
-    color: #FF6F00; /* Naranja Intenso */
+    color: var(--ion-color-primary); // Naranja
     margin-bottom: 10px;
-  }
-
-  .input-email-password {
-    color: #2F4F4F; /* Gris Pizarra */
-  }
-
-  ion-input::placeholder {
-    color: #999;  /* Color del placeholder */
   }
 }

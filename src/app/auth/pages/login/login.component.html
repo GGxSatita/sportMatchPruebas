@@ -1,13 +1,9 @@
 <ion-content class="ion-padding page-login">
   <div class="login-container">
-    <!-- Título de Login en la parte superior -->
-
-
     <ion-card class="login-card">
-      <!-- Imagen dentro de un div en el card -->
       <div class="image-container">
         <div class="login-header">
-          <h1 class="ion-text-center neon">⚡ Iniciar Sesión ⚡</h1>
+          <h1 class="ion-text-center">Iniciar Sesión</h1>
         </div>
       </div>
 
@@ -15,28 +11,43 @@
         <div *ngIf="user; else loginForm">
           <div class="ion-text-center">
             <h3>Bienvenido</h3>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Nombre:</strong> {{ user.name }}</p>
+            <p><strong>{{ user.name }}</strong> </p>
           </div>
-          <div class="ion-margin-top">
-            <ion-button expand="block" color="dark">Salir</ion-button>
-          </div>
+          <!-- <div class="ion-margin-top">
+            <ion-button expand="block" class="btn-salir">Salir</ion-button>
+          </div> -->
         </div>
 
         <ng-template #loginForm>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Correo electrónico</ion-label>
-            <ion-input type="text" [(ngModel)]="form.email" class="input-email-password"></ion-input>
+            <ion-input
+              type="text"
+              [(ngModel)]="form.email"
+              (ionBlur)="validateEmailField()"
+              (ionInput)="hideEmailError()"
+            ></ion-input>
           </ion-item>
+          <ion-text color="danger" class="error-message" *ngIf="showEmailError">
+            Ingresa un correo electrónico válido.
+          </ion-text>
 
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Contraseña</ion-label>
-            <ion-input type="password" [(ngModel)]="form.password"></ion-input>
+            <ion-input
+              type="password"
+              [(ngModel)]="form.password"
+              (ionBlur)="validatePasswordField()"
+              (ionInput)="hidePasswordError()"
+            ></ion-input>
           </ion-item>
+          <ion-text color="danger" class="error-message" *ngIf="showPasswordError">
+            Ingresa una contraseña válida.
+          </ion-text>
 
           <ion-row class="ion-margin-top">
             <ion-col>
-              <ion-button expand="block" color="dark" (click)="login()">
+              <ion-button expand="block" class="btn-iniciar-sesion" (click)="login()">
                 <ion-icon name="log-in-outline" slot="end"></ion-icon>
                 Iniciar sesión
               </ion-button>
@@ -45,9 +56,8 @@
 
           <ion-row class="ion-margin-top ion-text-center">
             <ion-col>
-              <!-- Botón para recuperar contraseña -->
               <p>¿Olvidaste tu contraseña?</p>
-              <ion-button expand="block" color="warning" (click)="goToRecoverPassword()">
+              <ion-button expand="block" class="btn-recuperar" (click)="goToRecoverPassword()">
                 <ion-icon name="lock-closed-outline" slot="end"></ion-icon>
                 Recuperar Contraseña
               </ion-button>
@@ -57,7 +67,7 @@
           <ion-row class="ion-margin-top ion-text-center">
             <ion-col>
               <p>¿No tienes una cuenta?</p>
-              <ion-button expand="block" color="dark" [routerLink]="['/registro']">
+              <ion-button expand="block" class="btn-registrarse" [routerLink]="['/registro']">
                 <ion-icon name="person-add-outline" slot="end"></ion-icon>
                 Registrarse
               </ion-button>

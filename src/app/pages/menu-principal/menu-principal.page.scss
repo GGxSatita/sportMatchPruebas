@@ -1,0 +1,25 @@
+.fondo-app {
+  background-color: #f4f4f8 !important; // Fondo claro para la aplicación
+}
+
+
+// Responsividad
+@media (max-width: 768px) {
+  ion-list {
+    font-size: 1rem !important; // Ajustar el tamaño en pantallas pequeñas
+  }
+
+  ion-icon {
+    font-size: 1.4rem !important; // Ajustar el tamaño del icono en pantallas pequeñas
+  }
+}
+
+@media (min-width: 769px) {
+  ion-list {
+    font-size: 1.2rem !important; // Ajustar el tamaño en pantallas grandes
+  }
+
+  ion-icon {
+    font-size: 1.6rem !important; // Ajustar el tamaño del icono en pantallas grandes
+  }
+}

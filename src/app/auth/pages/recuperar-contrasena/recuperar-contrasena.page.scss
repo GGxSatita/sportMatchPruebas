@@ -1,0 +1,78 @@
+// Variables de la paleta de colores
+$color-principal: #ff724c;
+$color-secundario: #fdbf50;
+$color-fondo: #f4f4f8;
+$color-texto-oscuro: #2a2c41;
+$color-blanco: #ffffff;
+
+// Estilos generales
+.page-recuperar-contrasena {
+  background-color: $color-fondo;
+
+  .reset-password-container {
+    ion-card {
+      background-color: $color-blanco;
+      border-radius: 12px;
+    }
+
+    ion-card-header {
+      display: flex;
+      justify-content: center; // Centra el título horizontalmente
+      text-align: center;
+      padding-bottom: 10px;
+
+      ion-card-title {
+        color: $color-texto-oscuro;
+        font-weight: bold;
+        font-size: 1.5rem; // Ajusta el tamaño según prefieras
+      }
+    }
+
+    ion-card-content {
+      form {
+        ion-item {
+          ion-label {
+            color: $color-texto-oscuro !important;
+          }
+
+          ion-input {
+            color: $color-texto-oscuro !important;
+          }
+        }
+
+        ion-text {
+          color: red !important; // Puedes ajustar este color si prefieres otro para los errores
+        }
+
+        ion-spinner {
+          --width: 40px;  // Ajusta el tamaño
+          --height: 40px; // Ajusta el tamaño
+          --color: $color-principal;  // Cambia el color del spinner
+        }
+
+        // Estilo personalizado para el botón de "Enviar Enlace"
+        .btn-enviar-enlace {
+          background-color: $color-principal !important;
+          color: $color-blanco !important;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(255, 111, 0, 0.4);
+          transition: transform 0.2s ease;
+          width: 100%;
+
+          // Sobreescribimos los estilos nativos del botón de Ionic
+          .button-native::after {
+            content: none !important;
+          }
+
+          &:disabled {
+            background-color: lighten($color-principal, 20%) !important;
+          }
+        }
+      }
+
+      p {
+        color: $color-texto-oscuro !important;
+      }
+    }
+  }
+}

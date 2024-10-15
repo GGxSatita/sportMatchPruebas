@@ -1,17 +1,30 @@
 <app-header></app-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item *ngFor="let player of players" (click)="goToPlayerDetails(player)">
-      <ion-avatar slot="start">
-        <img [src]="player?.photo || 'assets/img/default-profile.png'" alt="Foto de perfil del usuario" (error)="handleImageError($event)"/>
-      </ion-avatar>
-      <ion-label>
-        <h2>{{player.name}}</h2>
-        <p>Edad: {{player.edad}}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content class="ion-padding responsive-content">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="8" size-lg="6">
+        <ion-list>
+          <ion-item
+            *ngFor="let player of players; let i = index"
+            (click)="goToPlayerDetails(player)"
+            [ngClass]="{ 'odd-item': i % 2 === 0, 'even-item': i % 2 !== 0 }"
+          >
+            <ion-avatar slot="start">
+              <img [src]="player?.photo || 'assets/img/default-profile.png'"
+                   alt="Foto de perfil del usuario"
+                   (error)="handleImageError($event)" />
+            </ion-avatar>
+            <ion-label>
+              <h2>{{player.name}}</h2>
+              <p>Edad: {{player.edad}}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
 
 <app-footer></app-footer>
