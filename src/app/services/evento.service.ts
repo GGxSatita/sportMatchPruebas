@@ -29,15 +29,17 @@ export class EventosService {
     return collectionData(eventosRef, { idField: 'id' }) as Observable<eventos[]>;
   }
 
+
   getEvento(id: string): Observable<eventos | undefined> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return docData(eventoDoc) as Observable<eventos | undefined>;
   }
 
-  updateEvento(id: string, evento: eventos): Promise<void> {
+  updateEvento(id: string, evento: Partial<eventos>): Promise<void> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return updateDoc(eventoDoc, { ...evento });
   }
+
 
   deleteEvento(id: string): Promise<void> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
