@@ -8,11 +8,13 @@ export interface Horario{
 
 
 export interface Sectores{
-    idSector: string;
-    nombre: string;
-    image: string | null;
-    description?: string;
-    horarios: Horario[];
-    capacidad?: number;
-    acaptado: boolean;
+  idSector: string;
+  nombre: string;
+  image: string | null;
+  horarios: Horario[];
+  visible: boolean;
+  visibleVer:string;
+  description?: string;
+  capacidad?: number;
+
 }

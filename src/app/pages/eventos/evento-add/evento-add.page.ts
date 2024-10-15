@@ -121,6 +121,7 @@ export class EventoAddPage implements OnInit {
     this.filterHorarios();
   }
 
+
   filterHorarios(): void {
     if (this.selectedSectorId && this.selectedDate) {
       const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
@@ -130,27 +131,37 @@ export class EventoAddPage implements OnInit {
         this.horariosDisponibles = sector.horarios.map(horario => {
           const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
 
-          const eventoAprobado = this.eventos.some(evento => {
+          // Verificamos si hay un evento aprobado (espera: false) que bloquee el horario
+          const eventoBloqueado = this.eventos.some(evento => {
             const coincideSector = evento.idSector === this.selectedSectorId;
-            const coincideFecha = new Date(evento.fechaReservada).toDateString() === new Date(this.selectedDate).toDateString();
+            const coincideFecha = this.compararFechas(evento.fechaReservada, this.selectedDate);
             const coincideHora = evento.hora === `${horario.inicio} - ${horario.fin}`;
+
+            // La hora solo debe estar ocupada si el evento fue aprobado (espera: false)
             const estaAprobado = evento.espera === true;
 
-            console.log('Verificando horario:', {
-              coincideSector,
-              coincideFecha,
-              coincideHora,
-              estaAprobado,
-            });
+            console.log(`Verificando evento: ${evento.titulo}, Aprobado: ${estaAprobado}`);
 
             return coincideSector && coincideFecha && coincideHora && estaAprobado;
           });
 
-          return { ...horario, disponible: isSameDayOfWeek && !eventoAprobado };
+          // El horario estará disponible si no hay eventos aprobados para esa hora
+          return { ...horario, disponible: isSameDayOfWeek && !eventoBloqueado };
         }).filter(horario => this.normalizeDayName(horario.dia) === dayOfWeek);
       }
     }
   }
+
+  // Función para comparar fechas sin horas
+  compararFechas(fecha1: string, fecha2: string): boolean {
+    const date1 = new Date(fecha1).toDateString();
+    const date2 = new Date(fecha2).toDateString();
+    return date1 === date2;
+  }
+
+
+
+
 
   getDayOfWeek(dateString: string): string {
     const date = new Date(dateString);
@@ -174,10 +185,16 @@ export class EventoAddPage implements OnInit {
 
   onSubmit(): void {
     if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
+      const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
+
+      // Si el sector es público (visible: true), el evento queda en espera (espera: true).
+      // Si es privado (visible: false), el evento se aprueba (espera: false).
+      const enEspera = sector?.visible === true;
+
       const nuevoEvento: eventos = {
         ...this.newEvento,
         idSector: this.selectedSectorId,
-        espera: false,
+        espera: enEspera, // Asignación clara
         image: this.selectedSectorImage || '',
         fechaReservada: this.selectedDate,
         sectorNombre: this.getSectorNombre(this.selectedSectorId),
@@ -188,12 +205,23 @@ export class EventoAddPage implements OnInit {
       console.log('Evento a guardar:', nuevoEvento); // Depuración
 
       this.eventosService.createEvento(nuevoEvento).then(() => {
-        alert('Evento creado exitosamente.');
+        if (enEspera) {
+          alert('El evento ha sido creado y está en espera de confirmación.');
+        } else {
+          alert('Evento creado exitosamente y hora bloqueada.');
+        }
         this.resetForm();
         this.loadEventos(); // Recargar eventos después de crear uno nuevo
+      }).catch((error) => {
+        console.error('Error al crear evento:', error);
+        alert('Ocurrió un error al crear el evento.');
       });
     }
   }
+
+
+
+
 
   resetForm(): void {
     this.newEvento = new eventos();
@@ -206,4 +234,7 @@ export class EventoAddPage implements OnInit {
   getSectorNombre(sectorId: string): string {
     return this.sectores.find(s => s.idSector === sectorId)?.nombre || 'Desconocido';
   }
+
+
+
 }
