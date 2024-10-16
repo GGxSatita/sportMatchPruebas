@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
   standalone: true,
-  imports: [IonButton, IonCol, IonRow, IonGrid, IonToolbar, IonFooter, IonIcon, IonTabButton, IonTabBar, IonTabs, CommonModule ],
+  imports: [IonButton, IonCol, IonRow, IonGrid, IonToolbar, IonFooter, IonIcon, IonTabButton, IonTabBar, IonTabs, CommonModule, ],
 })
 export class FooterComponent  implements OnInit {
 

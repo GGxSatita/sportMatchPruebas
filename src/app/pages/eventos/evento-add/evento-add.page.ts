@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
+import { AlertController } from '@ionic/angular';
 
 
 import {
@@ -65,7 +66,8 @@ export class EventoAddPage implements OnInit {
     private eventosService: EventosService,
     private sectoresService: SectoresService,
     private auth: Auth,
-    private router: Router
+    private router: Router,
+    private alertController : AlertController
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
@@ -206,7 +208,7 @@ export class EventoAddPage implements OnInit {
       const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
 
       if (!sector) {
-        console.error('Sector no encontrado.');
+        this.presentAlert('Error', 'Sector no encontrado.');
         return;
       }
 
@@ -235,7 +237,7 @@ export class EventoAddPage implements OnInit {
         const message = enEspera
           ? 'El evento ha sido creado y está en espera de confirmación.'
           : 'Evento creado exitosamente y hora bloqueada.';
-        alert(message);
+          this.presentAlert('Éxito', message);
         this.resetForm();
         this.loadEventos();
 
@@ -243,11 +245,21 @@ export class EventoAddPage implements OnInit {
         this.router.navigate(['/evento-list']);
       }).catch(error => {
         console.error('Error al crear el evento:', error);
-        alert('Ocurrió un error al crear el evento.');
+        this.presentAlert('Error', 'Ocurrió un error al crear el evento.');
       });
     }
   }
 
+  //ALEEEERTAAAAA
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: message,
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+  }
 
 
 

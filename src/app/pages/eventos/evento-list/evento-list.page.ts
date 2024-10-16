@@ -35,6 +35,8 @@ import { eventos } from 'src/app/models/evento';
 import { Sectores, Horario } from 'src/app/models/sector';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
+import { AlertController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-evento-list',
@@ -85,6 +87,8 @@ export class EventoListPage implements OnInit {
     private sectoresService: SectoresService,
     private router: Router,
     private auth: Auth,
+    private alertController: AlertController
+
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
@@ -184,6 +188,16 @@ export class EventoListPage implements OnInit {
   selectHorario(horario: Horario): void {
     this.selectedHorario = horario;
   }
+  //ALEEEERTAAAAA
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: message,
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+  }
 
 
   inscribirseEnEvento(evento: eventos): void {
@@ -196,20 +210,20 @@ export class EventoListPage implements OnInit {
 
     // Verificar si el creador está intentando inscribirse
     if (evento.idAlumno === this.idAlumno) {
-      alert('El creador del evento no puede inscribirse.');
+      this.presentAlert('Error', 'El creador del evento no puede inscribirse.');
       return;
     }
 
     // Verificar si el usuario ya está inscrito
     if (evento.participantesActuales.includes(this.idAlumno)) {
-      alert('Ya estás inscrito en este evento.');
+      this.presentAlert('Error', 'Ya estás inscrito en este evento.');
       return;
     }
 
     // Verificar si hay cupo disponible
     if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      alert('El evento ya ha alcanzado su capacidad máxima.');
-      return;
+      this.presentAlert('Error', 'El evento ya ha alcanzado su capacidad máxima.');
+    return;
     }
 
 
@@ -221,10 +235,11 @@ export class EventoListPage implements OnInit {
     this.eventosService.updateEvento(evento.idEventosAlumnos, {
       participantesActuales: evento.participantesActuales
     }).then(() => {
-      alert('Te has inscrito en el evento exitosamente.');
+      this.presentAlert('Éxito', 'Te has inscrito en el evento exitosamente.');
       this.loadEventos(); // Recargar la lista de eventos
     }).catch(error => {
       console.error('Error al inscribirse en el evento:', error);
+      this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
     });
   }
 
@@ -245,3 +260,4 @@ export class EventoListPage implements OnInit {
     return sector ? sector.nombre : 'Sector no encontrado';
   }
 }
+
