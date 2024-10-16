@@ -33,6 +33,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 export class EventoAlumnoPage implements OnInit {
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
+  eventosInscritos: eventos[] = []
   idAlumno: string | null = null;
 
   constructor(
@@ -64,8 +65,14 @@ export class EventoAlumnoPage implements OnInit {
     this.eventosService.getEventos().subscribe((eventos) => {
       const eventosDelAlumno = eventos.filter(evento => evento.idAlumno === this.idAlumno);
 
+      // Filtramos eventos aprobados y en espera
       this.eventosAprobados = eventosDelAlumno.filter(evento => evento.espera);
       this.eventosEnEspera = eventosDelAlumno.filter(evento => !evento.espera);
+
+      // Filtramos los eventos donde el usuario esté inscrito
+      this.eventosInscritos = eventos.filter(evento =>
+        evento.participantesActuales?.includes(this.idAlumno)
+      );
     });
   }
 }
