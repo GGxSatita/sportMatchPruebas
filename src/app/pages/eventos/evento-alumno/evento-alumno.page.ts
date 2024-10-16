@@ -7,6 +7,7 @@ import { eventos } from 'src/app/models/evento';
 import { Auth } from '@angular/fire/auth';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-evento-alumno',
@@ -33,12 +34,13 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 export class EventoAlumnoPage implements OnInit {
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
-  eventosInscritos: eventos[] = []
+  eventosInscritos: eventos[] = [];
   idAlumno: string | null = null;
 
   constructor(
     private eventosService: EventosService,
-    private auth: Auth
+    private auth: Auth,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -75,4 +77,10 @@ export class EventoAlumnoPage implements OnInit {
       );
     });
   }
+
+  configurarDesafio(evento: eventos) {
+    console.log('Configurando desafío para el evento:', evento);
+    this.router.navigate(['/configurar-desafio', evento.idEventosAlumnos]);
+  }
+
 }

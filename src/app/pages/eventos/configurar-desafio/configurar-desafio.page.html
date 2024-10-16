@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Configurar Desafío</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="guardarDesafio()">
+    <ion-item>
+      <ion-label>Nombre del Desafío</ion-label>
+      <ion-input [(ngModel)]="desafio.name" name="name" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Deporte</ion-label>
+      <ion-select [(ngModel)]="desafio.sport" name="sport">
+        <ion-select-option value="FUTBOL">Fútbol</ion-select-option>
+        <ion-select-option value="TENIS">Tenis</ion-select-option>
+        <ion-select-option value="BASQUETBOL">Básquetbol</ion-select-option>
+        <ion-select-option value="VOLEIBOL">Vóleibol</ion-select-option>
+        <ion-select-option value="OTRO">Otro</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Estado</ion-label>
+      <ion-select [(ngModel)]="desafio.status" name="status">
+        <ion-select-option value="PENDIENTE">Pendiente</ion-select-option>
+        <ion-select-option value="EN_PROGRESO">En Progreso</ion-select-option>
+        <ion-select-option value="FINALIZADO">Finalizado</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Inicio</ion-label>
+      <ion-datetime [(ngModel)]="desafio.startTime" name="startTime"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Fin</ion-label>
+      <ion-datetime [(ngModel)]="desafio.endTime" name="endTime"></ion-datetime>
+    </ion-item>
+
+    <ion-button expand="full" type="submit">Guardar Desafío</ion-button>
+  </form>
+</ion-content>
