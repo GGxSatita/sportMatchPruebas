@@ -19,28 +19,24 @@
       </div>
 
       <ion-card-content>
-        <div class="ion-text-center">
-          <!-- Nombre del usuario destacado -->
+        <div class="user-info-container ion-padding">
           <div class="data-item">
-            <ion-icon name="person-outline"></ion-icon>
+            <ion-icon name="person" class="icon"></ion-icon>
             <h3 class="user-name">{{ user?.name || 'Nombre no disponible' }}</h3>
           </div>
 
-          <!-- Email del usuario -->
           <div class="data-item">
-            <ion-icon name="mail-outline"></ion-icon>
+            <ion-icon name="mail" class="icon"></ion-icon>
             <p><strong>Email:</strong> {{ user?.email }}</p>
           </div>
 
-          <!-- Edad del usuario si está disponible -->
           <div class="data-item" *ngIf="userProfile?.edad">
-            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-icon name="calendar" class="icon"></ion-icon>
             <p><strong>Edad:</strong> {{ userProfile.edad }}</p>
           </div>
 
-          <!-- Deporte favorito del usuario si está disponible -->
           <div class="data-item" *ngIf="userProfile?.deporteFavorito">
-            <ion-icon name="fitness-outline"></ion-icon>
+            <ion-icon name="star" class="icon"></ion-icon>
             <p><strong>Deporte Favorito:</strong> {{ userProfile.deporteFavorito }}</p>
           </div>
         </div>
