@@ -16,7 +16,6 @@ export interface RulesModel {
   maxGoals?: number; // Goles máximos para ganar
   setsToWin?: number; // Número de sets necesarios para ganar
   timeLimit?: number; // Límite de tiempo en minutos
-  customObjective?: string; // Objetivo especial (ej.: "Ganar sin cometer faltas")
 }
 
 export interface ResultModel {
@@ -32,8 +31,6 @@ export interface Desafio {
   type: ChallengeType; // Tipo de desafío
   sport: SportType; // Deporte asociado
   status: ChallengeStatus; // Estado del desafío
-  startTime: Date | null; // Fecha y hora de inicio
-  endTime: Date | null; // Fecha y hora de finalización
   participants: ParticipantModel[]; // Lista de participantes
   rules: RulesModel; // Reglas del desafío
   event: eventos; // Evento asociado al desafío
