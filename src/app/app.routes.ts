@@ -62,7 +62,15 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/eventos/evento-alumno/evento-alumno.page').then( m => m.EventoAlumnoPage),
     canActivate:[authGuard]
 
+  },  {
+    path: 'desafio',
+    loadComponent: () => import('./pages/desafio/desafio.page').then( m => m.DesafioPage)
+  },
+  {
+    path: 'desafio-list',
+    loadComponent: () => import('./pages/desafio-list/desafio-list.page').then( m => m.DesafioListPage)
   }
+
 
 
 

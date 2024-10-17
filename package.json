@@ -34,6 +34,7 @@
     "@ionic/pwa-elements": "^3.3.0",
     "firebase": "^10.14.1",
     "firebase-admin": "^12.6.0",
+    "firestore": "^1.1.6",
     "ionicons": "^7.2.1",
     "push.js": "^1.0.12",
     "rxjs": "~7.8.0",
