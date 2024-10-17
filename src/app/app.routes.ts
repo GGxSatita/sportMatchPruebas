@@ -68,14 +68,12 @@ export const routes: Routes = [
     canActivate:[authGuard]
   },
   {
-    path: 'desafio-alumno',
-    loadComponent: () => import('./pages/eventos/desafio-alumno/desafio-alumno.page').then(m => m.DesafioAlumnoPage),
-    canActivate: [authGuard]
+    path: 'clubes',
+    loadComponent: () => import('./pages/clubes/clubes.page').then( m => m.ClubesPage)
+
   },
-  {
-    path: 'configurar-desafio/:id',
-    loadComponent: () => import('./pages/eventos/configurar-desafio/configurar-desafio.page').then(m => m.ConfigurarDesafioPage)
-  },
+
+
 
 
 

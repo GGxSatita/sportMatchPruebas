@@ -1,7 +1,7 @@
 export type ChallengeType = 'PUNTOS' | 'GOLES' | 'SETS' | 'PARTIDO' | 'OBJETIVO';
-export type SportType = 'FUTBOL' | 'TENIS' | 'BASQUETBOL' | 'VOLEIBOL' | 'OTRO';
 export type ChallengeStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'FINALIZADO';
 
+import { Deporte } from './deporte'; //Deportes
 import { eventos } from './evento'; // Asegúrate del path correcto
 
 export interface ParticipantModel {
@@ -29,7 +29,7 @@ export interface Desafio {
   id: string; // ID del desafío
   name: string; // Nombre del desafío
   type: ChallengeType; // Tipo de desafío
-  sport: SportType; // Deporte asociado
+  sport: Deporte; // Deporte asociado
   status: ChallengeStatus; // Estado del desafío
   participants: ParticipantModel[]; // Lista de participantes
   rules: RulesModel; // Reglas del desafío
