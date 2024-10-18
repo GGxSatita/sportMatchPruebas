@@ -66,7 +66,16 @@ export const routes: Routes = [
     path: 'evento-alumno',
     loadComponent: () => import('./pages/eventos/evento-alumno/evento-alumno.page').then( m => m.EventoAlumnoPage),
     canActivate:[authGuard]
-  }
+  },
+  {
+    path: 'clubes',
+    loadComponent: () => import('./pages/clubes/clubes.page').then( m => m.ClubesPage)
+
+  },
+
+
+
+
 
 
 

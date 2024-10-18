@@ -84,6 +84,10 @@
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
+
+            <ion-button expand="full" (click)="configurarDesafio(evento)">
+              Configurar Desafío
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
