@@ -6,6 +6,9 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { EventoAdminService } from 'src/app/services/evento-admin.service';
+import { eventos } from 'src/app/models/evento-admin';
+
 @Component({
   selector: 'app-menu-principal',
   templateUrl: './menu-principal.page.html',
@@ -19,22 +22,37 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 })
 export class MenuPrincipalPage implements OnInit {
 
+  eventos: eventos[] = [];
+  alumnoId: string = '';
+
   constructor(
     private autenticacionService: AutenticacionService,
-    private router: Router,
-    private alertController: AlertController
+    private eventoAdminService: EventoAdminService,
   ) {}
 
-  ngOnInit() {}
+  async ngOnInit() {
+    try {
+      const user = await this.autenticacionService.getCurrentUser();
+      if (user) {
+        this.alumnoId = user.uid;
+      }
 
-  goToProfile() {
-    this.router.navigate(['/user-perfil']);
+      this.eventoAdminService.getEventos().subscribe((eventos) => {
+        this.eventos = eventos;
+      });
+    } catch (error) {
+      console.error('Error al obtener el usuario:', error);
+    }
   }
-  goToSettings() {
-    this.router.navigate(['/user-perfil']);
-  }
-  goToHelp(){
-    this.router.navigate(['/user-perfil']);
+
+
+  async unirseAlEvento(eventoId: string) {
+    try {
+      await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
+      console.log('Te has unido al evento.');
+    } catch (error) {
+      console.error('No se pudo unir al evento:', error);
+    }
   }
 
 }
