@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, deleteDoc, doc, updateDoc, collectionData, docData, getDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { eventos } from '../models/evento-admin';
+import { eventosAdmin } from '../models/evento-admin';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class EventoAdminService {
     try {
       const eventoSnap = await getDoc(eventoDoc);
       if (eventoSnap.exists()) {
-        const eventoData = eventoSnap.data() as eventos;
+        const eventoData = eventoSnap.data() as eventosAdmin;
 
         // Verifica si el alumno ya está en la lista
         if (eventoData.participants.includes(alumnoId)) {
@@ -40,7 +40,7 @@ export class EventoAdminService {
   }
 
 
-  createEvento(evento: eventos): Promise<void> {
+  createEvento(evento: eventosAdmin): Promise<void> {
     const eventosRef = collection(this.firestore, this.collectionName);
     return addDoc(eventosRef, { ...evento })
       .then((docRef) => {
@@ -53,18 +53,18 @@ export class EventoAdminService {
         throw error;
       });
   }
-  getEventos(): Observable<eventos[]> {
+  getEventos(): Observable<eventosAdmin[]> {
     const eventosRef = collection(this.firestore, this.collectionName);
-    return collectionData(eventosRef, { idField: 'id' }) as Observable<eventos[]>;
+    return collectionData(eventosRef, { idField: 'id' }) as Observable<eventosAdmin[]>;
   }
 
 
-  getEvento(id: string): Observable<eventos | undefined> {
+  getEvento(id: string): Observable<eventosAdmin | undefined> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
-    return docData(eventoDoc) as Observable<eventos | undefined>;
+    return docData(eventoDoc) as Observable<eventosAdmin | undefined>;
   }
 
-  updateEvento(id: string, evento: Partial<eventos>): Promise<void> {
+  updateEvento(id: string, evento: Partial<eventosAdmin>): Promise<void> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return updateDoc(eventoDoc, { ...evento });
   }

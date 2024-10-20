@@ -1,4 +1,4 @@
-export class eventos {
+export class eventosAdmin {
   idEventosAdmin: string;
   idSector: string;
   titulo: string;
@@ -9,6 +9,7 @@ export class eventos {
   fechaReservada: string;
   idCreator: string;
   participants: string[];
+  hora?: string;
   sectorNombre?:string;
   capacidadAlumnos?: number;
 

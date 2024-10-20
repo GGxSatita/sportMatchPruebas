@@ -1,16 +1,35 @@
 <app-header></app-header>
 
 <ion-list>
-  <ion-item *ngFor="let evento of eventos">
-    <ion-label>
-      <h2>{{ evento.titulo }}</h2>
+  <ion-card *ngFor="let evento of eventos">
+    <ion-card-header>
+      <ion-card-title>{{ evento.titulo }}</ion-card-title>
+      <ion-card-subtitle>{{ evento.fechaReservada }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
       <p>{{ evento.descripcion }}</p>
-    </ion-label>
-    <ion-button (click)="unirseAlEvento(evento.idEventosAdmin)" *ngIf="!evento.participants.includes(alumnoId)">
-      Unirse
-    </ion-button>
-  </ion-item>
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img [src]="evento.image" alt="Imagen del evento">
+        </ion-avatar>
+        <ion-label>
+          <p>Sector: {{ evento.sectorNombre }}</p>
+          <p>Capacidad: {{ evento.capacidadAlumnos }}</p>
+          <p>Participantes: {{ evento.participants.length }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-button
+        expand="full"
+        fill="outline"
+        [disabled]="evento.participants.length >= evento.capacidadAlumnos || evento.participants.includes(alumnoId)"
+        (click)="unirseAlEvento(evento.idEventosAdmin)">
+        Unirse al evento
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-list>
+
 
 
 <app-footer></app-footer>

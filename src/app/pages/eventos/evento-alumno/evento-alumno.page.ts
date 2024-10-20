@@ -8,6 +8,8 @@ import { Auth } from '@angular/fire/auth';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
+import { eventosAdmin } from 'src/app/models/evento-admin';
+import { EventoAdminService } from 'src/app/services/evento-admin.service';
 
 @Component({
   selector: 'app-evento-alumno',
@@ -32,15 +34,19 @@ import { Router } from '@angular/router';
   ]
 })
 export class EventoAlumnoPage implements OnInit {
+  eventosInscritosAdmin: eventosAdmin[] = [];
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
   eventosInscritos: eventos[] = [];
   idAlumno: string | null = null;
+  eventosAprobadosOInscritos: eventos[] = [];
+
 
   constructor(
     private eventosService: EventosService,
     private auth: Auth,
-    private router: Router
+    private router: Router,
+    private eventoAdminService: EventoAdminService
   ) {}
 
   ngOnInit() {
@@ -63,17 +69,22 @@ export class EventoAlumnoPage implements OnInit {
     }
   }
 
+
+
+
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
-      const eventosDelAlumno = eventos.filter(evento => evento.idAlumno === this.idAlumno);
+      if (!this.idAlumno) return;
 
-      // Filtramos eventos aprobados y en espera
-      this.eventosAprobados = eventosDelAlumno.filter(evento => evento.espera);
-      this.eventosEnEspera = eventosDelAlumno.filter(evento => !evento.espera);
-
-      // Filtramos los eventos donde el usuario esté inscrito
-      this.eventosInscritos = eventos.filter(evento =>
+      // Filtramos eventos aprobados e inscritos por el alumno autenticado
+      this.eventosAprobadosOInscritos = eventos.filter(evento =>
+        (evento.espera && evento.idAlumno === this.idAlumno) ||
         evento.participantesActuales?.includes(this.idAlumno)
+      );
+
+      // Filtramos los eventos en espera específicamente del alumno autenticado
+      this.eventosEnEspera = eventos.filter(evento =>
+        !evento.espera && evento.idAlumno === this.idAlumno
       );
     });
   }
@@ -82,5 +93,25 @@ export class EventoAlumnoPage implements OnInit {
     console.log('Configurando desafío para el evento:', evento);
     this.router.navigate(['/configurar-desafio', evento.idEventosAlumnos]);
   }
+
+
+  eliminarEvento(evento: eventos) {
+    if (evento.idAlumno === this.idAlumno) {
+      this.eventosService.deleteEvento(evento.idEventosAlumnos).then(
+        () => {
+          console.log(`Evento ${evento.idEventosAlumnos} eliminado exitosamente.`);
+          // Actualizamos la lista de eventos después de eliminar
+          this.loadEventos();
+        }
+      ).catch(
+        (error: any) => {
+          console.error('Error al eliminar el evento:', error);
+        }
+      );
+    } else {
+      console.error('No tienes permiso para eliminar este evento.');
+    }
+  }
+
 
 }
