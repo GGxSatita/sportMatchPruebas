@@ -12,7 +12,6 @@ import { eventosAdmin } from 'src/app/models/evento-admin';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
 import { AlertController } from '@ionic/angular';
 
-
 @Component({
   selector: 'app-evento-alumno',
   templateUrl: './evento-alumno.page.html',
@@ -36,13 +35,12 @@ import { AlertController } from '@ionic/angular';
   ]
 })
 export class EventoAlumnoPage implements OnInit {
-  eventosInscritosAdmin: eventosAdmin[] = [];
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
   eventosInscritos: eventos[] = [];
   idAlumno: string | null = null;
   eventosAprobadosOInscritos: eventos[] = [];
-
+  eventosAdminInscritos: eventosAdmin[] = [];
 
   constructor(
     private eventosService: EventosService,
@@ -54,13 +52,13 @@ export class EventoAlumnoPage implements OnInit {
 
   ngOnInit() {
     this.loadAlumnoId();
+    this.loadAlumnoIdAdmin();
   }
 
-  verDetallesEvento(evento: eventos) {
+  verDetallesEvento(evento: eventos | eventosAdmin) {
     console.log('Detalles del evento:', evento);
     // Aquí puedes navegar a una nueva página o mostrar un modal con más información.
   }
-
 
   async loadAlumnoId() {
     const user = this.auth.currentUser;
@@ -72,37 +70,57 @@ export class EventoAlumnoPage implements OnInit {
     }
   }
 
-
-
+  async loadAlumnoIdAdmin() {
+    const user = this.auth.currentUser;
+    if (user) {
+      this.idAlumno = user.uid;
+      this.loadEventosAdmin();
+    } else {
+      console.error('No hay usuario autenticado.');
+    }
+  }
 
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
       if (!this.idAlumno) return;
 
-      // Filtramos eventos aprobados e inscritos por el alumno autenticado
+      // Filtrar eventos aprobados e inscritos por el alumno autenticado
       this.eventosAprobadosOInscritos = eventos.filter(evento =>
         (evento.espera && evento.idAlumno === this.idAlumno) ||
         evento.participantesActuales?.includes(this.idAlumno)
       );
 
-      // Filtramos los eventos en espera específicamente del alumno autenticado
+      // Filtrar los eventos en espera específicamente del alumno autenticado
       this.eventosEnEspera = eventos.filter(evento =>
         !evento.espera && evento.idAlumno === this.idAlumno
       );
     });
   }
 
-  configurarDesafio(evento: eventos) {
-    console.log('Configurando desafío para el evento:', evento);
-    this.router.navigate(['/configurar-desafio', evento.idEventosAlumnos]);
+  loadEventosAdmin(): void {
+    this.eventoAdminService.getEventos().subscribe((eventosAdmin) => {
+      if (!this.idAlumno) return;
+
+      // Filtrar eventos administrados en los que el alumno está inscrito
+      this.eventosAdminInscritos = eventosAdmin.filter(eventoAdmin =>
+        eventoAdmin.participants.includes(this.idAlumno) && eventoAdmin.status === true
+      );
+    });
   }
 
+  esEventoAlumno(evento: eventos | eventosAdmin): evento is eventos {
+    return (evento as eventos).idAlumno !== undefined;
+  }
 
-  async eliminarEvento(evento: eventos) {
-    if (evento.idAlumno === this.idAlumno) {
+  getDisponibilidad(evento: eventos): string {
+    return evento.espera ? 'Disponible' : 'No Disponible';
+  }
+
+  async eliminarEvento(evento: eventos | eventosAdmin) {
+    if (this.esEventoAlumno(evento) && evento.idAlumno === this.idAlumno) {
       const alert = await this.alertController.create({
-        header: 'Confirmar eliminación',
-        message: `¿Estás seguro de que deseas eliminar el evento? Esta acción no se puede deshacer.`,
+        header: 'Cancelar evento',
+        message: `¿Estás seguro de que deseas cancelar el evento? Esta acción no se puede deshacer.`,
         buttons: [
           {
             text: 'Cancelar',
@@ -112,11 +130,12 @@ export class EventoAlumnoPage implements OnInit {
             }
           },
           {
-            text: 'Eliminar',
+            text: 'Cancelar',
             handler: () => {
-              this.eventosService.deleteEvento(evento.idEventosAlumnos).then(
+              const idEvento = evento.idEventosAlumnos;
+              this.eventosService.deleteEvento(idEvento).then(
                 () => {
-                  console.log(`Evento ${evento.idEventosAlumnos} eliminado exitosamente.`);
+                  console.log(`Evento ${idEvento} eliminado exitosamente.`);
                   // Actualizamos la lista de eventos después de eliminar
                   this.loadEventos();
                 }
@@ -135,7 +154,4 @@ export class EventoAlumnoPage implements OnInit {
       console.error('No tienes permiso para eliminar este evento.');
     }
   }
-
-
-
 }

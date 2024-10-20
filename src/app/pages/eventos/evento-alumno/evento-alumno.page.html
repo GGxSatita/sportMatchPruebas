@@ -27,11 +27,8 @@
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
-            <ion-button expand="full" (click)="configurarDesafio(evento)">
-              Configurar Desafío
-            </ion-button>
             <ion-button *ngIf="evento.idAlumno === idAlumno" expand="full" color="danger" (click)="eliminarEvento(evento)">
-              Eliminar
+              Cancelar evento
             </ion-button>
           </ion-card-content>
         </ion-card>
@@ -69,7 +66,32 @@
     </ion-row>
 
 
-        <!-- Título de Eventos Inscritos -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-item-divider class="custom-divider admin">
+          <ion-label>
+            <h2>Eventos Administrados</h2>
+          </ion-label>
+        </ion-item-divider>
+      </ion-col>
+    </ion-row>
+
+    <!-- Lista de Eventos Administrados -->
+    <ion-row *ngFor="let evento of eventosAdminInscritos">
+      <ion-col size-md="6" size-lg="4" size-sm="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{ evento.titulo }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
+            <p><strong>Hora:</strong> {{ evento.hora }}</p>
+            <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
+            <!-- Agregar más detalles según sea necesario -->
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
 
 
 
