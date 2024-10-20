@@ -10,6 +10,8 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
+import { AlertController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-evento-alumno',
@@ -46,7 +48,8 @@ export class EventoAlumnoPage implements OnInit {
     private eventosService: EventosService,
     private auth: Auth,
     private router: Router,
-    private eventoAdminService: EventoAdminService
+    private eventoAdminService: EventoAdminService,
+    private alertController: AlertController
   ) {}
 
   ngOnInit() {
@@ -95,23 +98,44 @@ export class EventoAlumnoPage implements OnInit {
   }
 
 
-  eliminarEvento(evento: eventos) {
+  async eliminarEvento(evento: eventos) {
     if (evento.idAlumno === this.idAlumno) {
-      this.eventosService.deleteEvento(evento.idEventosAlumnos).then(
-        () => {
-          console.log(`Evento ${evento.idEventosAlumnos} eliminado exitosamente.`);
-          // Actualizamos la lista de eventos después de eliminar
-          this.loadEventos();
-        }
-      ).catch(
-        (error: any) => {
-          console.error('Error al eliminar el evento:', error);
-        }
-      );
+      const alert = await this.alertController.create({
+        header: 'Confirmar eliminación',
+        message: `¿Estás seguro de que deseas eliminar el evento? Esta acción no se puede deshacer.`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => {
+              console.log('Eliminación de evento cancelada por el usuario.');
+            }
+          },
+          {
+            text: 'Eliminar',
+            handler: () => {
+              this.eventosService.deleteEvento(evento.idEventosAlumnos).then(
+                () => {
+                  console.log(`Evento ${evento.idEventosAlumnos} eliminado exitosamente.`);
+                  // Actualizamos la lista de eventos después de eliminar
+                  this.loadEventos();
+                }
+              ).catch(
+                (error: any) => {
+                  console.error('Error al eliminar el evento:', error);
+                }
+              );
+            }
+          }
+        ]
+      });
+
+      await alert.present();
     } else {
       console.error('No tienes permiso para eliminar este evento.');
     }
   }
+
 
 
 }
