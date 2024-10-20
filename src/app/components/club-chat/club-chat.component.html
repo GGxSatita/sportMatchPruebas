@@ -1,0 +1,20 @@
+<ion-list>
+  <ion-item *ngFor="let message of messages | async">
+    <ion-avatar slot="start">
+      <img [src]="message.userPhotoUrl" alt="{{ message.username }}">
+    </ion-avatar>
+    <ion-label>
+      <h2>{{ message.username }}</h2>
+      <p>{{ message.content }}</p>
+      <p>{{ message.timestamp?.toDate() | date:'short' }}</p> <!-- Convertir el timestamp a Date -->
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+
+<form [formGroup]="chatForm" (ngSubmit)="sendMessage()">
+  <ion-item>
+    <ion-input formControlName="message" placeholder="Escribe un mensaje..."></ion-input>
+  </ion-item>
+  <ion-button type="submit" [disabled]="!chatForm.valid">Enviar</ion-button>
+</form>

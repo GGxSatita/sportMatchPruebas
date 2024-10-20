@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<ion-content>
+  <form [formGroup]="clubForm" (ngSubmit)="crearClub()">
+
+    <!-- //Nombre del club -->
+    <ion-item>
+      <ion-label position="stacked">Nombre del Club</ion-label>
+      <ion-input formControlName="nombreClub" placeholder="Ingrese el nombre del club" required></ion-input>
+    </ion-item>
+
+    <!-- Descripciónde del club -->
+
+    <ion-item>
+      <ion-label position="stacked">Descripción</ion-label>
+      <ion-textarea formControlName="descripcion" placeholder="Descripción del club"></ion-textarea>
+    </ion-item>
+
+    <!-- logo -->
+    <ion-item>
+      <ion-label position="stacked">Logo del Club</ion-label>
+      <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo del club" class="club-logo" />
+    </ion-item>
+
+    <ion-row>
+      <ion-col size="6" class="iconos-grandes">
+        <ion-button expand="block" fill="clear" (click)="takeLogoPicture()">
+          <ion-icon slot="icon-only" name="camera-outline" color="dark"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="6" class="iconos-grandes">
+        <ion-button expand="block" fill="clear" (click)="selectLogoFromGallery()">
+          <ion-icon slot="icon-only" name="image-outline" color="dark"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <!-- deporte del club  -->
+    <ion-item>
+      <ion-label>Deporte</ion-label>
+      <ion-select formControlName="deporteNombre" placeholder="Selecciona el deporte del club">
+        <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
+          {{ deporte.nombre }}
+        </ion-select-option>
+      </ion-select>
+      <ion-note class="error-message" *ngIf="clubForm.controls['deporteNombre'].hasError('required') && clubForm.controls['deporteNombre'].touched">
+        Selecciona un <strong>deporte</strong>
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Número Máximo de Miembros</ion-label>
+      <ion-input type="number" formControlName="maxMiembros" placeholder="Número máximo" required></ion-input>
+    </ion-item>
+
+    <ion-button expand="full" type="submit" [disabled]="!clubForm.valid">Crear Club</ion-button>
+  </form>
+</ion-content>
+<app-footer></app-footer>

@@ -1,15 +1,16 @@
 import { Deporte } from "./deporte"
+import { MiembroClub } from "./miembro-club";
 
-export interface clubes{
+export interface Club{
 
-  idClubes?: string,
+  idClub?: string,
   nombreClub: string,
   logo: string,
   descripcion: string,
-  miembros: string[],
+  miembros: MiembroClub[];
   maxMiembros: number,
-  admin: boolean,
+  adminId: string,
   deporteNombre:string[],
   ranking?: number,
-
+  miembroIds: string[];
 }

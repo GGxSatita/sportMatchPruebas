@@ -1,0 +1,48 @@
+<ion-content [fullscreen]="true">
+  <!-- Input para buscar por nombre -->
+  <ion-item lines="none" class="search-bar">
+    <ion-input
+      placeholder="Buscar por nombre"
+      [(ngModel)]="searchTerm"
+      (ionInput)="filterClubs()"
+      class="search-input">
+    </ion-input>
+  </ion-item>
+
+  <ion-list>
+    <ion-card *ngFor="let club of (filteredClubs | async)">
+      <ion-grid>
+        <ion-row class="align-center">
+          <!-- Columna para el ícono del club -->
+          <ion-col size="2">
+            <ion-avatar>
+              <img [src]="club.logo" alt="{{ club.nombreClub }}" />
+            </ion-avatar>
+          </ion-col>
+
+          <!-- Columna para la información del club -->
+          <ion-col size="6">
+            <ion-label>
+              <h2>{{ club.nombreClub }}</h2>
+              <p>Miembros: {{ club.miembros.length }} / {{ club.maxMiembros }}</p>
+            </ion-label>
+          </ion-col>
+
+          <!-- Columna para el ícono de trofeos y el número -->
+          <ion-col size="2" class="trophies-col">
+            <ion-icon name="trophy-outline" color="warning"></ion-icon>
+            <p>{{ club.ranking }}</p>
+          </ion-col>
+
+          <!-- Columna para el botón de unirse -->
+          <ion-col size="2" class="align-center">
+            <ion-button *ngIf="!isMember" (click)="unirseAlClub(club)" size="small">
+              Unirse
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card>
+
+  </ion-list>
+</ion-content>
