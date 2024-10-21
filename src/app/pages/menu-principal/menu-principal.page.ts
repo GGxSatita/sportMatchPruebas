@@ -1,14 +1,13 @@
 
 import {  inject,  CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular'; // Importa solo IonicModule
+import { AlertController } from '@ionic/angular';
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, AlertController, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow } from '@ionic/angular/standalone';
+
 
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
@@ -60,12 +59,12 @@ export class MenuPrincipalPage implements OnInit {
   alumnoId: string = '';
 
 
-export class MenuPrincipalPage implements OnInit {
   constructor(
     private autenticacionService: AutenticacionService,
     private clubesService: ClubesService,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private eventoAdminService: EventoAdminService,
 
   ) {}
 
