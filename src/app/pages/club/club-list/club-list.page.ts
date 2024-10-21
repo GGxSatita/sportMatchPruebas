@@ -20,13 +20,14 @@ import {
   IonGrid,
   IonSelect,
   IonSelectOption,
-  IonInput
+  IonInput,
 } from '@ionic/angular/standalone';
 import { Observable, of } from 'rxjs';
 import { Club } from 'src/app/models/club';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-club-list',
@@ -54,7 +55,7 @@ import { map } from 'rxjs/operators';
     IonCardContent,
     CommonModule,
     FormsModule,
-    IonInput
+    IonInput,
   ],
 })
 export class ClubListPage implements OnInit {
@@ -64,10 +65,12 @@ export class ClubListPage implements OnInit {
   currentUserId: string;
   searchTerm: string = '';
   selectedDeporte: string = '';
+  deportes: string[] = []; // Lista para almacenar los deportes disponibles
 
   constructor(
     private clubesService: ClubesService,
-    private authService: AutenticacionService
+    private authService: AutenticacionService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -76,15 +79,22 @@ export class ClubListPage implements OnInit {
     await this.checkIfUserIsInAClub();
     this.clubs = this.clubesService.getAllClubs();
     this.filteredClubs = this.clubs; // Inicialmente muestra todos los clubes
+    await this.loadDeportes(); // Cargar los deportes disponibles
   }
 
   async checkIfUserIsInAClub() {
     if (this.currentUserId) {
-      const userClub = await this.clubesService.getClubForUser(
-        this.currentUserId
-      );
+      const userClub = await this.clubesService.getClubForUser(this.currentUserId);
       this.isMember = !!userClub;
       console.log('Usuario pertenece a un club:', this.isMember);
+    }
+  }
+
+  async loadDeportes() {
+    try {
+      this.deportes = await this.clubesService.getDeportes();
+    } catch (error) {
+      console.error('Error al cargar los deportes:', error);
     }
   }
 
@@ -94,7 +104,6 @@ export class ClubListPage implements OnInit {
       const userId = currentUser?.uid;
       const userProfile = await this.authService.getUserProfile(userId);
 
-      // Verificar si el usuario ya es el líder o administrador del club
       if (userId === club.adminId) {
         console.error('El creador del club no puede unirse nuevamente.');
         return;
@@ -109,7 +118,6 @@ export class ClubListPage implements OnInit {
           puntos: 0,
         };
 
-        // Actualizar miembroIds y miembros en Firestore
         const updatedMiembroIds = [...club.miembroIds, userId];
         const updatedMiembros = [...club.miembros, newMember];
 
@@ -121,9 +129,7 @@ export class ClubListPage implements OnInit {
         console.log('Usuario añadido al club:', club.idClub);
       }
     } else {
-      console.error(
-        'No puedes unirte a este club. Es posible que esté lleno o ya pertenezcas a otro club.'
-      );
+      console.error('No puedes unirte a este club. Es posible que esté lleno o ya pertenezcas a otro club.');
     }
   }
 
@@ -133,9 +139,7 @@ export class ClubListPage implements OnInit {
         clubs.filter(
           (club) =>
             (this.searchTerm
-              ? club.nombreClub
-                  .toLowerCase()
-                  .includes(this.searchTerm.toLowerCase())
+              ? club.nombreClub.toLowerCase().includes(this.searchTerm.toLowerCase())
               : true) &&
             (this.selectedDeporte
               ? club.deporteNombre.includes(this.selectedDeporte)
@@ -145,7 +149,7 @@ export class ClubListPage implements OnInit {
     );
   }
 
-  verMiembros(club: Club) {
-    console.log('Mostrar detalles de los miembros del club:', club);
+  verClubDetalle(clubId: string) {
+    this.router.navigate([`/club-detalle/${clubId}`]);
   }
 }

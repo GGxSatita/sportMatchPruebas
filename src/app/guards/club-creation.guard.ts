@@ -45,7 +45,7 @@ export class ClubCreationGuard implements CanActivate {
   private async showAlert() {
     const alert = await this.alertController.create({
       header: 'Acceso Denegado',
-      message: 'Ya perteneces a un club, no puedes crear otro.',
+      message: 'Ya perteneces a un club, no puedes crear o unirte a otro.',
       buttons: ['OK'],
     });
     await alert.present();

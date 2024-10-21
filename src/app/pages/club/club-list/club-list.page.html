@@ -1,6 +1,7 @@
 <ion-content [fullscreen]="true">
   <!-- Input para buscar por nombre -->
   <ion-item lines="none" class="search-bar">
+    <ion-icon slot="start" name="search-outline"></ion-icon>
     <ion-input
       placeholder="Buscar por nombre"
       [(ngModel)]="searchTerm"
@@ -8,9 +9,22 @@
       class="search-input">
     </ion-input>
   </ion-item>
+  <ion-item lines="none" class="filter-bar">
+    <ion-label>Filtrar por deporte</ion-label>
+    <ion-select [(ngModel)]="selectedDeporte" (ionChange)="filterClubs()">
+      <ion-select-option value="">Todos</ion-select-option>
+      <ion-select-option *ngFor="let deporte of deportes" [value]="deporte">
+        {{ deporte }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
 
   <ion-list>
-    <ion-card *ngFor="let club of (filteredClubs | async)">
+    <ion-card *ngFor="let club of (filteredClubs | async); let i = index"
+              [class.odd-item]="i % 2 === 0"
+              [class.even-item]="i % 2 !== 0"
+              class="custom-card"
+              (click)="verClubDetalle(club.idClub)"> <!-- Agregar evento click para navegar al detalle del club -->
       <ion-grid>
         <ion-row class="align-center">
           <!-- Columna para el ícono del club -->
@@ -36,13 +50,12 @@
 
           <!-- Columna para el botón de unirse -->
           <ion-col size="2" class="align-center">
-            <ion-button *ngIf="!isMember" (click)="unirseAlClub(club)" size="small">
+            <ion-button *ngIf="!isMember" (click)="unirseAlClub(club); $event.stopPropagation()" size="small">
               Unirse
             </ion-button>
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-card>
-
   </ion-list>
 </ion-content>

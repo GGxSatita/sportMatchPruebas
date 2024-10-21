@@ -13,8 +13,7 @@ import {
   IonList,
   IonCardContent,
   IonCardTitle,
-  IonCardHeader,
-} from '@ionic/angular/standalone';
+  IonCardHeader, IonCardSubtitle } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { ActivatedRoute } from '@angular/router';
@@ -22,13 +21,14 @@ import { ClubChatComponent } from 'src/app/components/club-chat/club-chat.compon
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { Club } from 'src/app/models/club';
 import { Observable } from 'rxjs';
+import { FooterComponent } from 'src/app/components/footer/footer.component';
 
 @Component({
   selector: 'app-club',
   templateUrl: './club.page.html',
   styleUrls: ['./club.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonCardSubtitle,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
@@ -45,6 +45,7 @@ import { Observable } from 'rxjs';
     FormsModule,
     ClubChatComponent,
     HeaderComponent,
+    FooterComponent
   ],
 })
 export class ClubPage implements OnInit {

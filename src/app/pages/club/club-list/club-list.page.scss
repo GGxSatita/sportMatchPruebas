@@ -1,22 +1,63 @@
+/* Estilo para la barra de búsqueda */
 .search-bar {
   margin: 10px;
   border-radius: 20px;
   background-color: #f0f0f5;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
 
   ion-input {
+    flex: 1;
     padding: 8px 15px;
     border-radius: 20px;
     background: transparent;
     font-size: 16px;
     color: #333;
   }
-}
-ion-card {
-  margin: 10px;
-  padding: 0;
+
+  ion-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: var(--ion-color-medium);
+  }
 }
 
+/* Contenedor principal para ser responsivo */
+ion-content.responsive-content {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* Estilos para las tarjetas de club */
+ion-card.custom-card {
+  margin: 10px 0;
+  padding: 0;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.85);
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 600px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Alternar colores en las tarjetas de club */
+ion-card.odd-item {
+  background-color: #ff724c
+}
+
+ion-card.even-item {
+  background-color:#fdbf50;
+}
+
+/* Centrando y alineando elementos */
 .align-center {
   display: flex;
   align-items: center;
@@ -30,18 +71,63 @@ ion-card {
   text-align: center;
 }
 
+/* Avatar circular para el logo del club */
 ion-avatar {
-  width: 60px;  /* Aumentado de 40px a 60px */
-  height: 60px; /* Aumentado de 40px a 60px */
+  width: 60px;
+  height: 60px;
+
+  img {
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+  }
 }
 
+/* Estilos para los labels */
 ion-label h2 {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin: 0;
+  color: var(--ion-text-color);
 }
 
 ion-label p {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--ion-text-color-step-600);
+}
+
+/* Media Queries para hacer responsivo */
+@media (max-width: 768px) {
+  ion-card.custom-card {
+    max-width: 100%; /* Ancho completo en pantallas pequeñas */
+    padding: 10px;
+  }
+
+  ion-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  ion-label h2 {
+    font-size: 1rem;
+  }
+
+  ion-label p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  ion-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  ion-label h2 {
+    font-size: 0.9rem;
+  }
+
+  ion-label p {
+    font-size: 0.7rem;
+  }
 }

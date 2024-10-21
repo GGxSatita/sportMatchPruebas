@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Firestore, collection, addDoc, collectionData, Timestamp ,query, orderBy} from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, collectionData, Timestamp, query, orderBy } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { IonItem, IonInput, IonButton, IonList, IonLabel, IonAvatar, IonContent } from "@ionic/angular/standalone";
+import { IonItem, IonInput, IonButton, IonList, IonLabel, IonAvatar, IonContent, IonIcon } from "@ionic/angular/standalone";
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { map } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { ModelsAuth } from 'src/app/models/auth.models';
   templateUrl: './club-chat.component.html',
   styleUrls: ['./club-chat.component.scss'],
   standalone: true,
-  imports: [
+  imports: [IonIcon,
     IonAvatar,
     CommonModule,
     IonItem,
@@ -45,7 +45,7 @@ export class ClubChatComponent implements OnInit {
       message: ['', Validators.required]
     });
 
-    // Consultar los mensajes del club, ordenándolos por timestamp de forma ascendente
+    // Configurar la colección y la consulta de mensajes, ordenados por timestamp ascendente
     const messagesCollection = collection(this.firestore, `clubs/${this.clubId}/messages`);
     const messagesQuery = query(messagesCollection, orderBy('timestamp', 'asc'));
 
@@ -74,10 +74,9 @@ export class ClubChatComponent implements OnInit {
     } else if (timestamp instanceof Date) {
       return timestamp;
     } else if (typeof timestamp === 'object' && timestamp?.seconds) {
-      // Si es un objeto con 'seconds' como un Firestore Timestamp en formato de objeto
       return new Date(timestamp.seconds * 1000);
     } else {
-      return new Date(); // Devolver la fecha actual como valor predeterminado
+      return new Date(); // Fecha actual como valor predeterminado
     }
   }
 
@@ -90,7 +89,7 @@ export class ClubChatComponent implements OnInit {
           username: this.username,
           userPhotoUrl: this.userPhotoUrl,
           content: messageContent,
-          timestamp: new Date(),
+          timestamp: Timestamp.now(), // Usar Firestore Timestamp
         };
 
         try {

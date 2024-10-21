@@ -21,7 +21,7 @@
 
       <ion-list>
         <ion-item *ngFor="let miembro of club.miembros">
-          <ion-label>{{ miembro.userId }}</ion-label>
+          <ion-label>{{ miembro.profile?.name || 'Sin nombre'}}</ion-label>
           <ion-button *ngIf="isLeader" (click)="eliminarMiembro(miembro.userId)">
             Expulsar
           </ion-button>
@@ -34,3 +34,5 @@
   </ion-content>
 
 </ion-content>
+
+<app-footer></app-footer>
