@@ -1,0 +1,38 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>{{ club?.nombreClub }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <div *ngIf="club">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ club.nombreClub }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <img [src]="club.logo" alt="Logo del Club" class="club-logo" />
+          <p>{{ club.descripcion }}</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-list>
+        <ion-item *ngFor="let miembro of club.miembros">
+          <ion-label>{{ miembro.profile?.name || 'Sin nombre'}}</ion-label>
+          <ion-button *ngIf="isLeader" (click)="eliminarMiembro(miembro.userId)">
+            Expulsar
+          </ion-button>
+        </ion-item>
+      </ion-list>
+
+      <!-- Componente de chat para la interacción en tiempo real -->
+      <app-club-chat [clubId]="club.idClub"></app-club-chat>
+    </div>
+  </ion-content>
+
+</ion-content>
+
+<app-footer></app-footer>
