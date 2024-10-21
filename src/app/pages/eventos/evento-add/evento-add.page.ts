@@ -294,12 +294,6 @@ export class EventoAddPage implements OnInit {
 
 
 
-
-
-
-
-
-
   resetForm(): void {
     this.newEvento = new eventos();
     this.selectedHorario = null;

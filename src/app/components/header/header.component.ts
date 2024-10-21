@@ -35,6 +35,8 @@ export class HeaderComponent implements OnInit {
     '/evento-alumno': 'Eventos Alumno',
     '/match':'Match',
     '/match-perfil': "Datos del jugador",
+    '/crear-club':'Crear club',
+    '/club':'Club',
     // Agrega las rutas y nombres que necesites
   };
 
@@ -51,7 +53,7 @@ export class HeaderComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.currentPage = event.urlAfterRedirects; // Almacena la URL actual
-      this.pageTitle = this.pageTitlesMap[this.currentPage] || 'Página Desconocida'; // Asigna el nombre de la página o un valor por defecto
+      this.pageTitle = this.pageTitlesMap[this.currentPage] || ''; // Asigna el nombre de la página o un valor por defecto
     });
   }
 
