@@ -154,4 +154,95 @@ export class EventoAlumnoPage implements OnInit {
       console.error('No tienes permiso para eliminar este evento.');
     }
   }
+
+  async cancelarInscripcion(evento: eventos) {
+    if (evento.participantesActuales?.includes(this.idAlumno!)) {
+      const alert = await this.alertController.create({
+        header: 'Cancelar inscripción',
+        message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => {
+              console.log('Cancelación de inscripción detenida por el usuario.');
+            }
+          },
+          {
+            text: 'Confirmar',
+            handler: async () => {
+              // Encontrar el índice del ID del alumno en la lista de participantes
+              const index = evento.participantesActuales.indexOf(this.idAlumno!);
+
+              if (index > -1) {
+                // Eliminar el ID del alumno de la lista de participantes
+                evento.participantesActuales.splice(index, 1);
+
+                try {
+                  // Actualizar el evento con la nueva lista de participantes
+                  await this.eventosService.updateEvento(evento.idEventosAlumnos, { participantesActuales: evento.participantesActuales });
+                  console.log(`Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`);
+                  // Actualizamos la lista de eventos después de cancelar la inscripción
+                  this.loadEventos();
+                } catch (error) {
+                  console.error('Error al cancelar la inscripción en el evento:', error);
+                }
+              }
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    } else {
+      console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+    }
+  }
+
+
+  async cancelarInscripcionAdmin(evento: eventosAdmin) {
+    if (evento.participants.includes(this.idAlumno!)) {
+      const alert = await this.alertController.create({
+        header: 'Cancelar inscripción',
+        message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => {
+              console.log('Cancelación de inscripción detenida por el usuario.');
+            }
+          },
+          {
+            text: 'Confirmar',
+            handler: async () => {
+              // Encontrar el índice del ID del alumno en la lista de participantes
+              const index = evento.participants.indexOf(this.idAlumno!);
+
+              if (index > -1) {
+                // Eliminar el ID del alumno de la lista de participantes
+                evento.participants.splice(index, 1);
+
+                try {
+                  // Actualizar el evento con la nueva lista de participantes
+                  await this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants });
+                  console.log(`Inscripción en el evento ${evento.idEventosAdmin} cancelada exitosamente.`);
+                  // Actualizamos la lista de eventos después de cancelar la inscripción
+                  this.loadEventosAdmin();
+                } catch (error) {
+                  console.error('Error al cancelar la inscripción en el evento:', error);
+                }
+              }
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    } else {
+      console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+    }
+  }
+
+
 }

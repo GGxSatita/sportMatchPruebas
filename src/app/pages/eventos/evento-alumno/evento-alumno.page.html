@@ -27,13 +27,22 @@
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
-            <ion-button *ngIf="evento.idAlumno === idAlumno" expand="full" color="danger" (click)="eliminarEvento(evento)">
+            <!-- Botón para cancelar inscripción si el alumno está inscrito y no es el creador del evento -->
+            <ion-button *ngIf="evento.participantesActuales && evento.participantesActuales.includes(idAlumno) && evento.idAlumno !== idAlumno"
+                        expand="full" color="danger" (click)="cancelarInscripcion(evento)">
+              Cancelar inscripción
+            </ion-button>
+
+            <!-- Botón para eliminar evento si el alumno es el creador -->
+            <ion-button *ngIf="evento.idAlumno === idAlumno"
+                        expand="full" color="danger" (click)="eliminarEvento(evento)">
               Cancelar evento
             </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
+
 
 
     <!-- Título de En Espera -->
@@ -86,8 +95,14 @@
           <ion-card-content>
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
+            <p><strong>Disponibilidad:</strong> {{ evento.status ? 'Disponible' : 'No Disponible' }}</p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
-            <!-- Agregar más detalles según sea necesario -->
+
+            <!-- Botón para cancelar inscripción si el alumno está inscrito en el evento administrado -->
+            <ion-button *ngIf="evento.participants.includes(idAlumno)"
+                        expand="full" color="danger" (click)="cancelarInscripcionAdmin(evento)">
+              Cancelar inscripción
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
