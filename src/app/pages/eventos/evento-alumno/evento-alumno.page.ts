@@ -35,6 +35,7 @@ import { AlertController } from '@ionic/angular';
   ]
 })
 export class EventoAlumnoPage implements OnInit {
+
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
   eventosInscritos: eventos[] = [];
