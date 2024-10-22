@@ -56,7 +56,8 @@ export class DesafioPage implements OnInit {
 
     this.cdr.detectChanges();
   }
-ngOnInit() {
+
+  ngOnInit() {
     this.initializeForm();
 
     user(this.auth).subscribe(currentUser => {

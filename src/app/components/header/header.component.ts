@@ -34,6 +34,8 @@ export class HeaderComponent implements OnInit {
     '/evento-add': 'Agendar evento',
     '/evento-alumno': 'Eventos Alumno',
     '/match':'Match',
+    '/desafio':'Crear desafio',
+    '/desafio-list':'Desafios Disponibles',
     '/match-perfil': "Datos del jugador",
     '/crear-club':'Crear club',
     '/club':'Club',
