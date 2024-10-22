@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider } from '@ionic/angular/standalone';
@@ -7,6 +7,7 @@ import { eventos } from 'src/app/models/evento';
 import { Auth } from '@angular/fire/auth';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-evento-alumno',
@@ -34,6 +35,7 @@ export class EventoAlumnoPage implements OnInit {
   eventosAprobados: eventos[] = [];
   eventosEnEspera: eventos[] = [];
   idAlumno: string | null = null;
+  router: Router = inject(Router); // Inject the Router
 
   constructor(
     private eventosService: EventosService,
@@ -58,6 +60,10 @@ export class EventoAlumnoPage implements OnInit {
     } else {
       console.error('No hay usuario autenticado.');
     }
+  }
+
+  configurarDesafio(evento: eventos) {
+    this.router.navigate(['/desafio'], { queryParams: { evento: JSON.stringify(evento) } });
   }
 
   loadEventos(): void {

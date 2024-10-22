@@ -1,7 +1,5 @@
 <app-header></app-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
-
   <ion-grid>
     <!-- Título de Aprobados -->
     <ion-row>
@@ -13,7 +11,6 @@
         </ion-item-divider>
       </ion-col>
     </ion-row>
-
     <!-- Eventos Aprobados -->
     <ion-row *ngFor="let evento of eventosAprobados">
       <ion-col size-md="6" size-lg="4" size-sm="12">
@@ -25,12 +22,15 @@
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
-            <p><strong>Hora:</strong> {{ evento.sectorNombre }}</p>
+            <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
+            <!-- Botón para redirigir a la configuración de reglas -->
+            <ion-button expand="full" (click)="configurarDesafio(evento)">
+              Configurar Reglas
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
     <!-- Título de En Espera -->
     <ion-row>
       <ion-col size="12">
@@ -41,7 +41,6 @@
         </ion-item-divider>
       </ion-col>
     </ion-row>
-
     <!-- Eventos en Espera -->
     <ion-row *ngFor="let evento of eventosEnEspera">
       <ion-col size-md="6" size-lg="4" size-sm="12">
@@ -53,15 +52,12 @@
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
-            <p><strong>Hora:</strong> {{ evento.sectorNombre }}</p>
-
+            <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
   </ion-grid>
-
 </ion-content>
-
 <app-footer></app-footer>
+

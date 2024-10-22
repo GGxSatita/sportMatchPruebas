@@ -28,13 +28,11 @@ export interface ResultModel {
 
 export interface Desafio {
   id: string; // ID del desafío
-  name: string; // Nombre del desafío
   type: ChallengeType; // Tipo de desafío
   sport: Deporte; // Deporte asociado
   status: ChallengeStatus; // Estado del desafío
   participants: ParticipantModel[]; // Lista de participantes
   rules: RulesModel; // Reglas del desafío
-  event: eventos; // Evento asociado al desafío
   results?: ResultModel; // Resultado del desafío, si aplica
 }
 

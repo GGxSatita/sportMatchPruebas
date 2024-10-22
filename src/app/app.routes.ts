@@ -69,6 +69,14 @@ export const routes: Routes = [
   {
     path: 'desafio-list',
     loadComponent: () => import('./pages/desafio-list/desafio-list.page').then( m => m.DesafioListPage)
+  },
+  {
+    path: 'enfrentamiento',
+    loadComponent: () => import('./pages/enfrentamiento/enfrentamiento.page').then( m => m.EnfrentamientoPage)
+  },
+  {
+    path: 'enfrentamiento-espera',
+    loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
   }
 
 

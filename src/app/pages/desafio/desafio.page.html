@@ -1,24 +1,9 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Crear Desafío</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Crear Desafío</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <form [formGroup]="desafioForm" (ngSubmit)="onSubmit()">
+<app-header></app-header>
+<ion-content>
+  <form *ngIf="desafioForm" [formGroup]="desafioForm" (ngSubmit)="onSubmit()">
     <ion-list>
       <ion-item>
-        <ion-label position="floating">Nombre del Desafío</ion-label>
-        <ion-input formControlName="name"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Tipo de Desafío</ion-label>
+        <ion-label position="floating">Tipo</ion-label>
         <ion-select formControlName="type">
           <ion-select-option value="PUNTOS">Puntos</ion-select-option>
           <ion-select-option value="GOLES">Goles</ion-select-option>
@@ -37,8 +22,21 @@
           <ion-select-option value="OTRO">Otro</ion-select-option>
         </ion-select>
       </ion-item>
-      <!-- Add more fields as necessary for participants, rules, etc. -->
-      <ion-button expand="full" type="submit">Crear Desafío</ion-button>
+      <div formGroupName="rules">
+        <ion-item>
+          <ion-label position="floating">Puntos Necesarios</ion-label>
+          <ion-input formControlName="maxPoints"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Cantidad de Partidas</ion-label>
+          <ion-input formControlName="setsToWin"></ion-input>
+        </ion-item>
+      </div>
+      <ion-item>
+        <ion-button expand="full" type="submit" fill="clear">Definir reglas</ion-button>
+      </ion-item>
     </ion-list>
   </form>
 </ion-content>
+<app-footer></app-footer>
+

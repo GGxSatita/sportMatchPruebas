@@ -1,25 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { Auth, user } from '@angular/fire/auth';
+import { ParticipantModel } from 'src/app/models/desafio';
+import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonButton } from '@ionic/angular/standalone';
-import { DesafioService } from 'src/app/services/desafio.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-desafio',
   templateUrl: './desafio.page.html',
   styleUrls: ['./desafio.page.scss'],
   standalone: true,
-  imports: [IonButton, IonLabel, IonItem, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ReactiveFormsModule, IonSelect, IonSelectOption]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    IonicModule,
+    HeaderComponent,
+    FooterComponent
+  ],
 })
 export class DesafioPage implements OnInit {
+  desafioForm: FormGroup;
+  auth: Auth = inject(Auth);
 
-desafioForm: any;
+  constructor(
+    private fb: FormBuilder,
+    private authService: AutenticacionService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) { }
 
-  constructor(private fb: FormBuilder, private desafiosService: DesafioService) { }
-
-  ngOnInit() {
+  initializeForm() {
     this.desafioForm = this.fb.group({
-      name: [''],
       type: [''],
       sport: [''],
       participants: this.fb.array([]),
@@ -29,7 +46,6 @@ desafioForm: any;
         setsToWin: [''],
         timeLimit: ['']
       }),
-      event: [''],
       results: this.fb.group({
         winner: [''],
         finalScore: [''],
@@ -37,14 +53,40 @@ desafioForm: any;
         summary: ['']
       })
     });
+
+    this.cdr.detectChanges();
   }
+
+  ngOnInit() {
+    this.initializeForm();
+
+    user(this.auth).subscribe(currentUser => {
+      if (currentUser) {
+        const creator: ParticipantModel = {
+          id: currentUser.uid,
+          name: currentUser.displayName || 'Nombre del Jugador',
+          score: 0
+        };
+        (this.desafioForm.get('participants') as FormArray).push(this.fb.group(creator));
+      }
+    });
+  }
+
   onSubmit() {
     if (this.desafioForm.valid) {
-      this.desafiosService.createDesafio(this.desafioForm.value).then(() => {
+      const desafio = this.desafioForm.value;
+
+      console.log('Desafío a crear:', desafio);
+
+      const userId = 'ID_DEL_RETADO'; // Asegúrate de reemplazar esto con el ID real del retado
+      this.authService.createChallenge(userId, desafio).then(() => {
         console.log('Desafío creado');
+        this.router.navigate(['/espera', { eventId: desafio.event }]); // Redirige a la página de espera con el eventId
       }).catch(error => {
         console.error('Error al crear desafío:', error);
       });
+    } else {
+      console.error('El formulario no es válido:', this.desafioForm.errors);
     }
   }
 }

@@ -35,7 +35,7 @@ export class HeaderComponent implements OnInit {
     '/evento-alumno': 'Eventos Alumno',
     '/match':'Match',
     '/match-perfil': 'Datos del jugador',
-    '/desafio':'Desafia a alquien',
+    '/desafio':'Crear desafio',
     '/desafio-list':'Desafios Disponibles',
     // Agrega las rutas y nombres que necesites
   };

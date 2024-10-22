@@ -5,9 +5,11 @@ import {
   updateProfile, fetchSignInMethodsForEmail, EmailAuthProvider,
   updatePassword, reauthenticateWithCredential, sendPasswordResetEmail
 } from '@angular/fire/auth';
-import { collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
+import { Desafio, ParticipantModel } from '../models/desafio';
+import { HttpClient } from '@angular/common/http';
 
 
 @Injectable({
@@ -18,7 +20,7 @@ export class AutenticacionService {
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
   router: Router = inject(Router);
-  http: any;
+
 
   constructor(private firestore: Firestore) { }
 
@@ -86,17 +88,41 @@ export class AutenticacionService {
     }
 
   }
-  async sendChallengeNotification(userId: string) {
-    const payload = {
-      userId: userId,
-      title: '¡Has sido desafiado!',
-      body: 'Acepta o rechaza el desafío.'
-    };
-    this.http.post('URL_DEL_SERVIDOR/api/send-notification', payload).subscribe((response: any) => {
-      console.log('Notificación enviada:', response);
-    }, (error: any) => {
-      console.log('Error enviando notificación:', error);
-    });
+
+  async createChallenge(userId: string, challengeData: any) {
+    try {
+      // Crear el desafío
+      const currentUser = await this.auth.currentUser;
+      if (!currentUser) throw new Error('Usuario no autenticado');
+
+      const newChallenge: Desafio = {
+        id: '',
+        type: challengeData.type,
+        sport: challengeData.sport,
+        status: 'PENDIENTE',
+        participants: [
+          {
+            id: currentUser.uid,
+            name: currentUser.displayName || 'Nombre del Jugador',
+            score: 0
+          } as ParticipantModel,
+          {
+            id: userId,
+            name: 'Nombre del Retado', // Asumiendo que obtendrás el nombre del retado de alguna forma
+            score: 0
+          } as ParticipantModel
+        ],
+        rules: challengeData.rules,
+        results: null
+      };
+
+      const desafioRef = await addDoc(collection(this.firestore, 'desafios'), newChallenge);
+      await updateDoc(desafioRef, { id: desafioRef.id });
+
+      console.log('Desafío creado con ID:', desafioRef.id);
+    } catch (error) {
+      console.error('Error creando desafío:', error);
+    }
   }
 
   async getLoggedInUsersExcludingCurrentUser() {
