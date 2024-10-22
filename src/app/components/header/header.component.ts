@@ -13,7 +13,7 @@ import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [IonTitle, IonToolbar, IonHeader, CommonModule, IonButtons, IonButton, IonIcon],
+  imports: [CommonModule, IonButtons, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle],
 })
 export class HeaderComponent implements OnInit {
 
@@ -34,9 +34,11 @@ export class HeaderComponent implements OnInit {
     '/evento-add': 'Agendar evento',
     '/evento-alumno': 'Eventos Alumno',
     '/match':'Match',
-    '/match-perfil': 'Datos del jugador',
     '/desafio':'Crear desafio',
     '/desafio-list':'Desafios Disponibles',
+    '/match-perfil': "Datos del jugador",
+    '/crear-club':'Crear club',
+    '/club':'Club',
     // Agrega las rutas y nombres que necesites
   };
 
@@ -53,7 +55,7 @@ export class HeaderComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.currentPage = event.urlAfterRedirects; // Almacena la URL actual
-      this.pageTitle = this.pageTitlesMap[this.currentPage] || 'Página Desconocida'; // Asigna el nombre de la página o un valor por defecto
+      this.pageTitle = this.pageTitlesMap[this.currentPage] || ''; // Asigna el nombre de la página o un valor por defecto
     });
   }
 

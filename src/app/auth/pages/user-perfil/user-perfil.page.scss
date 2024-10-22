@@ -5,6 +5,8 @@
   align-items: center;
   height: 100vh;
   background: none;
+  padding: 20px;
+  box-sizing: border-box;
 
   animation: fadeIn 1s ease-in-out;
 
@@ -23,6 +25,7 @@
   font-size: 28px;
   font-weight: bold;
   color: #FF724C;
+  text-align: center;
 }
 
 .login-card {
@@ -35,6 +38,7 @@
   width: 100%;
   max-width: 450px;
   transition: transform 0.3s ease;
+  overflow: hidden; /* Evitar desbordamientos */
 
   &:hover {
     transform: translateY(-10px);
@@ -60,19 +64,26 @@
 .data-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px; /* Espacio entre el ícono y el texto */
+  justify-content: flex-start;
   margin: 10px 0;
   font-size: 18px;
   color: #2a2c41;
   font-weight: 500;
 
   ion-icon {
-    margin-right: 10px;
     color: #FF724C;
-    font-size: 20px;
+    font-size: 24px;
+  }
+
+  p {
+    margin: 0;
+    color: #333;
+    font-size: 1rem;
   }
 }
 
+/* Botones */
 ion-button {
   display: flex;
   flex-direction: column;
@@ -104,6 +115,7 @@ ion-button {
   }
 }
 
+/* Botón dentro de tarjeta */
 .boton-card {
   display: flex;
   justify-content: center;
@@ -151,6 +163,7 @@ ion-button {
   }
 }
 
+/* Ajustes responsivos */
 @media (max-width: 768px) {
   .login-card {
     padding: 20px;
@@ -184,12 +197,6 @@ ion-button {
   ion-button {
     font-size: 1rem;
   }
-}
-
-.data-item p {
-  color: #333;
-  font-size: 1rem;
-  margin: 5px 0;
 }
 
 @media (max-width: 480px) {

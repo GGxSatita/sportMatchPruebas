@@ -1,25 +1,27 @@
-.fondo-app {
-  background-color: #f4f4f8 !important; // Fondo claro para la aplicación
+.evento-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-
-// Responsividad
-@media (max-width: 768px) {
-  ion-list {
-    font-size: 1rem !important; // Ajustar el tamaño en pantallas pequeñas
-  }
-
-  ion-icon {
-    font-size: 1.4rem !important; // Ajustar el tamaño del icono en pantallas pequeñas
-  }
+.evento-titulo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #2c3e50;
 }
 
-@media (min-width: 769px) {
-  ion-list {
-    font-size: 1.2rem !important; // Ajustar el tamaño en pantallas grandes
-  }
+.evento-fecha {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
 
-  ion-icon {
-    font-size: 1.6rem !important; // Ajustar el tamaño del icono en pantallas grandes
-  }
+.evento-descripcion {
+  margin: 10px 0;
+  color: #34495e;
+}
+
+.unirse-boton {
+  margin-top: 10px;
+  border-radius: 8px;
 }

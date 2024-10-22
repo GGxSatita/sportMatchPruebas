@@ -48,8 +48,20 @@
           <ion-row class="ion-margin-top">
             <ion-col>
               <ion-button expand="block" class="btn-iniciar-sesion" (click)="login()">
-                <ion-icon name="log-in-outline" slot="end"></ion-icon>
+                <ion-icon name="log-in" slot="end"></ion-icon>
                 Iniciar sesión
+              </ion-button>
+            </ion-col>
+          </ion-row>
+
+
+
+          <ion-row class="ion-margin-top ion-text-center">
+            <ion-col>
+              <p>¿No tienes una cuenta?</p>
+              <ion-button expand="block" class="btn-registrarse" [routerLink]="['/registro']">
+                <ion-icon name="person-add" slot="end"></ion-icon>
+                Registrarse
               </ion-button>
             </ion-col>
           </ion-row>
@@ -58,18 +70,8 @@
             <ion-col>
               <p>¿Olvidaste tu contraseña?</p>
               <ion-button expand="block" class="btn-recuperar" (click)="goToRecoverPassword()">
-                <ion-icon name="lock-closed-outline" slot="end"></ion-icon>
+                <ion-icon name="lock-closed" slot="end"></ion-icon>
                 Recuperar Contraseña
-              </ion-button>
-            </ion-col>
-          </ion-row>
-
-          <ion-row class="ion-margin-top ion-text-center">
-            <ion-col>
-              <p>¿No tienes una cuenta?</p>
-              <ion-button expand="block" class="btn-registrarse" [routerLink]="['/registro']">
-                <ion-icon name="person-add-outline" slot="end"></ion-icon>
-                Registrarse
               </ion-button>
             </ion-col>
           </ion-row>

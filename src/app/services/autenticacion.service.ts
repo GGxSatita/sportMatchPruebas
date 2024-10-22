@@ -8,8 +8,17 @@ import {
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
+
 import { Desafio, ParticipantModel } from '../models/desafio';
 import { HttpClient } from '@angular/common/http';
+
+import { Observable } from 'rxjs';
+import { ModelsAuth } from '../models/auth.models';
+import { User } from '@angular/fire/auth';
+import { take } from 'rxjs/operators';
+
+
+
 
 
 @Injectable({
@@ -89,6 +98,7 @@ export class AutenticacionService {
 
   }
 
+
   async createChallenge(userId: string, challengeData: any) {
     try {
       // Crear el desafío
@@ -123,6 +133,32 @@ export class AutenticacionService {
     } catch (error) {
       console.error('Error creando desafío:', error);
     }
+=======
+  getDesafiosDelJugador(): Observable<any> {
+    const currentUser = this.auth.currentUser;
+    return this.http.get(`http://localhost:4200/api/desafios?userId=${currentUser?.uid}`);
+  }
+
+  aceptarDesafio(desafioId: string): Observable<any> {
+    return this.http.post(`http://localhost:4200/api/aceptar-desafio`, { desafioId });
+  }
+
+  rechazarDesafio(desafioId: string): Observable<any> {
+    return this.http.post(`http://localhost:4200/api/rechazar-desafio`, { desafioId });
+  }
+
+  async sendChallengeNotification(userId: string) {
+    const payload = {
+      userId: userId,
+      title: '¡Has sido desafiado!',
+      body: 'Acepta o rechaza el desafío.'
+    };
+    this.http.post('http://localhost:4200/api/send-notification', payload).subscribe((response: any) => {
+      console.log('Notificación enviada:', response);
+    }, (error: any) => {
+      console.log('Error enviando notificación:', error);
+    });
+
   }
 
   async getLoggedInUsersExcludingCurrentUser() {
@@ -154,6 +190,11 @@ export class AutenticacionService {
   getCurrentUser() {
     return this.auth.currentUser;
   }
+  async getCurrentUserAsync(): Promise<User | null> {
+    const user = await this.authState.pipe(take(1)).toPromise();
+    return user;
+  }
+
 
   // Actualizar el perfil del usuario
   async updateProfile(data: { displayName?: string, photoURL?: string }) {
@@ -217,5 +258,22 @@ export class AutenticacionService {
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }
+  async getUserProfile(userId: string): Promise<ModelsAuth.UserProfile | null> {
+    try {
+      const userDocRef = doc(this.firestore, `Users/${userId}`);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        return userDocSnap.data() as ModelsAuth.UserProfile;
+      } else {
+        console.error('Perfil de usuario no encontrado.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener el perfil del usuario:', error);
+      return null;
+    }
+  }
+
 
 }
