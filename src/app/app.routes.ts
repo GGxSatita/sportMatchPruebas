@@ -87,5 +87,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/club/club-detalle/club-detalle.page').then( m => m.ClubDetallePage),
     canActivate:[authGuard]
   },
+  {
+    path: 'menu-club',
+    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+  },
+  {
+    path: 'club-miembros/:id',
+    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
+  },
+
 
 ];

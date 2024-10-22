@@ -1,0 +1,60 @@
+.fondo-app {
+  background-color: var(--ion-color-light);
+  padding: 20px;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.card-item {
+  flex: 1 1 calc(33.333% - 20px);
+  max-width: 300px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--ion-color-light);
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  ion-icon {
+    font-size: 2rem;
+    margin-bottom: 1px;
+    color: var(--ion-color-secondary);
+  }
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0%;
+    margin: 15px auto; /* Centrando la imagen */
+    display: block;
+  }
+
+  ion-button {
+    margin-top: 10px;
+    width: 100%;
+    --border-radius: 8px;
+    font-size: 1rem;
+  }
+}
+
+// Ajustes responsivos
+@media (max-width: 768px) {
+  .card-item {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}

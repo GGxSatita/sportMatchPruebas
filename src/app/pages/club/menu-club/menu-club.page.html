@@ -1,0 +1,39 @@
+<app-header></app-header>
+
+<ion-content class="fondo-app">
+  <div class="card-container">
+    <ion-card class="card-item">
+      <ion-card-content>
+        <img src="assets/img/escudo.png" alt="Ir al Club" /> <!-- Imagen opcional -->
+        <ion-button (click)="goToClub()" expand="block" fill="solid">
+          <ion-icon name="person"></ion-icon> <!-- Ícono representativo -->
+          Ir al Club
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="card-item">
+      <ion-card-content>
+        <img src="assets/img/crear.png" alt="Crear Club" />
+        <ion-button (click)="goToCrearClub()" expand="block" fill="solid">
+          <ion-icon name="add-circle"></ion-icon>
+          Crear Club
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="card-item">
+      <ion-card-content>
+        <img src="assets/img/buscar.png" alt="Ver Clubes" />
+        <ion-button (click)="goToVerClubes()" expand="block" fill="solid">
+          <ion-icon name="eye"></ion-icon>
+          Ver Clubes
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+
+
+<app-footer></app-footer>

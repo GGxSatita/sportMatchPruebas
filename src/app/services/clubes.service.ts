@@ -13,6 +13,7 @@ import {
   where,
   query,
   getDocs,
+  DocumentReference
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Club } from '../models/club';
@@ -110,26 +111,32 @@ export class ClubesService {
   }
 
   // Método para eliminar un miembro del club
-  async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
-    const clubRef = doc(this.firestore, `clubs/${clubId}`);
-    const clubSnap = await getDoc(clubRef);
-    if (clubSnap.exists()) {
+// Método para eliminar un miembro del club
+async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
+  const clubRef = doc(this.firestore, `clubs/${clubId}`);
+  const clubSnap = await getDoc(clubRef);
+
+  if (clubSnap.exists()) {
       const clubData = clubSnap.data() as Club;
       if (Array.isArray(clubData.miembros)) {
-        const updatedMembers = clubData.miembros.filter((miembro) => miembro.userId !== miembroId);
-        const updatedMemberIds = updatedMembers.map((miembro) => miembro.userId);
+          const updatedMembers = clubData.miembros.filter((miembro) => miembro.userId !== miembroId);
+          const updatedMemberIds = updatedMembers.map((miembro) => miembro.userId);
 
-        await updateDoc(clubRef, {
-          miembros: updatedMembers,
-          miembroIds: updatedMemberIds,
-        });
+          // Actualizar Firestore con la lista de miembros actualizada
+          await updateDoc(clubRef, {
+              miembros: updatedMembers,
+              miembroIds: updatedMemberIds,
+          });
       } else {
-        console.error('Los miembros no están definidos o no son un array.');
+          console.error('Los miembros no están definidos o no son un array.');
       }
-    } else {
+  } else {
+      console.error('Club no encontrado');
       throw new Error('Club no encontrado');
-    }
   }
+}
+
+
 
   // Método para obtener el club al que pertenece un usuario
   async getClubForUser(userId: string): Promise<Club | null> {
@@ -178,4 +185,36 @@ export class ClubesService {
 
     await addDoc(collection(this.firestore, `clubs/${clubId}/messages`), newMessage);
   }
+  // Servicio para marcar la expulsión en el perfil del miembro
+  async marcarExpulsion(userId: string, clubName: string): Promise<void> {
+    try {
+      // Obtén la referencia del documento del usuario
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        await updateDoc(userRef, {
+          expulsado: true,
+          clubExpulsado: clubName,
+          fechaExpulsion: new Date(),
+        });
+        console.log(`El usuario ${userId} ha sido marcado como expulsado del club ${clubName}.`);
+      } else {
+        console.error(`El documento del usuario ${userId} no existe en Firestore.`);
+        throw new Error('Usuario no encontrado');
+      }
+    } catch (error) {
+      console.error('Error al marcar la expulsión:', error);
+      throw error;
+    }
+  }
+
+
+// En ClubesService
+getUserDocRef(userId: string): DocumentReference {
+  return doc(this.firestore, `users/${userId}`);
+}
+
+
+
 }

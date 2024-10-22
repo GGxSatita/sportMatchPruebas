@@ -8,6 +8,9 @@
   </ion-header>
 
   <ion-content>
+    <ion-button expand="block" (click)="verMiembros(club.idClub)">
+      Ver Miembros
+    </ion-button>
     <div *ngIf="club">
       <ion-card>
         <ion-card-header>
@@ -18,15 +21,6 @@
           <p>{{ club.descripcion }}</p>
         </ion-card-content>
       </ion-card>
-
-      <ion-list>
-        <ion-item *ngFor="let miembro of club.miembros">
-          <ion-label>{{ miembro.profile?.name || 'Sin nombre'}}</ion-label>
-          <ion-button *ngIf="isLeader" (click)="eliminarMiembro(miembro.userId)">
-            Expulsar
-          </ion-button>
-        </ion-item>
-      </ion-list>
 
       <!-- Componente de chat para la interacción en tiempo real -->
       <app-club-chat [clubId]="club.idClub"></app-club-chat>

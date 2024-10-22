@@ -22,6 +22,7 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
 import { Club } from 'src/app/models/club';
 import { Observable } from 'rxjs';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-club',
@@ -56,7 +57,9 @@ export class ClubPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private clubesService: ClubesService,
-    private authService: AutenticacionService
+    private authService: AutenticacionService,
+    private router : Router
+
   ) {}
 
   async ngOnInit() {
@@ -97,4 +100,8 @@ export class ClubPage implements OnInit {
         });
     }
   }
+  verMiembros(clubId: string) {
+    this.router.navigate([`/club-miembros/${clubId}`]);
+  }
+
 }
