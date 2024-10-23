@@ -1,13 +1,9 @@
-
-import {  inject,  CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
-import { IonicModule } from '@ionic/angular'; // Importa solo IonicModule
-import { AlertController } from '@ionic/angular';
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular'; // Importa solo IonicModule
+import { AlertController } from '@ionic/angular';
 
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
@@ -16,11 +12,8 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
 import { eventosAdmin } from 'src/app/models/evento-admin';
-
-
 import { ClubesService } from 'src/app/services/clubes.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
-
 
 @Component({
   selector: 'app-menu-principal',
@@ -52,14 +45,13 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
     HeaderComponent,
     FooterComponent,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+ 
 })
 export class MenuPrincipalPage implements OnInit {
 
   eventos: eventosAdmin[] = [];
   alumnoId: string = '';
   notificaciones: any[] = [];
-
 
   constructor(
     private autenticacionService: AutenticacionService,
@@ -68,7 +60,6 @@ export class MenuPrincipalPage implements OnInit {
     private alertController: AlertController,
     private eventoAdminService: EventoAdminService,
     private notificacionesService: NotificacionesService
-
   ) {}
 
   async ngOnInit() {
@@ -76,20 +67,23 @@ export class MenuPrincipalPage implements OnInit {
       const user = await this.autenticacionService.getCurrentUser();
       if (user) {
         this.alumnoId = user.uid;
-          // Cargar las notificaciones del usuario
-          this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
+        // Cargar las notificaciones del usuario
+        this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
           this.notificaciones = notificaciones;
         });
       }
 
       this.eventoAdminService.getEventos().subscribe((eventos) => {
-        this.eventos = eventos.filter(evento => evento.status === true);
+        const today = new Date().toISOString().split('T')[0];
+        // Filtrar eventos que están activos y cuya fecha es igual o posterior a hoy
+        this.eventos = eventos.filter(evento => 
+          evento.status === true && new Date(evento.fechaReservada).toISOString().split('T')[0] >= today
+        );
       });
     } catch (error) {
       console.error('Error al obtener el usuario:', error);
     }
   }
-
 
   async unirseAlEvento(eventoId: string) {
     try {
@@ -118,16 +112,13 @@ export class MenuPrincipalPage implements OnInit {
     }
   }
 
-
-
-
   async goToClub() {
     const user = this.autenticacionService.getCurrentUser();
 
     if (user) {
         try {
             const club = await this.clubesService.getClubForUser(user.uid);
-            console.log('Club obtenido en goToClub:', club); // Log para verificar el club
+            console.log('Club obtenido en goToClub:', club);
             if (club) {
                 this.router.navigate([`/club/${club.idClub}`]);
             } else {
@@ -144,13 +135,12 @@ export class MenuPrincipalPage implements OnInit {
     } else {
         console.error('Usuario no autenticado');
     }
-}
-
-
+  }
 
   goToCrearClub() {
     this.router.navigate(['/crear-club']);
   }
+
   goToVerClubes() {
     this.router.navigate(['/club-list']);
   }
