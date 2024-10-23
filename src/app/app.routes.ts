@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { ClubGuard } from './guards/club.guard';
 import { ClubCreationGuard } from './guards/club-creation.guard';
+import { ClubLeaderGuard } from './guards/club-leader.guard';
 
 export const routes: Routes = [
   {
@@ -83,7 +84,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/club/club-detalle/club-detalle.page').then( m => m.ClubDetallePage),
     canActivate:[authGuard]
   },
-      {
+  {
     path: 'desafio',
     loadComponent: () => import('./pages/desafio/desafio.page').then( m => m.DesafioPage)
   },
@@ -106,7 +107,13 @@ export const routes: Routes = [
       {
     path: 'menu-club',
     loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+  },
+  {
+    path: 'club-edit/:id',
+    loadComponent: () => import('./pages/club/club-edit/club-edit.page').then( m => m.ClubEditPage),
+    // canActivate:[ClubLeaderGuard]
   }
+
 
 
 

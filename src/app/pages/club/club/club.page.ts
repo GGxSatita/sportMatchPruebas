@@ -103,5 +103,9 @@ export class ClubPage implements OnInit {
   verMiembros(clubId: string) {
     this.router.navigate([`/club-miembros/${clubId}`]);
   }
+  goToEditarClub(clubId: string){
+    this.router.navigate([`/club-edit/${clubId}`]);
+  }
+
 
 }

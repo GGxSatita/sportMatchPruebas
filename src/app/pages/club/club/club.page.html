@@ -6,8 +6,8 @@
     <div *ngIf="club">
       <ion-card class="compact-club-card">
         <ion-item lines="none">
-          <ion-avatar slot="start" class="small-club-logo">
-            <img [src]="club.logo" alt="Logo del Club" />
+          <ion-avatar slot="start" class="small-club-logo" >
+            <img [src]="club.logo" alt="Logo del Club"/>
           </ion-avatar>
           <ion-label>
             <h2 class="club-name">{{ club.nombreClub }}</h2>
@@ -15,6 +15,9 @@
           </ion-label>
           <ion-button (click)="verMiembros(club.idClub)">
             Ver Miembros
+          </ion-button>
+          <ion-button (click)="goToEditarClub(club.idClub)" expand="block" fill="clear" shape="round">
+            Editar
           </ion-button>
         </ion-item>
       </ion-card>

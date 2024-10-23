@@ -1,0 +1,48 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>club-edit</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <form [formGroup]="clubForm" (ngSubmit)="guardarCambios()">
+    <ion-item>
+      <ion-label position="floating">Nombre del Club</ion-label>
+      <ion-input formControlName="nombreClub"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-textarea formControlName="descripcion" auto-grow="true"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Deporte</ion-label>
+      <ion-select formControlName="deporteNombre" interface="popover">
+        <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
+          {{ deporte.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Máximo de Miembros</ion-label>
+      <ion-input type="number" formControlName="maxMiembros" min="1"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Logo del Club</ion-label>
+      <ion-button (click)="selectLogoFromGallery()" fill="outline" slot="end">Cambiar Logo</ion-button>
+    </ion-item>
+
+    <div class="logo-preview" *ngIf="logoUrl">
+      <img [src]="logoUrl" alt="Logo del Club" />
+    </div>
+
+    <ion-button expand="block" type="submit" [disabled]="!clubForm.valid">
+      Guardar Cambios
+    </ion-button>
+    <ion-button expand="block" color="medium" (click)="cancelar()">
+      Cancelar
+    </ion-button>
+  </form>
+</ion-content>

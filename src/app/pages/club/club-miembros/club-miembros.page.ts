@@ -9,6 +9,7 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { getDoc } from '@angular/fire/firestore';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-club-miembros',
@@ -28,7 +29,8 @@ export class ClubMiembrosPage implements OnInit {
     private clubesService: ClubesService,
     private authService: AutenticacionService,
     private alertController: AlertController,
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private router : Router
   ) { }
 
   async ngOnInit() {
@@ -140,4 +142,5 @@ export class ClubMiembrosPage implements OnInit {
       }
     }
   }
+
 }
