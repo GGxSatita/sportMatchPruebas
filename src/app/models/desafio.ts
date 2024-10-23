@@ -3,7 +3,7 @@ export type SportType = 'FUTBOL' | 'TENIS' | 'BASQUETBOL' | 'VOLEIBOL' | 'OTRO';
 import { eventos } from './evento'; // Asegúrate del path correcto
 import { Deporte } from './deporte';
 export type ChallengeStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'FINALIZADO';
-
+export type ChallengeType = 'PUNTOS' | 'GOLES' | 'SETS' | 'PARTIDO' | 'OBJETIVO';
 
 export interface ParticipantModel {
   id: string; // ID del alumno (UID de Firebase)

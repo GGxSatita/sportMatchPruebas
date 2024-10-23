@@ -1,91 +1,61 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { Auth, user } from '@angular/fire/auth';
-import { ParticipantModel } from 'src/app/models/desafio';
-import { AutenticacionService } from 'src/app/services/autenticacion.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { FooterComponent } from 'src/app/components/footer/footer.component';
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, setDoc, DocumentData } from '@angular/fire/firestore';
+import { map, Observable } from 'rxjs';
+import { Desafio } from '../models/desafio';
+import { eventos } from '../models/evento';
 
-@Component({
-  selector: 'app-desafio',
-  templateUrl: './desafio.page.html',
-  styleUrls: ['./desafio.page.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    IonicModule,
-    HeaderComponent,
-    FooterComponent
-  ],
+@Injectable({
+  providedIn: 'root',
 })
-export class DesafioPage implements OnInit {
-  desafioForm: FormGroup;
-  auth: Auth = inject(Auth);
+export class DesafioService {
+  private collectionName = 'desafios';
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AutenticacionService,
-    private cdr: ChangeDetectorRef,
-    private router: Router
-  ) { }
+  constructor(private firestore: Firestore) {}
 
-  initializeForm() {
-    this.desafioForm = this.fb.group({
-      type: [''],
-      sport: [''],
-      participants: this.fb.array([]),
-      rules: this.fb.group({
-        maxPoints: [''],
-        maxGoals: [''],
-        setsToWin: [''],
-        timeLimit: ['']
-      }),
-      results: this.fb.group({
-        winner: [''],
-        finalScore: [''],
-        isDraw: [false],
-        summary: ['']
+  // Obtener todos los desafíos
+  getDesafios(): Observable<Desafio[]> {
+    const desafiosRef = collection(this.firestore, this.collectionName);
+    return collectionData(desafiosRef, { idField: 'id' }) as Observable<Desafio[]>;
+  }
+
+  // Obtener un desafío por ID
+  getDesafioById(id: string): Observable<Desafio | undefined> {
+    const desafioDoc = doc(this.firestore,`${this.collectionName}/${id}`);
+    return docData(desafioDoc, { idField: 'id' }) as Observable<Desafio | undefined>;
+  }
+// Crear un nuevo desafío
+  async createDesafio(desafio: Desafio): Promise<void> {
+    const desafiosRef = collection(this.firestore, this.collectionName);
+    const docRef = await addDoc(desafiosRef, { ...desafio });
+    console.log('Desafío creado con ID:', docRef.id);
+
+    // Actualiza el documento con el ID generado automáticamente
+    await updateDoc(docRef, { id: docRef.id });
+  }
+
+  // Actualizar un desafío existente
+  updateDesafio(id: string, updatedData: Partial<Desafio>): Promise<void> {
+    const desafioDoc = doc(this.firestore, `${this.collectionName}/${id}`);
+    return updateDoc(desafioDoc, { ...updatedData });
+  }
+
+  // Eliminar un desafío por ID
+  deleteDesafio(id: string): Promise<void> {
+    const desafioDoc = doc(this.firestore, `${this.collectionName}/${id}`);
+    return deleteDoc(desafioDoc);
+  }
+
+  getEventStatus(eventId: string): Observable<string> {
+    const eventDoc = doc(this.firestore, `eventos/${eventId}`);
+    return docData(eventDoc).pipe(
+      map((doc: DocumentData) => {
+        const event = doc as eventos; // Casting a 'eventos'
+        if (event.participantesActuales.length >= event.capacidadMaxima) {
+          return 'FULL';
+        } else {
+          return 'PENDING';
+        }
       })
-    });
-
-    this.cdr.detectChanges();
-  }
-ngOnInit() {
-    this.initializeForm();
-
-    user(this.auth).subscribe(currentUser => {
-      if (currentUser) {
-        const creator: ParticipantModel = {
-          id: currentUser.uid,
-          name: currentUser.displayName || 'Nombre del Jugador',
-          score: 0
-        };
-        (this.desafioForm.get('participants') as FormArray).push(this.fb.group(creator));
-      }
-    });
-  }
-
-  onSubmit() {
-    if (this.desafioForm.valid) {
-      const desafio = this.desafioForm.value;
-
-      console.log('Desafío a crear:', desafio);
-
-      const userId = 'ID_DEL_RETADO'; // Asegúrate de reemplazar esto con el ID real del retado
-      this.authService.createChallenge(userId, desafio).then(() => {
-        console.log('Desafío creado');
-        this.router.navigate(['/espera', { eventId: desafio.event }]); // Redirige a la página de espera con el eventId
-      }).catch(error => {
-        console.error('Error al crear desafío:', error);
-      });
-    } else {
-      console.error('El formulario no es válido:', this.desafioForm.errors);
-    }
+    ) as Observable<string>;
   }
 }

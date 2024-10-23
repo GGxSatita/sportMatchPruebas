@@ -24,7 +24,7 @@ export class EnfrentamientoEsperaPage implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private desafioService: DesafioService
+    private desafioServicio: DesafioService
   ) {}
 
   ngOnInit() {
@@ -35,7 +35,7 @@ export class EnfrentamientoEsperaPage implements OnInit {
   // Lógica para chequear si el evento está lleno
   checkPlayers() {
     if (this.eventId) {
-      this.desafioService.getEventStatus(this.eventId).subscribe(status => {
+      this.desafioServicio.getEventStatus(this.eventId).subscribe(status => {
         if (status === 'FULL') {
           this.router.navigate(['/enfrentamiento']);
         }

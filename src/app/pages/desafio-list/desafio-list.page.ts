@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
 export class DesafioListPage implements OnInit {
   desafios: Desafio[] = [];
   desafiosExpandido: { [key: string]: boolean } = {};
-  constructor(private desafiosService: DesafioService, private router : Router) { }
+  constructor(private desafiosServicio: DesafioService, private router : Router) { }
 
   ngOnInit() {
     this.loadDesafios();
@@ -27,7 +27,7 @@ export class DesafioListPage implements OnInit {
     this.router.navigate([`/${page}`]);
   }
   loadDesafios() {
-    this.desafiosService.getDesafios().subscribe(data => {
+    this.desafiosServicio.getDesafios().subscribe(data => {
       this.desafios = data;
     });
   }

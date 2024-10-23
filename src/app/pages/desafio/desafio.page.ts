@@ -9,6 +9,7 @@ import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
+import { EventosService } from 'src/app/services/evento.service';
 
 @Component({
   selector: 'app-desafio',
@@ -27,12 +28,15 @@ import { Router } from '@angular/router';
 export class DesafioPage implements OnInit {
   desafioForm: FormGroup;
   auth: Auth = inject(Auth);
+  isCreator = false
 
   constructor(
     private fb: FormBuilder,
     private authService: AutenticacionService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private eventoService: EventosService
+
   ) { }
 
   initializeForm() {
@@ -71,7 +75,14 @@ export class DesafioPage implements OnInit {
       }
     });
   }
-
+  checkIfCreator(userId: string) {
+    this.eventoService.getEventos().subscribe(eventos => {
+      const event = eventos.find(evento => evento.idEventosAlumnos === this.desafioForm.get('event')?.value);
+      if (event && event.idAlumno === userId) {
+        this.isCreator = true;
+      }
+    });
+  }
   onSubmit() {
     if (this.desafioForm.valid) {
       const desafio = this.desafioForm.value;

@@ -28,7 +28,7 @@ export class EnfrentamientoPage {
   maxGoals = 3; // Valor inicial según el desafío
   totalScore = 0;
 
-  constructor(private fb: FormBuilder, private desafioService: DesafioService) {
+  constructor(private fb: FormBuilder) {
     this.enfrentamientoForm = this.fb.group({
       // Agrega los controles del formulario necesarios
     });

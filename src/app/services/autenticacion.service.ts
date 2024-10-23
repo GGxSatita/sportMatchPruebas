@@ -29,6 +29,7 @@ export class AutenticacionService {
   auth: Auth = inject(Auth);
   authState = authState(this.auth);
   router: Router = inject(Router);
+  http: any;
 
 
   constructor(private firestore: Firestore) { }
@@ -133,7 +134,7 @@ export class AutenticacionService {
     } catch (error) {
       console.error('Error creando desafío:', error);
     }
-=======
+  }
   getDesafiosDelJugador(): Observable<any> {
     const currentUser = this.auth.currentUser;
     return this.http.get(`http://localhost:4200/api/desafios?userId=${currentUser?.uid}`);

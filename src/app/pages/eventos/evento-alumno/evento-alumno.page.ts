@@ -40,9 +40,6 @@ export class EventoAlumnoPage implements OnInit {
   eventosEnEspera: eventos[] = [];
   eventosInscritos: eventos[] = [];
   idAlumno: string | null = null;
-
-  router: Router = inject(Router); // Inject the Router
-
   eventosAprobadosOInscritos: eventos[] = [];
   eventosAdminInscritos: eventosAdmin[] = [];
 
@@ -78,7 +75,7 @@ export class EventoAlumnoPage implements OnInit {
 
   configurarDesafio(evento: eventos) {
     this.router.navigate(['/desafio'], { queryParams: { evento: JSON.stringify(evento) } });
-
+  }
   async loadAlumnoIdAdmin() {
     const user = this.auth.currentUser;
     if (user) {
@@ -87,8 +84,8 @@ export class EventoAlumnoPage implements OnInit {
     } else {
       console.error('No hay usuario autenticado.');
     }
-
   }
+
 
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
