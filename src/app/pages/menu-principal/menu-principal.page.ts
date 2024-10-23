@@ -19,6 +19,7 @@ import { eventosAdmin } from 'src/app/models/evento-admin';
 
 
 import { ClubesService } from 'src/app/services/clubes.service';
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
 
 
 @Component({
@@ -57,6 +58,7 @@ export class MenuPrincipalPage implements OnInit {
 
   eventos: eventosAdmin[] = [];
   alumnoId: string = '';
+  notificaciones: any[] = [];
 
 
   constructor(
@@ -65,6 +67,7 @@ export class MenuPrincipalPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private eventoAdminService: EventoAdminService,
+    private notificacionesService: NotificacionesService
 
   ) {}
 
@@ -73,6 +76,10 @@ export class MenuPrincipalPage implements OnInit {
       const user = await this.autenticacionService.getCurrentUser();
       if (user) {
         this.alumnoId = user.uid;
+          // Cargar las notificaciones del usuario
+          this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
+          this.notificaciones = notificaciones;
+        });
       }
 
       this.eventoAdminService.getEventos().subscribe((eventos) => {
@@ -141,11 +148,7 @@ export class MenuPrincipalPage implements OnInit {
 
 
 
-
-
-
-
-  goCrearClub() {
+  goToCrearClub() {
     this.router.navigate(['/crear-club']);
   }
   goToVerClubes() {

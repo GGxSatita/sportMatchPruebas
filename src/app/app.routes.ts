@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { ClubGuard } from './guards/club.guard';
@@ -97,6 +98,14 @@ export const routes: Routes = [
   {
     path: 'enfrentamiento-espera',
     loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
+  },
+      {
+    path: 'club-miembros/:id',
+    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
+  },
+      {
+    path: 'menu-club',
+    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
   }
 
 

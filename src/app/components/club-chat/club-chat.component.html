@@ -1,5 +1,5 @@
 <ion-list>
-  <ion-item *ngFor="let message of messages | async">
+  <ion-item *ngFor="let message of messages | async" class="message-item">
     <ion-avatar slot="start">
       <img [src]="message.userPhotoUrl" alt="{{ message.username }}">
     </ion-avatar>
@@ -11,10 +11,9 @@
   </ion-item>
 </ion-list>
 
-<form [formGroup]="chatForm" (ngSubmit)="sendMessage()">
-  <ion-item>
-    <ion-icon slot="end" name="send-outline"></ion-icon>
-    <ion-input formControlName="message" placeholder="Escribe un mensaje..."></ion-input>
+<form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="chat-form">
+  <ion-item lines="none" class="input-item">
+    <ion-input formControlName="message" placeholder="Escribe un mensaje..." type="text" clearInput></ion-input>
+    <ion-icon slot="end" name="send-outline" (click)="sendMessage()" class="send-icon"></ion-icon>
   </ion-item>
-  <ion-button type="submit" expand="block" [disabled]="!chatForm.valid">Enviar</ion-button>
 </form>
