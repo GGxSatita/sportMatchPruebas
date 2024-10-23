@@ -241,6 +241,9 @@ export class EventoListPage implements OnInit {
       console.error('Error al inscribirse en el evento:', error);
       this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
     });
+
+    // Redirigir a la página de enfrentamiento espera
+    this.router.navigate(['/enfrentamiento-espera']);
   }
 
 

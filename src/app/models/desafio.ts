@@ -30,6 +30,7 @@ export interface Desafio {
   id: string; // ID del desafío
   type: ChallengeType; // Tipo de desafío
   sport: Deporte; // Deporte asociado
+  event: eventos
   status: ChallengeStatus; // Estado del desafío
   participants: ParticipantModel[]; // Lista de participantes
   rules: RulesModel; // Reglas del desafío

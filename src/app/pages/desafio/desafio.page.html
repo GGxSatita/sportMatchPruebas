@@ -37,5 +37,26 @@
       </ion-item>
     </ion-list>
   </form>
+  <div *ngIf="!isCreator">
+    <ion-list>
+      <!-- Display the rules to non-creators -->
+      <ion-item>
+        <ion-label>Tipo</ion-label>
+        <ion-note>{{ desafioForm.get('type').value }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Deporte</ion-label>
+        <ion-note>{{ desafioForm.get('sport').value }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Puntos Necesarios</ion-label>
+        <ion-note>{{ desafioForm.get('rules.maxPoints').value }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Cantidad de Partidas</ion-label>
+        <ion-note>{{ desafioForm.get('rules.setsToWin').value }}</ion-note>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>
 <app-footer></app-footer>

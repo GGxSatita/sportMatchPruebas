@@ -10,6 +10,7 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
 import { EventosService } from 'src/app/services/evento.service';
+import { eventos } from 'src/app/models/evento';
 
 @Component({
   selector: 'app-desafio',
@@ -28,7 +29,8 @@ import { EventosService } from 'src/app/services/evento.service';
 export class DesafioPage implements OnInit {
   desafioForm: FormGroup;
   auth: Auth = inject(Auth);
-  isCreator = false
+  isCreator = false;
+  event: eventos;
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +45,7 @@ export class DesafioPage implements OnInit {
     this.desafioForm = this.fb.group({
       type: [''],
       sport: [''],
+      event:[''],
       participants: this.fb.array([]),
       rules: this.fb.group({
         maxPoints: [''],
@@ -72,17 +75,21 @@ export class DesafioPage implements OnInit {
           score: 0
         };
         (this.desafioForm.get('participants') as FormArray).push(this.fb.group(creator));
+        this.checkIfCreator(currentUser.uid);
       }
     });
   }
+
   checkIfCreator(userId: string) {
     this.eventoService.getEventos().subscribe(eventos => {
       const event = eventos.find(evento => evento.idEventosAlumnos === this.desafioForm.get('event')?.value);
       if (event && event.idAlumno === userId) {
         this.isCreator = true;
       }
+      this.cdr.detectChanges(); // Detect changes after setting isCreator
     });
   }
+
   onSubmit() {
     if (this.desafioForm.valid) {
       const desafio = this.desafioForm.value;

@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { ModelsAuth } from '../models/auth.models';
 import { User } from '@angular/fire/auth';
 import { take } from 'rxjs/operators';
+import { eventos } from '../models/evento';
 
 
 
@@ -101,15 +102,20 @@ export class AutenticacionService {
 
 
   async createChallenge(userId: string, challengeData: any) {
+
     try {
       // Crear el desafío
       const currentUser = await this.auth.currentUser;
       if (!currentUser) throw new Error('Usuario no autenticado');
+      const eventId = challengeData.event;
+      const eventDoc = await getDoc(doc(this.firestore, `eventosAlumnos/${eventId}`)); // Asegúrate de que la colección y el ID del evento sean correctos
+      const event: eventos = eventDoc.data() as eventos;
 
       const newChallenge: Desafio = {
         id: '',
         type: challengeData.type,
         sport: challengeData.sport,
+        event: event,
         status: 'PENDIENTE',
         participants: [
           {
@@ -117,11 +123,7 @@ export class AutenticacionService {
             name: currentUser.displayName || 'Nombre del Jugador',
             score: 0
           } as ParticipantModel,
-          {
-            id: userId,
-            name: 'Nombre del Retado', // Asumiendo que obtendrás el nombre del retado de alguna forma
-            score: 0
-          } as ParticipantModel
+          ...challengeData.participants
         ],
         rules: challengeData.rules,
         results: null
