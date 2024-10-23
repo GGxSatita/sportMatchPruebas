@@ -91,29 +91,48 @@ export class EventoAlumnoPage implements OnInit {
     this.eventosService.getEventos().subscribe((eventos) => {
       if (!this.idAlumno) return;
 
-      // Filtrar eventos aprobados e inscritos por el alumno autenticado
-      this.eventosAprobadosOInscritos = eventos.filter(evento =>
-        (evento.espera && evento.idAlumno === this.idAlumno) ||
-        evento.participantesActuales?.includes(this.idAlumno)
-      );
+      // Obtener la fecha actual (solo la parte de año, mes y día)
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
 
-      // Filtrar los eventos en espera específicamente del alumno autenticado
-      this.eventosEnEspera = eventos.filter(evento =>
-        !evento.espera && evento.idAlumno === this.idAlumno
-      );
+      // Filtrar eventos aprobados e inscritos por el alumno autenticado que sean futuros o del día actual
+      this.eventosAprobadosOInscritos = eventos.filter(evento => {
+        const fechaEvento = new Date(evento.fechaReservada);
+        const fechaEventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
+
+        return ((evento.espera && evento.idAlumno === this.idAlumno) ||
+                evento.participantesActuales?.includes(this.idAlumno)) &&
+                fechaEventoSinHora >= hoy;
+      });
+
+      // Filtrar los eventos en espera específicamente del alumno autenticado que sean futuros o del día actual
+      this.eventosEnEspera = eventos.filter(evento => {
+        const fechaEvento = new Date(evento.fechaReservada);
+        const fechaEventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
+
+        return !evento.espera && evento.idAlumno === this.idAlumno &&
+               fechaEventoSinHora >= hoy;
+      });
     });
   }
+
 
   loadEventosAdmin(): void {
     this.eventoAdminService.getEventos().subscribe((eventosAdmin) => {
       if (!this.idAlumno) return;
 
-      // Filtrar eventos administrados en los que el alumno está inscrito
+      const ahora = new Date();
+
+      // Filtrar eventos administrados en los que el alumno está inscrito y que sean futuros
       this.eventosAdminInscritos = eventosAdmin.filter(eventoAdmin =>
-        eventoAdmin.participants.includes(this.idAlumno) && eventoAdmin.status === true
+        eventoAdmin.participants.includes(this.idAlumno) &&
+        eventoAdmin.status === true &&
+        new Date(eventoAdmin.fechaReservada) >= ahora
       );
     });
   }
+
+
 
   esEventoAlumno(evento: eventos | eventosAdmin): evento is eventos {
     return (evento as eventos).idAlumno !== undefined;
@@ -254,5 +273,5 @@ export class EventoAlumnoPage implements OnInit {
 
 
 
-  
+
 }
