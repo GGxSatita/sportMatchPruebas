@@ -2,7 +2,6 @@
 ion-content {
   --background: var(--ion-color-light);
   padding: 16px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,85 +9,107 @@ ion-content {
 
 /* Estilos para la tarjeta del club */
 ion-card {
-  border-radius: 15px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s ease;
-  max-width: 800px;
-  margin: 20px auto;
+  max-width: 600px; /* Reduce el ancho máximo */
+  width: 100%;
+  margin: 15px 0;
 
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
   }
 
   ion-card-header {
     background-color: var(--ion-color-light);
-    text-align: center;
-    padding: 16px;
+    padding: 12px;
     border-bottom: 1px solid var(--ion-color-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   ion-card-title {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: var(--ion-color-dark);
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   ion-card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
 
     p {
-      font-size: 1rem;
-      margin-top: 10px;
+      font-size: 0.9rem;
+      margin-top: 8px;
       color: var(--ion-color-dark);
       text-align: center;
+      line-height: 1.4;
     }
   }
 
   .club-logo {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    border: 3px solid var(--ion-color-primary);
-    margin-bottom: 15px;
+    border: 2px solid var(--ion-color-primary);
     object-fit: cover;
+    margin-bottom: 10px;
   }
 }
 
-/* Estilos para la lista de miembros */
-ion-list {
-  margin: 20px 0;
-}
-
-ion-item {
-  --background: var(--ion-color-light);
-  border-radius: 10px;
-  margin-bottom: 12px;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    background-color: var(--ion-color-light-tint);
+/* Estilos responsivos para pantallas pequeñas */
+@media (max-width: 768px) {
+  ion-card {
+    max-width: 100%;
   }
 
-  ion-label {
-    font-size: 1rem;
-    color: var(--ion-color-dark);
+  .club-logo {
+    width: 80px;
+    height: 80px;
   }
 
-  ion-button {
-    --border-radius: 8px;
-    margin-left: auto;
-    color: white;
-    font-size: 0.8rem;
+  ion-card-title {
+    font-size: 1.2rem;
+  }
+
+  ion-card-content p {
+    font-size: 0.85rem;
   }
 }
 
-/* Chat styling */
-app-club-chat {
-  margin-top: 20px;
+/* Estilos para pantallas grandes */
+@media (min-width: 1024px) {
+  ion-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 20px;
+  }
+
+  ion-card-header {
+    align-items: flex-start;
+    text-align: left;
+    padding: 10px;
+    width: 60%; /* Limita el ancho del contenido en pantallas grandes */
+  }
+
+  ion-card-title {
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+  }
+
+  .club-logo {
+    margin: 0 20px;
+  }
+
+  ion-card-content {
+    align-items: flex-start;
+    padding: 10px;
+  }
 }

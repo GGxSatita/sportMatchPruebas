@@ -13,7 +13,7 @@ import {
   IonList,
   IonCardContent,
   IonCardTitle,
-  IonCardHeader, IonCardSubtitle } from '@ionic/angular/standalone';
+  IonCardHeader, IonCardSubtitle, IonAvatar } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { ActivatedRoute } from '@angular/router';
@@ -29,7 +29,7 @@ import { Router } from '@angular/router';
   templateUrl: './club.page.html',
   styleUrls: ['./club.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle,
+  imports: [IonAvatar, IonCardSubtitle,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
