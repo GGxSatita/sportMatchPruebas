@@ -1,0 +1,52 @@
+.fondo-app {
+  background-color: #f4f4f8 !important; // Fondo claro para la aplicación
+}
+
+
+// Responsividad
+@media (max-width: 768px) {
+  ion-list {
+    font-size: 1rem !important; // Ajustar el tamaño en pantallas pequeñas
+  }
+
+  ion-icon {
+    font-size: 1.4rem !important; // Ajustar el tamaño del icono en pantallas pequeñas
+  }
+}
+
+@media (min-width: 769px) {
+  ion-list {
+    font-size: 1.2rem !important; // Ajustar el tamaño en pantallas grandes
+  }
+
+  ion-icon {
+    font-size: 1.6rem !important; // Ajustar el tamaño del icono en pantallas grandes
+  }
+}
+
+ion-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 3px 15px;
+  border-radius: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #FF724C, #FDBF50);
+  color: #F4F4F8;
+  box-shadow: 0 4px 10px rgba(255, 114, 76, 0.4);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: #FDBF50;
+  }
+
+  ion-icon {
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+  }
+
+}

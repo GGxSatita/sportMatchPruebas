@@ -1,7 +1,5 @@
 <app-header></app-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
-
   <ion-grid>
     <!-- Título de Aprobados -->
     <ion-row>
@@ -13,8 +11,6 @@
         </ion-item-divider>
       </ion-col>
     </ion-row>
-
-    <!-- Lista de Eventos Inscritos -->
     <ion-row *ngFor="let evento of eventosAprobadosOInscritos">
       <ion-col size-md="6" size-lg="4" size-sm="12">
         <ion-card>
@@ -27,23 +23,27 @@
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
+            <!-- Botón para redirigir a la configuración de reglas -->
+            <ion-button expand="full" (click)="configurarDesafio(evento)">
+              Configurar Reglas
+            </ion-button>
             <!-- Botón para cancelar inscripción si el alumno está inscrito y no es el creador del evento -->
-            <ion-button *ngIf="evento.participantesActuales && evento.participantesActuales.includes(idAlumno) && evento.idAlumno !== idAlumno"
-                        expand="full" color="danger" (click)="cancelarInscripcion(evento)">
+            <ion-button
+              *ngIf="evento.participantesActuales && evento.participantesActuales.includes(idAlumno) && evento.idAlumno !== idAlumno"
+              expand="full" color="danger" (click)="cancelarInscripcion(evento)">
               Cancelar inscripción
             </ion-button>
 
             <!-- Botón para eliminar evento si el alumno es el creador -->
-            <ion-button *ngIf="evento.idAlumno === idAlumno"
-                        expand="full" color="danger" (click)="eliminarEvento(evento)">
+            <ion-button *ngIf="evento.idAlumno === idAlumno" expand="full" color="danger"
+              (click)="eliminarEvento(evento)">
               Cancelar evento
+
             </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
-
 
     <!-- Título de En Espera -->
     <ion-row>
@@ -55,7 +55,6 @@
         </ion-item-divider>
       </ion-col>
     </ion-row>
-
     <!-- Eventos en Espera -->
     <ion-row *ngFor="let evento of eventosEnEspera">
       <ion-col size-md="6" size-lg="4" size-sm="12">
@@ -67,8 +66,7 @@
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
             <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
-            <p><strong>Hora:</strong> {{ evento.sectorNombre }}</p>
-
+            <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -99,8 +97,8 @@
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
             <!-- Botón para cancelar inscripción si el alumno está inscrito en el evento administrado -->
-            <ion-button *ngIf="evento.participants.includes(idAlumno)"
-                        expand="full" color="danger" (click)="cancelarInscripcionAdmin(evento)">
+            <ion-button *ngIf="evento.participants.includes(idAlumno)" expand="full" color="danger"
+              (click)="cancelarInscripcionAdmin(evento)">
               Cancelar inscripción
             </ion-button>
           </ion-card-content>
@@ -111,7 +109,5 @@
 
 
   </ion-grid>
-
 </ion-content>
-
 <app-footer></app-footer>

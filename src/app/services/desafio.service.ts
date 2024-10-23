@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, setDoc, DocumentData } from '@angular/fire/firestore';
+import { map, Observable } from 'rxjs';
 import { Desafio } from '../models/desafio';
+import { eventos } from '../models/evento';
 
 @Injectable({
   providedIn: 'root',
@@ -19,11 +20,10 @@ export class DesafioService {
 
   // Obtener un desafío por ID
   getDesafioById(id: string): Observable<Desafio | undefined> {
-    const desafioDoc = doc(this.firestore, `${this.collectionName}/${id}`);
+    const desafioDoc = doc(this.firestore,`${this.collectionName}/${id}`);
     return docData(desafioDoc, { idField: 'id' }) as Observable<Desafio | undefined>;
   }
-
-  // Crear un nuevo desafío
+// Crear un nuevo desafío
   async createDesafio(desafio: Desafio): Promise<void> {
     const desafiosRef = collection(this.firestore, this.collectionName);
     const docRef = await addDoc(desafiosRef, { ...desafio });
@@ -43,5 +43,19 @@ export class DesafioService {
   deleteDesafio(id: string): Promise<void> {
     const desafioDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return deleteDoc(desafioDoc);
+  }
+
+  getEventStatus(eventId: string): Observable<string> {
+    const eventDoc = doc(this.firestore, `eventos/${eventId}`);
+    return docData(eventDoc).pipe(
+      map((doc: DocumentData) => {
+        const event = doc as eventos; // Casting a 'eventos'
+        if (event.participantesActuales.length >= event.capacidadMaxima) {
+          return 'FULL';
+        } else {
+          return 'PENDING';
+        }
+      })
+    ) as Observable<string>;
   }
 }

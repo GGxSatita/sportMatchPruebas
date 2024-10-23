@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { ClubGuard } from './guards/club.guard';
@@ -58,11 +59,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'desafios',
-    loadComponent: () => import('./pages/desafios/desafios.page').then(m => m.DesafiosPage),
-    canActivate: [authGuard]
-  },
-  {
     path: 'evento-alumno',
     loadComponent: () => import('./pages/eventos/evento-alumno/evento-alumno.page').then(m => m.EventoAlumnoPage),
     canActivate: [authGuard]
@@ -87,14 +83,35 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/club/club-detalle/club-detalle.page').then( m => m.ClubDetallePage),
     canActivate:[authGuard]
   },
-  {
-    path: 'menu-club',
-    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+      {
+    path: 'desafio',
+    loadComponent: () => import('./pages/desafio/desafio.page').then( m => m.DesafioPage)
   },
   {
+    path: 'desafio-list',
+    loadComponent: () => import('./pages/desafio-list/desafio-list.page').then( m => m.DesafioListPage)
+  },
+  {
+    path: 'enfrentamiento',
+    loadComponent: () => import('./pages/enfrentamiento/enfrentamiento.page').then( m => m.EnfrentamientoPage)
+  },
+  {
+    path: 'enfrentamiento-espera',
+    loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
+  },
+      {
     path: 'club-miembros/:id',
     loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
   },
+      {
+    path: 'menu-club',
+    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+  }
+
+
+
+
+
 
 
 ];

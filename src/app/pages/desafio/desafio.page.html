@@ -1,0 +1,41 @@
+<app-header></app-header>
+<ion-content>
+  <form *ngIf="desafioForm" [formGroup]="desafioForm" (ngSubmit)="onSubmit()">
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">Tipo</ion-label>
+        <ion-select formControlName="type" [disabled]="!isCreator">
+          <ion-select-option value="PUNTOS">Puntos</ion-select-option>
+          <ion-select-option value="GOLES">Goles</ion-select-option>
+          <ion-select-option value="SETS">Sets</ion-select-option>
+          <ion-select-option value="PARTIDO">Partido</ion-select-option>
+          <ion-select-option value="OBJETIVO">Objetivo</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Deporte</ion-label>
+        <ion-select formControlName="sport" [disabled]="!isCreator">
+          <ion-select-option value="FUTBOL">Fútbol</ion-select-option>
+          <ion-select-option value="TENIS">Tenis</ion-select-option>
+          <ion-select-option value="BASQUETBOL">Básquetbol</ion-select-option>
+          <ion-select-option value="VOLEIBOL">Voleibol</ion-select-option>
+          <ion-select-option value="OTRO">Otro</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div formGroupName="rules">
+        <ion-item>
+          <ion-label position="floating">Puntos Necesarios</ion-label>
+          <ion-input formControlName="maxPoints" [disabled]="!isCreator"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Cantidad de Partidas</ion-label>
+          <ion-input formControlName="setsToWin" [disabled]="!isCreator"></ion-input>
+        </ion-item>
+      </div>
+      <ion-item *ngIf="isCreator">
+        <ion-button expand="full" type="submit" fill="clear">Definir reglas</ion-button>
+      </ion-item>
+    </ion-list>
+  </form>
+</ion-content>
+<app-footer></app-footer>

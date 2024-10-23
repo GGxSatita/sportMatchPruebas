@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider } from '@ionic/angular/standalone';
@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
 import { AlertController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-evento-alumno',
@@ -42,6 +43,7 @@ export class EventoAlumnoPage implements OnInit {
   eventosAprobadosOInscritos: eventos[] = [];
   eventosAdminInscritos: eventosAdmin[] = [];
 
+
   constructor(
     private eventosService: EventosService,
     private auth: Auth,
@@ -70,6 +72,10 @@ export class EventoAlumnoPage implements OnInit {
     }
   }
 
+
+  configurarDesafio(evento: eventos) {
+    this.router.navigate(['/desafio'], { queryParams: { evento: JSON.stringify(evento) } });
+  }
   async loadAlumnoIdAdmin() {
     const user = this.auth.currentUser;
     if (user) {
@@ -79,6 +85,7 @@ export class EventoAlumnoPage implements OnInit {
       console.error('No hay usuario autenticado.');
     }
   }
+
 
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {

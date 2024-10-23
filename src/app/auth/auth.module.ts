@@ -26,6 +26,7 @@ import { UserPerfilPage } from './pages/user-perfil/user-perfil.page';
     FormsModule,
     ReactiveFormsModule,
 
+
   ]
 })
 export class AuthModule { }
