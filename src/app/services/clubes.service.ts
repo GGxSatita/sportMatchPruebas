@@ -214,6 +214,19 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
 getUserDocRef(userId: string): DocumentReference {
   return doc(this.firestore, `users/${userId}`);
 }
+// En ClubesService
+async eliminarClub(clubId: string): Promise<void> {
+  try {
+    // Eliminar la colección 'miembros' y otras subcolecciones si existen
+    const clubRef = doc(this.firestore, `clubs/${clubId}`);
+    await deleteDoc(clubRef);
+    console.log('Club eliminado con ID:', clubId);
+  } catch (error) {
+    console.error('Error al eliminar el club:', error);
+    throw error;
+  }
+}
+
 
 
 

@@ -1,21 +1,27 @@
 <ion-content class="ion-padding">
-  <ion-card *ngIf="club" class="club-card">
-    <ion-card-header class="ion-text-center">
-      <ion-avatar class="large-avatar">
-        <img [src]="club.logo" alt="Logo del club">
-      </ion-avatar>
-      <ion-card-title>{{ club.nombreClub }}</ion-card-title>
-      <ion-card-subtitle class="deporte-subtitle">
-        Deporte: {{ club.deporteNombre }}
-      </ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p><strong>Descripción:</strong> {{ club.descripcion }}</p>
-      <p><strong>Líder:</strong> {{ leaderName }}</p>
-      <p><strong>Miembros:</strong> {{ club.miembros.length }} / {{ club.maxMiembros }}</p>
-      <ion-button expand="block" *ngIf="!isMember" (click)="unirseAlClub()" color="primary">
-        Unirse al Club
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+  <ion-grid>
+    <ion-row justify-content-center>
+      <ion-col size="12" size-md="8" size-lg="6">
+        <ion-card *ngIf="club" class="club-card">
+          <ion-card-header class="ion-text-center">
+            <ion-avatar class="large-avatar">
+              <img [src]="club.logo" alt="Logo del club" />
+            </ion-avatar>
+            <ion-card-title>{{ club.nombreClub }}</ion-card-title>
+            <ion-card-subtitle class="deporte-subtitle">
+              Deporte: {{ club.deporteNombre }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Descripción:</strong> {{ club.descripcion }}</p>
+            <p><strong>Líder:</strong> {{ leaderName }}</p>
+            <p><strong>Miembros:</strong> {{ club.miembros.length }} / {{ club.maxMiembros }}</p>
+            <ion-button expand="block" *ngIf="!isMember" (click)="unirseAlClub()" color="primary">
+              Unirse al Club
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

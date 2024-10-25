@@ -102,16 +102,18 @@ export const routes: Routes = [
   },
       {
     path: 'club-miembros/:id',
-    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
+    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage),
+    canActivate:[authGuard, ClubGuard]
   },
       {
     path: 'menu-club',
-    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage),
+    canActivate:[authGuard]
   },
   {
     path: 'club-edit/:id',
     loadComponent: () => import('./pages/club/club-edit/club-edit.page').then( m => m.ClubEditPage),
-    // canActivate:[ClubLeaderGuard]
+    canActivate:[authGuard,ClubLeaderGuard]
   }
 
 

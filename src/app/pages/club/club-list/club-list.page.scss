@@ -1,12 +1,14 @@
 /* Estilo para la barra de búsqueda */
 .search-bar {
-  margin: 10px;
+  margin: 10px auto;
   border-radius: 20px;
   background-color: #f0f0f5;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   padding: 5px 15px;
+  width: 100%;
+  max-width: 600px;
 
   ion-input {
     flex: 1;
@@ -24,24 +26,36 @@
   }
 }
 
+/* Estilo para la barra de filtro */
+.filter-bar {
+  margin: 10px auto;
+  background-color: #f0f0f5;
+  border-radius: 20px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 5px 15px;
+  width: 100%;
+  max-width: 600px;
+}
+
 /* Contenedor principal para ser responsivo */
 ion-content.responsive-content {
-  padding: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding: 16px;
+  width: 100%;
 }
 
 /* Estilos para las tarjetas de club */
 ion-card.custom-card {
-  margin: 10px 0;
+  margin: 10px;
   padding: 0;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.85);
   transition: background-color 0.3s ease;
-  width: 100%;
-  max-width: 600px;
+  width: calc(100% - 20px);
+  max-width: 800px; /* Ajuste para pantallas grandes */
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.95);
@@ -50,17 +64,18 @@ ion-card.custom-card {
 
 /* Alternar colores en las tarjetas de club */
 ion-card.odd-item {
-  background-color: #ff724c
+  background-color: #ff724c;
 }
 
 ion-card.even-item {
-  background-color:#fdbf50;
+  background-color: #fdbf50;
 }
 
 /* Centrando y alineando elementos */
 .align-center {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .trophies-col {
@@ -81,6 +96,16 @@ ion-avatar {
     border-radius: 50%;
     border: 2px solid var(--primary-color);
   }
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+  }
+
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* Estilos para los labels */
@@ -99,13 +124,8 @@ ion-label p {
 /* Media Queries para hacer responsivo */
 @media (max-width: 768px) {
   ion-card.custom-card {
-    max-width: 100%; /* Ancho completo en pantallas pequeñas */
+    max-width: 100%;
     padding: 10px;
-  }
-
-  ion-avatar {
-    width: 50px;
-    height: 50px;
   }
 
   ion-label h2 {
@@ -118,16 +138,49 @@ ion-label p {
 }
 
 @media (max-width: 480px) {
-  ion-avatar {
-    width: 40px;
-    height: 40px;
-  }
-
   ion-label h2 {
     font-size: 0.9rem;
   }
 
   ion-label p {
     font-size: 0.7rem;
+  }
+}
+
+/* Media Queries para pantallas medianas y grandes */
+@media (min-width: 767px) {
+  .search-bar,
+  .filter-bar {
+    max-width: none; /* Elimina la restricción de ancho */
+    width: 100vw; /* Ocupar el 100% del ancho de la pantalla */
+    margin: 10px 0; /* Ajuste del margen para que ocupe todo el ancho */
+    border-radius: 0; /* Elimina el borde redondeado para que se vea natural ocupando todo el ancho */
+  }
+}
+
+/* Media Queries para pantallas grandes */
+@media (min-width: 1024px) {
+  ion-content.responsive-content {
+    max-width: 80%;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  ion-card.custom-card {
+    max-width: 60%; /* Ocupar el 60% del contenedor en pantallas grandes */
+    margin: 20px auto;
+  }
+
+  ion-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  ion-label h2 {
+    font-size: 1.4rem;
+  }
+
+  ion-label p {
+    font-size: 1rem;
   }
 }

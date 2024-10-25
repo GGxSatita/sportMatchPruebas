@@ -1,41 +1,52 @@
 <ion-content [fullscreen]="true">
   <!-- Input para buscar por nombre -->
-  <ion-item lines="none" class="search-bar">
-    <ion-icon slot="start" name="search-outline"></ion-icon>
-    <ion-input
-      placeholder="Buscar por nombre"
-      [(ngModel)]="searchTerm"
-      (ionInput)="filterClubs()"
-      class="search-input">
-    </ion-input>
-  </ion-item>
-  <ion-item lines="none" class="filter-bar">
-    <ion-label>Filtrar por deporte</ion-label>
-    <ion-select [(ngModel)]="selectedDeporte" (ionChange)="filterClubs()">
-      <ion-select-option value="">Todos</ion-select-option>
-      <ion-select-option *ngFor="let deporte of deportes" [value]="deporte">
-        {{ deporte }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
+  <ion-grid>
+    <ion-row justify-content-center>
+      <ion-col size="12" size-md="8" size-lg="6">
+        <ion-item class="search-bar">
+          <ion-icon slot="start" name="search-outline"></ion-icon>
+          <ion-input
+            placeholder="Buscar por nombre"
+            [(ngModel)]="searchTerm"
+            (ionInput)="filterClubs()"
+            class="search-input">
+          </ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row justify-content-center>
+      <ion-col size="12" size-md="8" size-lg="6">
+        <ion-item lines="none" class="filter-bar">
+          <ion-label>Filtrar por deporte</ion-label>
+          <ion-select [(ngModel)]="selectedDeporte" (ionChange)="filterClubs()">
+            <ion-select-option value="">Todos</ion-select-option>
+            <ion-select-option *ngFor="let deporte of deportes" [value]="deporte">
+              {{ deporte }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <ion-list>
     <ion-card *ngFor="let club of (filteredClubs | async); let i = index"
               [class.odd-item]="i % 2 === 0"
               [class.even-item]="i % 2 !== 0"
               class="custom-card"
-              (click)="verClubDetalle(club.idClub)"> <!-- Agregar evento click para navegar al detalle del club -->
+              (click)="verClubDetalle(club.idClub)">
       <ion-grid>
         <ion-row class="align-center">
           <!-- Columna para el ícono del club -->
-          <ion-col size="2">
+          <ion-col size="3" size-md="2" class="align-center">
             <ion-avatar>
               <img [src]="club.logo" alt="{{ club.nombreClub }}" />
             </ion-avatar>
           </ion-col>
 
           <!-- Columna para la información del club -->
-          <ion-col size="6">
+          <ion-col size="6" size-md="6">
             <ion-label>
               <h2>{{ club.nombreClub }}</h2>
               <p>Miembros: {{ club.miembros.length }} / {{ club.maxMiembros }}</p>
@@ -43,14 +54,14 @@
           </ion-col>
 
           <!-- Columna para el ícono de trofeos y el número -->
-          <ion-col size="2" class="trophies-col">
+          <ion-col size="2" size-md="2" class="trophies-col align-center">
             <ion-icon name="trophy-outline" color="warning"></ion-icon>
             <p>{{ club.ranking }}</p>
           </ion-col>
 
           <!-- Columna para el botón de unirse -->
-          <ion-col size="2" class="align-center">
-            <ion-button *ngIf="!isMember" (click)="unirseAlClub(club); $event.stopPropagation()" size="small">
+          <ion-col size="12" size-md="2" class="align-center">
+            <ion-button *ngIf="!isMember || isLeader" (click)="unirseAlClub(club); $event.stopPropagation()" size="small">
               Unirse
             </ion-button>
           </ion-col>
