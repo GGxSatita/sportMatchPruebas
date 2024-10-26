@@ -134,13 +134,25 @@ export class ClubMiembrosPage implements OnInit {
   async abandonarClub() {
     if (this.club && this.currentUserId) {
       try {
+        // Eliminar al miembro del club
         await this.clubesService.eliminarMiembro(this.club.idClub, this.currentUserId);
+
+        // Actualizar el perfil del usuario en la base de datos para reflejar que no pertenece a ningún club
+        await this.clubesService.actualizarEstadoUsuarioSinClub(this.currentUserId);
+
         console.log('Has abandonado el club');
-        // Redirigir o actualizar la página según sea necesario
+        this.router.navigate(['/menu-principal']); // Redirigir al menú principal o a otra página
       } catch (error) {
         console.error('Error al abandonar el club:', error);
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se pudo abandonar el club. Por favor, inténtalo de nuevo.',
+          buttons: ['OK'],
+        });
+        await alert.present();
       }
     }
   }
+
 
 }

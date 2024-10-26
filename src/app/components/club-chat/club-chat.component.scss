@@ -1,3 +1,14 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ocupa todo el espacio disponible */
+  overflow: hidden; /* Controla el overflow para no crear scroll adicional */
+}
+.messages-list {
+  flex: 1;
+  overflow-y: auto; /* Desplazamiento vertical para los mensajes */
+  padding: 10px;
+}
 .message-item {
   --ion-item-background: var(--ion-color-light);
   --inner-padding-top: 10px;
@@ -31,10 +42,11 @@
 }
 
 .chat-form {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  padding: 0 10px;
+  padding: 10px;
+  background: var(--ion-color-light);
+  flex-shrink: 0;
+  width: 100%;
+
 
   .input-item {
     display: flex;

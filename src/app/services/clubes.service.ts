@@ -31,6 +31,39 @@ export class ClubesService {
     // Obtén la referencia de la colección 'clubs'
     this.clubsCollection = collection(this.firestore, 'clubs') as CollectionReference<Club>;
   }
+  // Método para abandonar el club
+  async abandonarClub(clubId: string, userId: string): Promise<void> {
+    try {
+      const clubRef = doc(this.firestore, `clubs/${clubId}`);
+      const clubSnap = await getDoc(clubRef);
+
+      if (clubSnap.exists()) {
+        const clubData = clubSnap.data() as Club;
+        const updatedMembers = clubData.miembros.filter((miembro) => miembro.userId !== userId);
+        const updatedMemberIds = updatedMembers.map((miembro) => miembro.userId);
+
+        // Actualizar el club en Firestore para eliminar el usuario
+        await updateDoc(clubRef, {
+          miembros: updatedMembers,
+          miembroIds: updatedMemberIds,
+        });
+
+        // Actualizar el perfil del usuario para reflejar que no pertenece a ningún club
+        const userRef = doc(this.firestore, `users/${userId}`);
+        await updateDoc(userRef, {
+          clubId: null // Asegúrate de que este campo refleje la relación con el club
+        });
+
+        console.log(`Usuario ${userId} ha abandonado el club ${clubId}.`);
+      } else {
+        console.error('El club no existe.');
+        throw new Error('Club no encontrado');
+      }
+    } catch (error) {
+      console.error('Error al abandonar el club:', error);
+      throw error;
+    }
+  }
 
   // Método para crear un nuevo club
   async createClub(club: Club, userId: string): Promise<string> {
@@ -138,8 +171,9 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
 
 
 
-  // Método para obtener el club al que pertenece un usuario
-  async getClubForUser(userId: string): Promise<Club | null> {
+// Método para obtener el club al que pertenece un usuario
+async getClubForUser(userId: string): Promise<Club | null> {
+  try {
     console.log('Buscando club para el usuario con ID:', userId);
     const clubsRef = collection(this.firestore, 'clubs');
     const q = query(clubsRef, where('miembroIds', 'array-contains', userId));
@@ -147,8 +181,8 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
 
     if (!querySnapshot.empty) {
       const clubDoc = querySnapshot.docs[0];
-      console.log('Club encontrado:', clubDoc.data());
       const clubData = clubDoc.data();
+      console.log('Club encontrado:', clubData);
       return {
         idClub: clubDoc.id,
         nombreClub: clubData['nombreClub'],
@@ -162,10 +196,15 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
         miembroIds: clubData['miembroIds'],
       } as Club;
     } else {
-      console.warn('No se encontró ningún club para el usuario');
+      console.warn('No se encontró ningún club para el usuario:', userId);
       return null;
     }
+  } catch (error) {
+    console.error('Error al buscar el club para el usuario:', error);
+    return null;
   }
+}
+
 
   // Método para enviar un mensaje en el chat del club
   async sendMessage(
@@ -227,6 +266,19 @@ async eliminarClub(clubId: string): Promise<void> {
   }
 }
 
+// Método para actualizar el perfil del usuario al abandonar el club
+async actualizarEstadoUsuarioSinClub(userId: string): Promise<void> {
+  try {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    await updateDoc(userRef, {
+      clubId: null // Actualiza este campo para reflejar que el usuario no pertenece a ningún club
+    });
+    console.log(`Usuario ${userId} marcado como sin club`);
+  } catch (error) {
+    console.error('Error al actualizar el estado del usuario:', error);
+    throw error;
+  }
+}
 
 
 

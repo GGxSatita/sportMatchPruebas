@@ -16,8 +16,7 @@ import {
   IonNote,
   IonIcon,
   IonRow,
-  IonCol
-} from '@ionic/angular/standalone';
+  IonCol, IonGrid } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { DeportesService } from 'src/app/services/deportes.service';
@@ -26,13 +25,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Club } from 'src/app/models/club';
 import { Deporte } from 'src/app/models/deporte';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-club-edit',
   templateUrl: './club-edit.page.html',
   styleUrls: ['./club-edit.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonGrid,
     IonCol,
     IonRow,
     IonIcon,
@@ -50,6 +51,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     IonInput,
     IonTextarea,
     IonSelect,
+    HeaderComponent
   ],
 })
 export class ClubEditPage implements OnInit {
@@ -114,36 +116,46 @@ export class ClubEditPage implements OnInit {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
+        allowEditing: true,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera
       });
 
-      const blob = await fetch(image.dataUrl).then((r) => r.blob());
-      const file = new File([blob], `club_logo_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
-      this.uploadLogo(file);
+      // Si la foto fue tomada exitosamente, asignarla
+      this.logoUrl = image.webPath;
     } catch (error) {
-      console.error('Error al tomar la foto del logo:', error);
+      // Verificar si el error es una cancelación por parte del usuario
+      if (error instanceof Capacitor.Exception && error.message.includes("User cancelled")) {
+        console.info("Captura de foto cancelada por el usuario.");
+      } else {
+        console.error("Error al tomar la foto del logo:", error);
+      }
     }
   }
+
 
   // Método para seleccionar una foto de la galería
   async selectLogoFromGallery() {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Photos,
+        allowEditing: true,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Photos
       });
 
-      const blob = await fetch(image.dataUrl).then((r) => r.blob());
-      const file = new File([blob], `club_logo_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
-      this.uploadLogo(file);
+      // Si la imagen fue seleccionada exitosamente, asignarla
+      this.logoUrl = image.webPath;
     } catch (error) {
-      console.error('Error al seleccionar la foto del logo:', error);
+      // Verificar si el error es una cancelación por parte del usuario
+      if (error instanceof Capacitor.Exception && error.message.includes("User cancelled")) {
+        console.info("Selección de imagen cancelada por el usuario.");
+      } else {
+        console.error("Error al seleccionar la imagen del logo:", error);
+      }
     }
   }
+
 
   // Método para subir el logo del club
   async uploadLogo(file: File) {
@@ -185,7 +197,7 @@ export class ClubEditPage implements OnInit {
   }
   cancelar() {
     // Navega de regreso a la página anterior o a una ruta específica
-    this.router.navigate(['/club-detalle', this.clubId]);
+    this.router.navigate(['/club', this.clubId]);
   }
 
 }

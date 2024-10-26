@@ -1,19 +1,29 @@
-<ion-list>
-  <ion-item *ngFor="let message of messages | async" class="message-item">
-    <ion-avatar slot="start">
-      <img [src]="message.userPhotoUrl" alt="{{ message.username }}">
-    </ion-avatar>
-    <ion-label>
-      <h2>{{ message.username }}</h2>
-      <p>{{ message.content }}</p>
-      <p>{{ message.timestamp | date: 'short' }}</p>
-    </ion-label>
-  </ion-item>
-</ion-list>
+<div class="chat-container">
+  <ion-list class="messages-list" #messagesList>
+    <ion-item *ngFor="let message of messages | async" class="message-item">
+      <ion-avatar slot="start">
+        <img [src]="message.userPhotoUrl" alt="{{ message.username }}">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ message.username }}</h2>
+        <p>{{ message.content }}</p>
+        <p>{{ message.timestamp | date: 'short' }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
-<form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="chat-form">
-  <ion-item lines="none" class="input-item">
-    <ion-input formControlName="message" placeholder="Escribe un mensaje..." type="text" clearInput></ion-input>
-    <ion-icon slot="end" name="send-outline" (click)="sendMessage()" class="send-icon"></ion-icon>
-  </ion-item>
-</form>
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreMessages($event)" *ngIf="hasMoreMessages">
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Cargando más mensajes..."
+      >
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="chat-form">
+    <ion-item lines="none" class="input-item">
+      <ion-input formControlName="message" placeholder="Escribe un mensaje..." type="text" clearInput></ion-input>
+      <ion-icon slot="end" name="send-outline" (click)="sendMessage()" class="send-icon"></ion-icon>
+    </ion-item>
+  </form>
+</div>

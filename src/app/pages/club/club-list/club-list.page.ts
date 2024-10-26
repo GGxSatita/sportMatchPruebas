@@ -29,6 +29,7 @@ import { ClubesService } from 'src/app/services/clubes.service';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-club-list',
@@ -57,6 +58,7 @@ import { Router } from '@angular/router';
     CommonModule,
     FormsModule,
     IonInput,
+    HeaderComponent
   ],
 })
 export class ClubListPage implements OnInit {

@@ -16,8 +16,7 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonAvatar,
-  AlertController
-} from '@ionic/angular/standalone';
+  AlertController, IonGrid, IonRow, IonCol, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,7 +30,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
   templateUrl: './club.page.html',
   styleUrls: ['./club.page.scss'],
   standalone: true,
-  imports: [IonAvatar, IonCardSubtitle,
+  imports: [IonInfiniteScrollContent, IonInfiniteScroll, IonIcon, IonCol, IonRow, IonGrid, IonAvatar, IonCardSubtitle,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
