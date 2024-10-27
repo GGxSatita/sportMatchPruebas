@@ -117,17 +117,22 @@ export class ClubPage implements OnInit {
   async eliminarClubCompleto() {
     if (this.club) {
       try {
-        // Eliminar todos los miembros y el club
-        await this.clubesService.eliminarClub(this.club.idClub);
-        console.log('El club ha sido eliminado completamente.');
-        await this.showAlert('Club Eliminado', 'El club ha sido eliminado junto con todos sus miembros.');
+        // Llamar al nuevo método para eliminar el club y actualizar los miembros
+        await this.clubesService.eliminarClubYActualizarMiembros(this.club.idClub);
+        console.log('El club y el estado de los miembros han sido actualizados correctamente.');
+
+        // Mostrar alerta de confirmación
+        await this.showAlert('Club Eliminado', 'El club y todos los miembros han sido actualizados para reflejar la eliminación.');
+
+        // Redirigir a la lista de clubes
         this.router.navigate(['/club-list']);
       } catch (error) {
-        console.error('Error al eliminar el club:', error);
+        console.error('Error al eliminar el club y actualizar los miembros:', error);
         await this.showAlert('Error', 'Ocurrió un error al intentar eliminar el club.');
       }
     }
   }
+
 
   async showAlert(header: string, message: string) {
     const alert = await this.alertController.create({

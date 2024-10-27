@@ -254,17 +254,40 @@ getUserDocRef(userId: string): DocumentReference {
   return doc(this.firestore, `users/${userId}`);
 }
 // En ClubesService
-async eliminarClub(clubId: string): Promise<void> {
+async eliminarClubYActualizarMiembros(clubId: string): Promise<void> {
   try {
-    // Eliminar la colección 'miembros' y otras subcolecciones si existen
+    // Referencia al club en Firestore
     const clubRef = doc(this.firestore, `clubs/${clubId}`);
-    await deleteDoc(clubRef);
-    console.log('Club eliminado con ID:', clubId);
+    const clubSnap = await getDoc(clubRef);
+
+    if (clubSnap.exists()) {
+      const clubData = clubSnap.data() as Club;
+
+      // Actualizar cada miembro del club para reflejar que ya no pertenecen a ningún club
+      const updateMemberPromises = clubData.miembroIds.map(async (userId) => {
+        const userRef = doc(this.firestore, `users/${userId}`);
+        return await updateDoc(userRef, { clubId: null });
+      });
+
+      // Esperar a que todos los usuarios se actualicen
+      await Promise.all(updateMemberPromises);
+
+      // Luego, eliminar el documento del club en Firestore
+      await deleteDoc(clubRef);
+
+      console.log(`Club con ID ${clubId} y todos los miembros actualizados correctamente.`);
+
+      // Opcional: Aquí puedes agregar una lógica para enviar notificaciones a los usuarios
+    } else {
+      console.error('El club no existe.');
+      throw new Error('Club no encontrado');
+    }
   } catch (error) {
-    console.error('Error al eliminar el club:', error);
+    console.error('Error al eliminar el club y actualizar miembros:', error);
     throw error;
   }
 }
+
 
 // Método para actualizar el perfil del usuario al abandonar el club
 async actualizarEstadoUsuarioSinClub(userId: string): Promise<void> {
