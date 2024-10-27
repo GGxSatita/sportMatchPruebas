@@ -114,7 +114,11 @@ export const routes: Routes = [
     path: 'club-edit/:id',
     loadComponent: () => import('./pages/club/club-edit/club-edit.page').then( m => m.ClubEditPage),
     canActivate:[authGuard]
+  },  {
+    path: 'club-eliminar',
+    loadComponent: () => import('./pages/club/club-eliminar/club-eliminar.page').then( m => m.ClubEliminarPage)
   }
+
 
 
 

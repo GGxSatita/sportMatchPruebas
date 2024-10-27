@@ -1,0 +1,50 @@
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Eliminar Club</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Tarjeta principal de confirmación -->
+  <ion-card class="confirmation-card">
+    <ion-card-header>
+      <ion-card-title>¿Estás seguro de que deseas eliminar el club?</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Eliminar el club es una acción irreversible. Todos los miembros perderán su acceso y los datos del club serán eliminados.</p>
+    </ion-card-content>
+
+    <!-- Primera confirmación -->
+    <ion-grid>
+      <ion-row class="confirmation-question">
+        <ion-col size="12" size-md="6">
+          <ion-item lines="none">
+            <ion-label color="primary">¿Estás realmente seguro?</ion-label>
+          </ion-item>
+          <ion-button expand="block" color="danger" (click)="confirmFirstStep()">Sí, continuar</ion-button>
+        </ion-col>
+      </ion-row>
+
+      <!-- Segunda confirmación, visible solo si se confirma la primera -->
+      <ion-row class="confirmation-question" *ngIf="firstConfirmed">
+        <ion-col size="12" size-md="6">
+          <ion-item lines="none">
+            <ion-label color="warning">¿Confirmas que entiendes las consecuencias?</ion-label>
+          </ion-item>
+          <ion-button expand="block" color="warning" (click)="confirmSecondStep()">Sí, entiendo</ion-button>
+        </ion-col>
+      </ion-row>
+
+      <!-- Tercera confirmación, visible solo si se confirma la segunda -->
+      <ion-row class="confirmation-question" *ngIf="secondConfirmed">
+        <ion-col size="12" size-md="6">
+          <ion-item lines="none">
+            <ion-label color="tertiary">Última confirmación. ¿Eliminar definitivamente?</ion-label>
+          </ion-item>
+          <ion-button expand="block" color="tertiary" (click)="confirmFinalStep()">Eliminar Club</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card>
+

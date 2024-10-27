@@ -156,4 +156,7 @@ export class ClubPage implements OnInit {
   goToEditarClub(clubId: string) {
     this.router.navigate([`/club-edit/${clubId}`]);
   }
+  goToEliminararClub(clubId: string) {
+    this.router.navigate([`/club-eliminar/${clubId}`]);
+  }
 }
