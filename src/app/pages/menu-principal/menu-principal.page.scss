@@ -1,3 +1,6 @@
+@import "~swiper/swiper-bundle.min.css"; // Asegúrate de que esta línea esté presente
+
+
 .evento-card {
   margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -24,4 +27,61 @@
 .unirse-boton {
   margin-top: 10px;
   border-radius: 8px;
+}
+
+
+
+ion-card {
+  border-radius: 15px; /* Bordes redondeados */
+  overflow: hidden; /* Evitar el desbordamiento de la imagen */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  margin: 10px; /* Espaciado entre tarjetas */
+}
+
+img {
+  width: 100%; /* Imagen responsiva */
+  height: auto; /* Mantener la proporción de la imagen */
+}
+
+ion-card-header {
+  background: linear-gradient(135deg, #f0f8ff 0%, #e0e0e0 100%); /* Fondo degradado */
+  padding: 15px; /* Espaciado interno */
+}
+
+ion-card-title {
+  font-size: 1.5em; /* Tamaño de fuente del título */
+  color: #333; /* Color del texto */
+}
+
+ion-card-subtitle {
+  font-size: 0.9em; /* Tamaño de fuente del subtítulo */
+  color: #777; /* Color del texto */
+}
+
+button {
+  margin-top: 10px; /* Espaciado superior del botón */
+  background-color: #3880ff; /* Color de fondo del botón */
+  color: white; /* Color del texto del botón */
+  border-radius: 5px; /* Bordes redondeados del botón */
+  padding: 10px 15px; /* Espaciado interno del botón */
+  border: none; /* Sin borde */
+  cursor: pointer; /* Cambiar cursor al pasar sobre el botón */
+}
+
+button:hover {
+  background-color: #007bff; /* Color al pasar el cursor */
+}
+
+.swiper-pagination {
+  bottom: 10px; /* Posiciona la paginación en la parte inferior */
+}
+
+@media (max-width: 600px) {
+  ion-card-title {
+    font-size: 1.3em; /* Ajustar tamaño en pantallas pequeñas */
+  }
+
+  ion-card-subtitle {
+    font-size: 0.8em; /* Ajustar subtítulo en pantallas pequeñas */
+  }
 }

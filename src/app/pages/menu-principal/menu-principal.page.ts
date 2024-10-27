@@ -1,19 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
-import { IonicModule } from '@ionic/angular'; // Importa solo IonicModule
+import {
+  IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+  IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar,
+  IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle
+} from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
-
+import { SwiperOptions } from 'swiper';
+import { SwiperComponent, SwiperModule } from 'swiper/angular';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
-
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { Noticias } from 'src/app/models/noticias';
+import { NoticiasService } from 'src/app/services/noticias.service';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-menu-principal',
@@ -44,14 +50,28 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
     IonTitle,
     HeaderComponent,
     FooterComponent,
+    SwiperModule,
   ],
- 
 })
 export class MenuPrincipalPage implements OnInit {
+  @ViewChild('swiperRef') swiperRef!: SwiperComponent; // Referencia al Swiper
 
   eventos: eventosAdmin[] = [];
   alumnoId: string = '';
   notificaciones: any[] = [];
+  noticias: Noticias[] = [];
+
+  swiperConfig: SwiperOptions = {
+    autoplay: {
+      delay: 3000, // Cambia cada 3 segundos
+      disableOnInteraction: false, // Permitir que la navegación manual no detenga el autoplay
+    },
+    pagination: {
+      el: '.swiper-pagination', // Asegúrate de que esto esté bien configurado
+      clickable: true,
+    },
+    loop: true, // Habilitar el loop para que el swiper reinicie
+  };
 
   constructor(
     private autenticacionService: AutenticacionService,
@@ -59,15 +79,18 @@ export class MenuPrincipalPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private eventoAdminService: EventoAdminService,
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private noticiasService: NoticiasService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
+    await this.cargarNoticias();
+
     try {
       const user = await this.autenticacionService.getCurrentUser();
       if (user) {
         this.alumnoId = user.uid;
-        // Cargar las notificaciones del usuario
         this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
           this.notificaciones = notificaciones;
         });
@@ -75,8 +98,7 @@ export class MenuPrincipalPage implements OnInit {
 
       this.eventoAdminService.getEventos().subscribe((eventos) => {
         const today = new Date().toISOString().split('T')[0];
-        // Filtrar eventos que están activos y cuya fecha es igual o posterior a hoy
-        this.eventos = eventos.filter(evento => 
+        this.eventos = eventos.filter((evento) =>
           evento.status === true && new Date(evento.fechaReservada).toISOString().split('T')[0] >= today
         );
       });
@@ -85,24 +107,31 @@ export class MenuPrincipalPage implements OnInit {
     }
   }
 
+  cargarNoticias() {
+    this.noticiasService.getNoticias().subscribe((noticias: Noticias[]) => {
+      this.noticias = noticias.map(noticia => {
+        return {
+          ...noticia,
+          fecha: noticia.fecha instanceof Timestamp ? noticia.fecha.toDate() : noticia.fecha // Convertir Timestamp a Date
+        };
+      });
+    });
+  }
+
+  toggleDetails(noticia: Noticias) {
+    noticia.showDetails = !noticia.showDetails;
+  }
+
   async unirseAlEvento(eventoId: string) {
     try {
-      // Obtén el evento específico para verificar su capacidad
-      const evento = this.eventos.find(e => e.idEventosAdmin === eventoId);
-
+      const evento = this.eventos.find((e) => e.idEventosAdmin === eventoId);
       if (evento) {
-        // Verifica si la cantidad de participantes ya ha alcanzado la capacidad máxima
         if (evento.participants.length >= evento.capacidadAlumnos) {
           console.log('Este evento ya ha alcanzado su capacidad máxima.');
           return;
         }
-
-        // Si no ha alcanzado la capacidad, procede a unirse
         await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
-
-        // Actualiza el evento localmente para reflejar los cambios
         evento.participants.push(this.alumnoId);
-
         console.log('Te has unido al evento.');
       } else {
         console.error('Evento no encontrado.');
@@ -111,38 +140,4 @@ export class MenuPrincipalPage implements OnInit {
       console.error('No se pudo unir al evento:', error);
     }
   }
-
-  async goToClub() {
-    const user = this.autenticacionService.getCurrentUser();
-
-    if (user) {
-        try {
-            const club = await this.clubesService.getClubForUser(user.uid);
-            console.log('Club obtenido en goToClub:', club);
-            if (club) {
-                this.router.navigate([`/club/${club.idClub}`]);
-            } else {
-                const alert = await this.alertController.create({
-                    header: 'No estás en un club',
-                    message: 'Actualmente no perteneces a ningún club.',
-                    buttons: ['OK'],
-                });
-                await alert.present();
-            }
-        } catch (error) {
-            console.error('Error al obtener el club del usuario:', error);
-        }
-    } else {
-        console.error('Usuario no autenticado');
-    }
-  }
-
-  goToCrearClub() {
-    this.router.navigate(['/crear-club']);
-  }
-
-  goToVerClubes() {
-    this.router.navigate(['/club-list']);
-  }
-
 }

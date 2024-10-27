@@ -1,5 +1,28 @@
 <app-header></app-header>
 
+<ion-content>
+  <!-- Mostrar swiper solo si hay noticias -->
+  <swiper *ngIf="noticias.length > 0" [config]="swiperConfig" #swiperRef>
+    <ng-container *ngFor="let noticia of noticias">
+      <ng-template swiperSlide>
+        <ion-card>
+          <img *ngIf="noticia.imagen" [src]="noticia.imagen" />
+          <ion-card-header>
+            <ion-card-title>{{ noticia.titulo }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ noticia.cuerpo }}</p>
+          </ion-card-content>
+        </ion-card>
+      </ng-template>
+    </ng-container>
+    <div class="swiper-pagination"></div>
+  </swiper>
+
+  <!-- Mensaje cuando no hay noticias -->
+  <p *ngIf="noticias.length === 0">No hay noticias disponibles.</p>
+</ion-content>
+
 <ion-content class="ion-padding">
   <ion-grid>
     <ion-row>
