@@ -1,8 +1,19 @@
-@import "~swiper/swiper-bundle.min.css"; // Asegúrate de que esta línea esté presente
+@import "~swiper/swiper-bundle.min.css"; /* Asegúrate de que esta línea esté presente */
 
+/* Quitar padding en ion-content */
+ion-content {
+  --background: #ffffff;
 
+}
+
+/* Ajustar ion-grid para que no añada padding extra */
+ion-grid {
+  padding: 0;
+}
+
+/* Estilos para las tarjetas de eventos */
 .evento-card {
-  margin-bottom: 20px;
+  margin-bottom: 8px; /* Espacio reducido entre tarjetas de eventos */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   overflow: hidden;
@@ -29,59 +40,70 @@
   border-radius: 8px;
 }
 
-
-
-ion-card {
-  border-radius: 15px; /* Bordes redondeados */
-  overflow: hidden; /* Evitar el desbordamiento de la imagen */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-  margin: 10px; /* Espaciado entre tarjetas */
+/* Ajuste para el primer evento para acercarlo más al título */
+.evento-card:first-child {
+  margin-top: 5px; /* Espacio reducido al inicio de la lista de eventos */
 }
 
-img {
-  width: 100%; /* Imagen responsiva */
-  height: auto; /* Mantener la proporción de la imagen */
+/* Estilos para el título de Eventos Masivos */
+.eventosTitulos {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #FF724C;
 }
 
-ion-card-header {
-  background: linear-gradient(135deg, #f0f8ff 0%, #e0e0e0 100%); /* Fondo degradado */
-  padding: 15px; /* Espaciado interno */
+/* Estilos para la galería de noticias */
+.noticia-card {
+  position: relative;
+  overflow: hidden;
 }
 
-ion-card-title {
-  font-size: 1.5em; /* Tamaño de fuente del título */
-  color: #333; /* Color del texto */
+.image-overlay {
+  position: relative;
 }
 
-ion-card-subtitle {
-  font-size: 0.9em; /* Tamaño de fuente del subtítulo */
-  color: #777; /* Color del texto */
+.image-overlay img {
+  width: 100%;
+  height: 200px; /* Altura predeterminada para dispositivos móviles */
+  object-fit: cover;
 }
 
-button {
-  margin-top: 10px; /* Espaciado superior del botón */
-  background-color: #3880ff; /* Color de fondo del botón */
-  color: white; /* Color del texto del botón */
-  border-radius: 5px; /* Bordes redondeados del botón */
-  padding: 10px 15px; /* Espaciado interno del botón */
-  border: none; /* Sin borde */
-  cursor: pointer; /* Cambiar cursor al pasar sobre el botón */
+.overlay-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-button:hover {
-  background-color: #007bff; /* Color al pasar el cursor */
+.overlay-title {
+  font-size: 1.2em; /* Tamaño de fuente más pequeño para el título */
+  color: #FFFFFF;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.7);
+  margin-bottom: 4px; /* Reducir margen inferior */
 }
 
-.swiper-pagination {
-  bottom: 10px; /* Posiciona la paginación en la parte inferior */
+.overlay-description {
+  font-size: 0.9em; /* Tamaño de fuente más pequeño para la descripción */
+  color: #FFFFFF;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.7);
 }
 
-@media (max-width: 600px) {
-  ion-card-title {
-    font-size: 1.3em; /* Ajustar tamaño en pantallas pequeñas */
+/* Estilos para diferentes tamaños de pantalla */
+
+/* Para tabletas (pantallas entre 600px y 900px) */
+@media (min-width: 600px) and (max-width: 900px) {
+  .image-overlay img {
+    height: 350px; /* Ajusta la altura para tabletas */
   }
+}
 
-  ion-card-subtitle {
-    font-size: 0.8em; /* Ajustar subtítulo en pantallas pequeñas */
+/* Para pantallas más grandes (escritorio) */
+@media (min-width: 901px) {
+  .image-overlay img {
+    height: 400px; /* Ajusta la altura para pantallas de escritorio */
   }
 }
