@@ -118,7 +118,11 @@ export const routes: Routes = [
   {
     path: 'club-eliminar/:id',
     loadComponent: () => import('./pages/club/club-eliminar/club-eliminar.page').then( m => m.ClubEliminarPage)
+  },  {
+    path: 'notificaciones',
+    loadComponent: () => import('./pages/notificaciones/notificaciones.page').then( m => m.NotificacionesPage)
   }
+
 
 
 

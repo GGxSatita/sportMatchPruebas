@@ -1,0 +1,50 @@
+<app-header></app-header>
+<ion-content class="notificaciones-content ion-padding">
+
+  <!-- Segmento para alternar entre No Leídas y Leídas -->
+  <ion-segment [(ngModel)]="segmentoSeleccionado">
+    <ion-segment-button value="noLeidas">
+      No Leídas
+    </ion-segment-button>
+    <ion-segment-button value="leidas">
+      Leídas
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Botón para marcar todas como leídas -->
+  <ion-button expand="full" *ngIf="segmentoSeleccionado === 'noLeidas'" (click)="marcarTodasComoLeidas()">
+    Marcar todas como leídas
+  </ion-button>
+
+  <!-- Lista de Notificaciones No Leídas -->
+  <ion-list *ngIf="segmentoSeleccionado === 'noLeidas'">
+    <ion-item *ngFor="let notificacion of notificacionesNoLeidas">
+      <ion-card class="notificacion-card no-leida">
+        <ion-card-header>
+          <ion-card-title>{{ notificacion.titulo }}</ion-card-title>
+          <ion-label>{{ convertirATimestampFecha(notificacion.timestamp) | date: 'short' }}</ion-label>
+        </ion-card-header>
+        <ion-card-content>
+          <p>{{ notificacion.mensaje }}</p>
+          <ion-button (click)="marcarComoLeida(notificacion.id)">Marcar como leída</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+  <!-- Lista de Notificaciones Leídas -->
+  <ion-list *ngIf="segmentoSeleccionado === 'leidas'">
+    <ion-item *ngFor="let notificacion of notificacionesLeidas">
+      <ion-card class="notificacion-card leida">
+        <ion-card-header>
+          <ion-card-title>{{ notificacion.titulo }}</ion-card-title>
+          <ion-label>{{ convertirATimestampFecha(notificacion.timestamp) | date: 'short' }}</ion-label>
+        </ion-card-header>
+        <ion-card-content>
+          <p>{{ notificacion.mensaje }}</p>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<app-footer></app-footer>

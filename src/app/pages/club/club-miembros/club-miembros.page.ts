@@ -10,6 +10,7 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { getDoc } from '@angular/fire/firestore';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { Router } from '@angular/router';
+import { NotificacionTipo } from 'src/app/models/notificacion';
 
 @Component({
   selector: 'app-club-miembros',
@@ -65,7 +66,17 @@ export class ClubMiembrosPage implements OnInit {
             // Eliminar al miembro del club
             await this.clubesService.eliminarMiembro(this.club.idClub, miembroId);
             console.log('Miembro eliminado correctamente');
-            this.cargarClub(this.club.idClub); // Refrescar la lista de miembros
+
+            // Enviar notificación al miembro eliminado
+            await this.notificacionesService.enviarNotificacion(
+              miembroId,
+              `Has sido eliminado del club ${this.club.nombreClub}.`,
+              'Expulsión de Club',
+              NotificacionTipo.ALERTA
+            );
+
+            // Refrescar la lista de miembros
+            this.cargarClub(this.club.idClub);
 
         } catch (error) {
             console.error('Error al eliminar el miembro:', error);
@@ -79,7 +90,8 @@ export class ClubMiembrosPage implements OnInit {
     } else {
         console.error('No tienes permisos para eliminar miembros.');
     }
-}
+  }
+
 
 
 

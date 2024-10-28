@@ -89,4 +89,7 @@ export class HeaderComponent implements OnInit {
     this.autenticacionService.logout();
     this.router.navigate(['/login']); // Redirige al login después de cerrar sesión
   }
+  goToNotificaciones() {
+    this.router.navigate(['/notificaciones']); // Navega a la página de notificaciones
+  }
 }

@@ -76,12 +76,9 @@ export class MenuPrincipalPage implements OnInit {
       const user = await this.autenticacionService.getCurrentUser();
       if (user) {
         this.alumnoId = user.uid;
-          // Cargar las notificaciones del usuario
-          this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
-          this.notificaciones = notificaciones;
-        });
       }
 
+      // Obtener eventos activos
       this.eventoAdminService.getEventos().subscribe((eventos) => {
         this.eventos = eventos.filter(evento => evento.status === true);
       });
