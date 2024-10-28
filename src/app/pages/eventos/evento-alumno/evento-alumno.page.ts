@@ -1,7 +1,7 @@
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider, IonIcon } from '@ionic/angular/standalone';
 import { EventosService } from 'src/app/services/evento.service';
 import { eventos } from 'src/app/models/evento';
 import { Auth } from '@angular/fire/auth';
@@ -31,6 +31,7 @@ import { AlertController } from '@ionic/angular';
     IonItemDivider, // Asegúrate de importarlo
     CommonModule,
     FormsModule,
+    IonIcon,
     HeaderComponent,
     FooterComponent,
   ]

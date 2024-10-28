@@ -114,9 +114,24 @@ export class EventoListPage implements OnInit {
   }
 
   filtrarEventos(): void {
-    this.eventosFiltrados = this.eventos.filter(evento =>
-      evento.espera === true // Filtrar solo los eventos aprobados
-    );
+    const ahora = new Date(); // Fecha y hora actuales
+
+    this.eventosFiltrados = this.eventos.filter(evento => {
+      if (!evento.espera) return false; // Filtrar solo eventos aprobados
+
+      if (evento.fechaReservada && evento.hora) {
+        const [horaInicio] = evento.hora.split(' - '); // Obtener solo la hora inicial del rango
+        const fechaHoraEvento = new Date(`${evento.fechaReservada}T${horaInicio}:00`); // Crear objeto de fecha completa
+
+        // Sumar 5 horas a la hora de inicio para obtener el límite de visibilidad
+        const fechaHoraExpiracion = new Date(fechaHoraEvento.getTime() + 5 * 60 * 60 * 1000);
+
+        // Filtrar eventos cuya fecha de expiración no ha pasado
+        return fechaHoraExpiracion > ahora;
+      }
+
+      return true; // Si no tiene fecha y hora, incluir el evento (ajusta según sea necesario)
+    });
   }
 
 

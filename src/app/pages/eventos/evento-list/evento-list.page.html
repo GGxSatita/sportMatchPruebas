@@ -30,7 +30,7 @@
                     <ion-card-header>
                       <ion-card-title>{{ evento.titulo }}</ion-card-title>
                     </ion-card-header>
-                    <p>{{ evento.descripcion }}</p>
+
                   </ion-col>
                 </ion-row>
 
@@ -54,6 +54,10 @@
 
                 <div *ngIf="eventosExpandido[evento.idEventosAlumnos]" style="margin-top: 10px;">
                   <ion-grid>
+                    <ion-row class="evento-info-row">
+                      <ion-col size="4"><ion-label color="primary"><strong>Descripción:</strong></ion-label></ion-col>
+                      <ion-col size="8"><p>{{ evento.descripcion }}</p></ion-col>
+                    </ion-row>
                     <ion-row class="evento-info-row">
                       <ion-col size="4"><ion-label color="primary"><strong>Sector:</strong></ion-label></ion-col>
                       <ion-col size="8"><p>{{ evento.sectorNombre }}</p></ion-col>
