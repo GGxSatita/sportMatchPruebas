@@ -125,23 +125,5 @@ export class NoticiasComponent  implements OnInit {
     noticia.showDetails = !noticia.showDetails;
   }
 
-  async unirseAlEvento(eventoId: string) {
-    try {
-      const evento = this.eventos.find((e) => e.idEventosAdmin === eventoId);
-      if (evento) {
-        if (evento.participants.length >= evento.capacidadAlumnos) {
-          console.log('Este evento ya ha alcanzado su capacidad máxima.');
-          return;
-        }
-        await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
-        evento.participants.push(this.alumnoId);
-        console.log('Te has unido al evento.');
-      } else {
-        console.error('Evento no encontrado.');
-      }
-    } catch (error) {
-      console.error('No se pudo unir al evento:', error);
-    }
-  }
 
 }

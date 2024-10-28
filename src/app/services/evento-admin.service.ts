@@ -22,13 +22,13 @@ export class EventoAdminService {
         const eventoData = eventoSnap.data() as eventosAdmin;
 
         // Verifica si el alumno ya está en la lista
-        if (eventoData.participants.includes(alumnoId)) {
+        if (eventoData.participants.some(part => part.idAlumno === alumnoId)) {
           throw new Error('Ya estás registrado en este evento.');
         }
 
-        // Agrega el ID del alumno a la lista de participantes
+        // Agrega el objeto del alumno a la lista de participantes
         await updateDoc(eventoDoc, {
-          participants: [...eventoData.participants, alumnoId]
+          participants: [...eventoData.participants, { idAlumno: alumnoId, llego: false }]
         });
       } else {
         throw new Error('El evento no existe.');
@@ -38,6 +38,7 @@ export class EventoAdminService {
       throw error;
     }
   }
+
 
 
   createEvento(evento: eventosAdmin): Promise<void> {
@@ -74,4 +75,36 @@ export class EventoAdminService {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return deleteDoc(eventoDoc);
   }
+
+  async marcarLlegada(eventoId: string, alumnoId: string): Promise<void> {
+    const eventoDoc = doc(this.firestore, `${this.collectionName}/${eventoId}`);
+
+    try {
+      const eventoSnap = await getDoc(eventoDoc);
+      if (eventoSnap.exists()) {
+        const eventoData = eventoSnap.data() as eventosAdmin;
+
+        // Busca el participante por su ID
+        const participanteIndex = eventoData.participants.findIndex(part => part.idAlumno === alumnoId);
+
+        if (participanteIndex === -1) {
+          throw new Error('El alumno no está inscrito en este evento.');
+        }
+
+        // Actualiza el campo 'llego' a true
+        eventoData.participants[participanteIndex].llego = true;
+
+        // Actualiza el evento en Firestore
+        await updateDoc(eventoDoc, {
+          participants: eventoData.participants
+        });
+      } else {
+        throw new Error('El evento no existe.');
+      }
+    } catch (error) {
+      console.error('Error al marcar llegada:', error);
+      throw error;
+    }
+  }
+
 }

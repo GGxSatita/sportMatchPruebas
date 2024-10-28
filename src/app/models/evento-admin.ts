@@ -8,8 +8,7 @@ export class eventosAdmin {
   image: string;
   fechaReservada: string;
   idCreator: string;
-  participants: string[];
-  hora?: string;
+  participants: { idAlumno: string; llego: boolean }[];  hora?: string;
   sectorNombre?:string;
   capacidadAlumnos?: number;
 
@@ -24,7 +23,7 @@ export class eventosAdmin {
     idCreator: string,
     image: string ,
     fechaReservada: string,
-    participants: string[] = []
+    participants: { idAlumno: string; llego: boolean }[] = []
   ) {
     this.idEventosAdmin = idEventosAdmin;
     this.idSector = idSector;

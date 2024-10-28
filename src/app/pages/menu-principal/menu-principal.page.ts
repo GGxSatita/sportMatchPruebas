@@ -133,7 +133,7 @@ export class MenuPrincipalPage implements OnInit {
           return;
         }
         await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
-        evento.participants.push(this.alumnoId);
+        evento.participants.push({ idAlumno: this.alumnoId, llego: false });
         console.log('Te has unido al evento.');
       } else {
         console.error('Evento no encontrado.');
@@ -142,4 +142,13 @@ export class MenuPrincipalPage implements OnInit {
       console.error('No se pudo unir al evento:', error);
     }
   }
+
+  estaLlenoOUnido(evento: eventosAdmin): boolean {
+    return (
+      evento.participants.length >= evento.capacidadAlumnos ||
+      evento.participants.some(p => p.idAlumno === this.alumnoId)
+    );
+  }
+
+
 }

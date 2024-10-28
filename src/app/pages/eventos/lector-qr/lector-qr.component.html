@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Lector de QR</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div id="reader" style="width: 100%; height: 300px;"></div>
+
+  <!-- Mostrar el resultado de la verificación -->
+  <div *ngIf="scanResult" class="scan-result">
+    <h3>{{ scanResult }}</h3>
+    <p *ngIf="isInscrito === true" style="color: green;">Inscrito: Sí</p>
+    <p *ngIf="isInscrito === false" style="color: red;">Inscrito: No</p>
+  </div>
+</ion-content>
