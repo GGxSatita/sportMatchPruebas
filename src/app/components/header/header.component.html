@@ -15,9 +15,15 @@
     <!-- Botón de cerrar sesión, oculto en la página de recuperar contraseña -->
     <ion-buttons slot="end">
       <ion-button (click)="goToNotificaciones()">
-        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-icon
+          name="notifications"
+          [ngClass]="{ 'icono-notificacion-rojo': notificacionesNoLeidas }"
+        ></ion-icon>
       </ion-button>
-      <ion-button *ngIf="currentPage !== '/recuperar-contrasena'" (click)="confirmLogout()">
+      <ion-button
+        *ngIf="currentPage !== '/recuperar-contrasena'"
+        (click)="confirmLogout()"
+      >
         <ion-icon name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>

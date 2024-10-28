@@ -4,6 +4,7 @@ import { Observable, from } from 'rxjs';
 import { AutenticacionService } from './autenticacion.service';
 import { Notificacion, NotificacionTipo } from '../models/notificacion';
 import { User } from '@angular/fire/auth';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -72,4 +73,22 @@ export class NotificacionesService {
       console.error('Error al enviar la notificación:', error);
     }
   }
+    // Método para verificar si hay al menos una notificación sin leer
+    hayNotificacionesNoLeidas(): Observable<boolean> {
+      return new Observable((observer) => {
+        from(this.authService.getCurrentUserAsync()).subscribe((user: User | null) => {
+          if (user) {
+            const notificacionesRef = collection(this.firestore, `users/${user.uid}/notifications`);
+            const q = query(notificacionesRef, where('leida', '==', false));
+
+            collectionData(q).pipe(
+              map((notificaciones) => notificaciones.length > 0) // Devuelve `true` si hay no leídas
+            ).subscribe(observer);
+          } else {
+            observer.next(false);
+          }
+        });
+      });
+    }
+
 }
