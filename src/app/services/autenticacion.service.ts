@@ -5,7 +5,7 @@ import {
   updateProfile, fetchSignInMethodsForEmail, EmailAuthProvider,
   updatePassword, reauthenticateWithCredential, sendPasswordResetEmail
 } from '@angular/fire/auth';
-import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, updateDoc, where, setDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
 
@@ -51,52 +51,64 @@ export class AutenticacionService {
 
   async login(email: string, password: string) {
     try {
-      // Verificar que las credenciales no estén vacías
-      if (!email || !password) {
-        throw new Error('Las credenciales no pueden estar vacías.');
-      }
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      const userID = userCredential.user;
+      const userDocRef = doc(this.firestore, `Users/${userID.uid}`);
+      const userDocSnap = await getDoc(userDocRef);
 
-      // Verificar el formato del correo
-      if (!this.validateEmail(email)) {
-        throw new Error('El formato del correo electrónico no es válido.');
-      }
-
-      // Intentar el login
-      const user = await signInWithEmailAndPassword(this.auth, email, password);
-      const userID = user.user;
-      if (user) {
-        const userDoc = doc(this.firestore, `Users/${userID.uid}`);
-        await updateDoc(userDoc, {
-          lastLogin: new Date(),
-          isLoggedIn: true,
-          messagingToken: await getToken(getMessaging())
-        });
-      }
-      return user;
-    } catch (error: any) {
-      // Capturar los códigos de error específicos de Firebase
-      if (error.code) {
-        if (error.code === 'auth/invalid-email') {
-          console.error('Correo electrónico inválido.');
-          throw new Error('Correo electrónico inválido.');
-        } else if (error.code === 'auth/user-disabled') {
-          console.error('Usuario deshabilitado.');
-          throw new Error('Este usuario ha sido deshabilitado.');
-        } else if (error.code === 'auth/user-not-found') {
-          console.error('Usuario no encontrado.');
-          throw new Error('No se encontró un usuario con este correo.');
-        } else if (error.code === 'auth/wrong-password') {
-          console.error('Contraseña incorrecta.');
-          throw new Error('Contraseña incorrecta. Por favor, intenta de nuevo.');
-        } else if (error.code === 'auth/invalid-credential') {
-          console.error('Credenciales inválidas.');
-          throw new Error('Credenciales inválidas.');
+      // Intentar obtener el token de mensajería solo si los permisos están habilitados
+      let messagingToken: string | null = null;
+      try {
+        messagingToken = await getToken(getMessaging());
+      } catch (error: any) {
+        if (error.code === 'messaging/permission-blocked') {
+          console.warn('El permiso de notificación fue bloqueado por el usuario. Las notificaciones no estarán disponibles.');
+        } else {
+          console.error('Error al obtener el token de mensajería:', error);
         }
       }
-      console.error('Error al iniciar sesión:', error);
+
+      // Crear o actualizar el documento de usuario en Firestore
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, {
+          email: userID.email,
+          name: userID.displayName || "Usuario",
+          lastLogin: new Date(),
+          isLoggedIn: true,
+          messagingToken: messagingToken || null // Evita error si el token es nulo
+        });
+      } else {
+        await updateDoc(userDocRef, {
+          lastLogin: new Date(),
+          isLoggedIn: true,
+          messagingToken: messagingToken || null // Evita error si el token es nulo
+        });
+      }
+
+      return userCredential;
+    } catch (error: any) {
+      console.error('Error en login:', error);
       throw error;
     }
+  }
 
+
+
+
+
+  private getErrorMessage(code: string): string {
+    switch (code) {
+      case 'auth/invalid-email':
+        return 'Correo electrónico inválido.';
+      case 'auth/user-disabled':
+        return 'Este usuario ha sido deshabilitado.';
+      case 'auth/user-not-found':
+        return 'No se encontró un usuario con este correo.';
+      case 'auth/wrong-password':
+        return 'Contraseña incorrecta. Por favor, intenta de nuevo.';
+      default:
+        return 'Error al iniciar sesión. Intenta de nuevo.';
+    }
   }
 
 
@@ -176,17 +188,20 @@ export class AutenticacionService {
   async logout() {
     const user = this.auth.currentUser;
     if (user) {
-      const userDoc = doc(this.firestore, `Users/${user.uid}`);
-      await updateDoc(userDoc, {
-        isLoggedIn: false
-      });
+      const userDocRef = doc(this.firestore, `Users/${user.uid}`);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        // Actualizar solo si el documento existe
+        await updateDoc(userDocRef, {
+          isLoggedIn: false
+        });
+      }
     }
-    signOut(this.auth).then(() => {
-      this.router.navigate(['/login']);
-    }).catch(error => {
-      console.error('Error durante el logout:', error);
-    });
+    await signOut(this.auth);
+    this.router.navigate(['/login']);
   }
+
 
   getCurrentUser() {
     return this.auth.currentUser;
