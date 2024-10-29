@@ -1,14 +1,14 @@
 .custom-divider {
   margin-top: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   text-align: center;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil para mayor contraste */
 }
 
-/* Colores personalizados */
 .aprobado {
   background-color: #e3f2fd; /* Azul claro */
   color: #1565c0; /* Azul oscuro */
@@ -19,17 +19,73 @@
   color: #6a1b9a; /* Morado oscuro */
 }
 
+.admin {
+  background-color: #e0e0e0; /* Gris claro */
+  color: #424242; /* Gris oscuro */
+}
+
 /* Estilo para las tarjetas */
 ion-card {
   margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  transition: transform 0.2s; /* Efecto de hover */
+}
+
+ion-card:hover {
+  transform: translateY(-5px); /* Levanta la tarjeta al pasar el mouse */
+}
+
+ion-card-header {
+  background-color: #f9f9f9; /* Fondo claro para el header */
+  border-bottom: 2px solid #e0e0e0; /* Borde en el header */
+  padding: 10px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 ion-card-title {
   font-size: 1.2rem;
   text-align: center;
   font-weight: bold;
+  color: #333;
+}
+
+ion-card-content p {
+  font-size: 1rem;
+  color: #666;
+  margin: 5px 0;
 }
 
 ion-button {
-  margin-top: 10px;
+  margin-top: 12px;
+  font-weight: bold;
+  --border-radius: 5px;
 }
+
+ion-button[color="danger"] {
+  --background: #e57373; /* Rojo suave */
+  --background-focused: #ef5350;
+  --background-hover: #e53935;
+}
+
+
+h2 mat-icon {
+  font-size: 1.5rem;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+ion-card-content p mat-icon {
+  font-size: 1.2rem;
+  color: #666;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+ion-button mat-icon {
+  font-size: 1.2rem;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+

@@ -4,7 +4,7 @@ export namespace ModelsAuth {
   export interface DatosRegister {
     email: string;
     password: string;
-  }
+  } 
 
   export interface DatosLogin {
     email: string;
