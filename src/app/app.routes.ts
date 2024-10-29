@@ -106,7 +106,15 @@ export const routes: Routes = [
       {
     path: 'menu-club',
     loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
-  }
+  },
+  {
+    path: 'lector',
+    loadComponent: () => import('./pages/eventos/lector/lector.page').then( m => m.LectorPage),
+    canActivate: [authGuard]
+  },
+
+
+
 
 
 

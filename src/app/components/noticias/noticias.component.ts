@@ -20,12 +20,13 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { Noticias } from 'src/app/models/noticias';
 import { NoticiasService } from 'src/app/services/noticias.service';
 import { Timestamp } from 'firebase/firestore';
-import { NoticiasComponent } from 'src/app/components/noticias/noticias.component';
+
+
 
 @Component({
-  selector: 'app-menu-principal',
-  templateUrl: './menu-principal.page.html',
-  styleUrls: ['./menu-principal.page.scss'],
+  selector: 'app-noticias',
+  templateUrl: './noticias.component.html',
+  styleUrls: ['./noticias.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -51,11 +52,11 @@ import { NoticiasComponent } from 'src/app/components/noticias/noticias.componen
     IonTitle,
     HeaderComponent,
     FooterComponent,
-    NoticiasComponent,
     SwiperModule,
   ],
 })
-export class MenuPrincipalPage implements OnInit {
+export class NoticiasComponent  implements OnInit {
+
   @ViewChild('swiperRef') swiperRef!: SwiperComponent; // Referencia al Swiper
 
   eventos: eventosAdmin[] = [];
@@ -122,32 +123,6 @@ export class MenuPrincipalPage implements OnInit {
 
   toggleDetails(noticia: Noticias) {
     noticia.showDetails = !noticia.showDetails;
-  }
-
-  async unirseAlEvento(eventoId: string) {
-    try {
-      const evento = this.eventos.find((e) => e.idEventosAdmin === eventoId);
-      if (evento) {
-        if (evento.participants.length >= evento.capacidadAlumnos) {
-          console.log('Este evento ya ha alcanzado su capacidad máxima.');
-          return;
-        }
-        await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
-        evento.participants.push({ idAlumno: this.alumnoId, llego: false });
-        console.log('Te has unido al evento.');
-      } else {
-        console.error('Evento no encontrado.');
-      }
-    } catch (error) {
-      console.error('No se pudo unir al evento:', error);
-    }
-  }
-
-  estaLlenoOUnido(evento: eventosAdmin): boolean {
-    return (
-      evento.participants.length >= evento.capacidadAlumnos ||
-      evento.participants.some(p => p.idAlumno === this.alumnoId)
-    );
   }
 
 

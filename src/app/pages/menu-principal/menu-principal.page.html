@@ -1,6 +1,12 @@
 <app-header></app-header>
 
+
 <ion-content class="ion-padding">
+
+<app-noticias></app-noticias>
+
+  <h2 class="eventosTitulos">Eventos Masivos</h2>
+
   <ion-grid>
     <ion-row>
       <ion-col size="12">
@@ -24,15 +30,16 @@
                 </ion-label>
               </ion-item>
               <ion-button
-                class="unirse-boton"
-                expand="full"
-                fill="solid"
-                color="primary"
-                [disabled]="evento.participants.length >= evento.capacidadAlumnos || evento.participants.includes(alumnoId)"
-                (click)="unirseAlEvento(evento.idEventosAdmin)">
-                <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-                Unirse al evento
-              </ion-button>
+              class="unirse-boton"
+              expand="full"
+              fill="solid"
+              color="primary"
+              [disabled]="estaLlenoOUnido(evento)"
+              (click)="unirseAlEvento(evento.idEventosAdmin)">
+              <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+              Unirse al evento
+            </ion-button>
+
             </ion-card-content>
           </ion-card>
         </ion-list>
