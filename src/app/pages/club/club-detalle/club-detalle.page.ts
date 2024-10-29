@@ -6,13 +6,14 @@ import { Club } from 'src/app/models/club';
 import { ActivatedRoute } from '@angular/router';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-club-detalle',
   templateUrl: './club-detalle.page.html',
   styleUrls: ['./club-detalle.page.scss'],
   standalone: true,
-  imports: [IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonButton, IonIcon, IonLabel, IonAvatar, IonCol, IonRow, IonGrid, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [HeaderComponent,IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonButton, IonIcon, IonLabel, IonAvatar, IonCol, IonRow, IonGrid, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 export class ClubDetallePage implements OnInit {
   club: Club | null = null;

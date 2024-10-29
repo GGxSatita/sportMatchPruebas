@@ -52,7 +52,7 @@ import { NoticiasComponent } from 'src/app/components/noticias/noticias.componen
     HeaderComponent,
     FooterComponent,
     NoticiasComponent,
-    SwiperModule,
+    SwiperModule
   ],
 })
 export class MenuPrincipalPage implements OnInit {
