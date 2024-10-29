@@ -113,14 +113,17 @@
             <p><ion-icon name="location-outline"></ion-icon>{{ evento.sectorNombre }}</p>
 
             <!-- Botón para cancelar inscripción en evento admin -->
-
-            <ion-button (click)="iniciarEscaneo()">Iniciar Escaneo QR</ion-button>
-            <div id="reader" style="width: 300px; height: 300px;"></div>
-
             <ion-button *ngIf="isParticipating(evento)" expand="full" color="danger" (click)="cancelarInscripcionAdmin(evento)">
               <ion-icon name="close-circle-outline"></ion-icon> Cancelar inscripción
             </ion-button>
 
+
+            <ion-button *ngIf="isParticipating(evento)" [disabled]="hasArrived(evento)" expand="full" color="primary" (click)="iniciarEscaneo()">
+              <ion-icon name="qr-code-outline"></ion-icon>
+              <ng-container *ngIf="hasArrived(evento); else notRegistered">Registrado</ng-container>
+              <ng-template #notRegistered>Iniciar Escaneo QR</ng-template>
+            </ion-button>
+            <div id="reader" style="width: 300px; height: 300px;" *ngIf="!hasArrived(evento)"></div>
 
 
           </ion-card-content>

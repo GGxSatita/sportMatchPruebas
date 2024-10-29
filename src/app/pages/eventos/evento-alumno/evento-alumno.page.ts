@@ -202,42 +202,7 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
     });
   }
 
-  actualizarLlegada(codigoQr: string) {
-    let qrData;
 
-    try {
-        // Intentar parsear el JSON del código QR
-        qrData = JSON.parse(codigoQr);
-    } catch (error) {
-        console.error('Error al parsear el código QR:', error);
-        return;
-    }
-
-    // Asegurarse de que el JSON contiene un `eventoId`
-    if (!qrData.eventoId) {
-        console.error('El código QR no contiene un eventoId.');
-        return;
-    }
-
-    // Buscar el evento en ambas listas
-    const evento = this.eventosAprobadosOInscritos.find(evento => evento.idEventosAlumnos === qrData.eventoId) ||
-                   this.eventosAdminInscritos.find(eventoAdmin => eventoAdmin.idEventosAdmin === qrData.eventoId);
-
-    if (evento && this.esEventoAdmin(evento)) {
-        const participante = evento.participants.find(part => part.idAlumno === this.idAlumno);
-
-        if (participante) {
-            participante.llego = true; // Cambiar `llego` a true
-            this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants })
-                .then(() => console.log(`Estado de llegada actualizado para el evento ${evento.idEventosAdmin}`))
-                .catch(error => console.error('Error al actualizar el estado de llegada:', error));
-        } else {
-            console.error('Participante no encontrado');
-        }
-    } else {
-        console.error('Evento no encontrado para el código QR proporcionado o no es un evento administrado.');
-    }
-}
 
   esEventoAdmin(evento: eventos | eventosAdmin): evento is eventosAdmin {
     return (evento as eventosAdmin).participants !== undefined;
@@ -313,4 +278,48 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
   isParticipating(evento: eventosAdmin): boolean {
     return evento.participants.some(part => part.idAlumno === this.idAlumno);
   }
+
+  hasArrived(evento: eventosAdmin): boolean {
+    const participante = evento.participants.find(part => part.idAlumno === this.idAlumno);
+    return participante ? participante.llego : false;
+}
+
+
+actualizarLlegada(codigoQr: string) {
+  let qrData;
+
+  try {
+      qrData = JSON.parse(codigoQr);
+  } catch (error) {
+      console.error('Error al parsear el código QR:', error);
+      return;
+  }
+
+  if (!qrData.eventoId) {
+      console.error('El código QR no contiene un eventoId.');
+      return;
+  }
+
+  const evento = this.eventosAprobadosOInscritos.find(evento => evento.idEventosAlumnos === qrData.eventoId) ||
+                 this.eventosAdminInscritos.find(eventoAdmin => eventoAdmin.idEventosAdmin === qrData.eventoId);
+
+  if (evento && this.esEventoAdmin(evento)) {
+      const participante = evento.participants.find(part => part.idAlumno === this.idAlumno);
+
+      if (participante) {
+          participante.llego = true;
+          this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants })
+              .then(() => {
+                  console.log(`Estado de llegada actualizado para el evento ${evento.idEventosAdmin}`);
+                  // Refrescar el estado de la interfaz para reflejar "Registrado"
+                  this.loadEventosAdmin();  // Opcional: puedes llamar a esta función si necesitas refrescar la lista completa
+              })
+              .catch(error => console.error('Error al actualizar el estado de llegada:', error));
+      } else {
+          console.error('Participante no encontrado');
+      }
+  } else {
+      console.error('Evento no encontrado para el código QR proporcionado o no es un evento administrado.');
+  }
+ }
 }
