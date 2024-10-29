@@ -10,3 +10,20 @@ ion-label {
 ion-input, ion-textarea {
   margin-top: 5px;
 }
+
+.status-circle {
+  width: 10px; /* Tamaño del círculo */
+  height: 10px;
+  border-radius: 50%; /* Hace que sea un círculo */
+  display: inline-block; /* Para que aparezca en la misma línea que el texto */
+  margin-left: 10px; /* Espacio entre el texto y el círculo */
+}
+
+
+.public {
+  background-color: green; /* Color verde para sector público */
+}
+
+.private {
+  background-color: red; /* Color rojo para sector privado */
+}

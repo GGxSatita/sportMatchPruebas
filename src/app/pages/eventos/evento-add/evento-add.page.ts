@@ -65,6 +65,9 @@ export class EventoAddPage implements OnInit {
 
   idAlumno: string | null = null;
 
+  sectorVisibilityStatus: string = '';
+  sectorButtonColor: string = 'primary';
+
   constructor(
     private eventosService: EventosService,
     private sectoresService: SectoresService,
@@ -92,6 +95,9 @@ export class EventoAddPage implements OnInit {
     this.loadAlumnoId();
     this.loadEventosAdmin();
   }
+
+
+
 
   loadEventosAdmin(): void {
     this.eventoAdminService.getEventos().subscribe((eventosAdmin) => {
@@ -136,6 +142,16 @@ export class EventoAddPage implements OnInit {
     this.selectedSectorId = event.detail.value;
     const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
     this.selectedSectorImage = sector?.image || null;
+
+    // Configurar el estado de visibilidad y color del botón
+    if (sector) {
+      this.sectorVisibilityStatus = sector.visible ? 'Disponible' : 'Privado';
+      this.sectorButtonColor = sector.visible ? 'success' : 'danger'; // 'success' es verde, 'danger' es rojo
+    } else {
+      this.sectorVisibilityStatus = '';
+      this.sectorButtonColor = 'primary';
+    }
+
     this.filterHorarios();
   }
 
