@@ -7,8 +7,7 @@ import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from 
 import { Location } from '@angular/common';
 import { filter, Subscription } from 'rxjs';
 import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
-import { NotificacionesService } from 'src/app/services/notificaciones.service';
-
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -49,7 +48,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private alertController: AlertController,
     private location: Location, // Inyectar el servicio Location para manejar el historial
-    private notificacionesService: NotificacionesService,
+    private notificacionesService: NotificationService,
     private cdRef: ChangeDetectorRef
   ) {}
 

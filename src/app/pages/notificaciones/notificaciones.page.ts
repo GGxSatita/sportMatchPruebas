@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonSegmentButton, IonButton, IonList, IonItem, IonCard, IonCardHeader, IonCardTitle, IonLabel, IonCardContent, IonSegment } from '@ionic/angular/standalone';
 import { Notificacion, NotificacionTipo } from 'src/app/models/notificacion';
-import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { NotificationService } from 'src/app/services/notification.service';
 import { Timestamp } from '@angular/fire/firestore';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
@@ -21,7 +21,7 @@ export class NotificacionesPage implements OnInit {
   notificacionesLeidas: Notificacion[] = [];
   userId: string;
 
-  constructor(private notificacionesService: NotificacionesService) { }
+  constructor(private notificacionesService: NotificationService) { }
 
   async ngOnInit() {
     const currentUser = await this.notificacionesService.authService.getCurrentUserAsync();

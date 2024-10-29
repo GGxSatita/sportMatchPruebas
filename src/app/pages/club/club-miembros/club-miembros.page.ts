@@ -6,7 +6,7 @@ import { Club } from 'src/app/models/club';
 import { ClubesService } from 'src/app/services/clubes.service';
 import { ActivatedRoute } from '@angular/router';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
-import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { NotificationService } from 'src/app/services/notification.service';
 import { getDoc } from '@angular/fire/firestore';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { Router } from '@angular/router';
@@ -30,7 +30,7 @@ export class ClubMiembrosPage implements OnInit {
     private clubesService: ClubesService,
     private authService: AutenticacionService,
     private alertController: AlertController,
-    private notificacionesService: NotificacionesService,
+    private notificacionesService: NotificationService,
     private router : Router
   ) { }
 
