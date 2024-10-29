@@ -1,29 +1,33 @@
 .solid-header {
-  background-color:  #2a2c41; // Fondo oscuro para mejorar legibilidad
-  color: var(--ion-color-white); // Texto e íconos en blanco para alto contraste
+  background-color: #2a2c41;
+  color: var(--ion-color-white);
 
   ion-button {
-    color: var(--ion-color-white); // Los botones serán blancos
+    color: var(--ion-color-white);
   }
 
   ion-title {
-    color: var(--ion-color-white); // Título en blanco
+    color: var(--ion-color-white);
     font-weight: bold;
-    font-size: 1.8rem; // Tamaño por defecto del título
+    font-size: 1.8rem;
   }
 
   ion-icon {
-    font-size: 1.5rem; // Tamaño de los iconos
+    font-size: 1.5rem;
   }
 
-  // Ajustes para pantallas pequeñas
+  // Ajuste para aplicar color rojo específicamente a los iconos con `icono-notificacion-rojo`
+  ion-icon.icono-notificacion-rojo {
+    color: red;
+  }
+
   @media (max-width: 768px) {
     ion-title {
-      font-size: 1.4rem; // Ajustar tamaño del título en pantallas pequeñas
+      font-size: 1.4rem;
     }
 
     ion-icon {
-      font-size: 1.2rem; // Reducir tamaño de iconos en pantallas pequeñas
+      font-size: 1.2rem;
     }
   }
 }

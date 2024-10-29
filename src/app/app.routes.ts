@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { ClubGuard } from './guards/club.guard';
@@ -112,6 +111,15 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/eventos/lector/lector.page').then( m => m.LectorPage),
     canActivate: [authGuard]
   },
+   {
+    path: 'club-eliminar/:id',
+    loadComponent: () => import('./pages/club/club-eliminar/club-eliminar.page').then( m => m.ClubEliminarPage)
+  },
+  {
+    path: 'notificaciones',
+    loadComponent: () => import('./pages/notificaciones/notificaciones.page').then( m => m.NotificacionesPage)
+  }
+
 
 
 

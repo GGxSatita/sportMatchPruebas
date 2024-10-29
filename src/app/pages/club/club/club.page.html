@@ -1,26 +1,33 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <div class="club-container">
-
-    <div *ngIf="club">
-      <ion-card class="compact-club-card">
-        <ion-item lines="none">
-          <ion-avatar slot="start" class="small-club-logo">
+<ion-content [fullscreen]="true" class="page-content">
+  <div class="club-container" *ngIf="club">
+    <!-- Sección fija: Card del club -->
+    <div class="fixed-club-card">
+      <ion-card class="club-card">
+        <div class="club-details">
+          <ion-avatar class="club-logo">
             <img [src]="club.logo" alt="Logo del Club" />
           </ion-avatar>
-          <ion-label>
+          <ion-label class="club-info">
             <h2 class="club-name">{{ club.nombreClub }}</h2>
             <p class="club-description">{{ club.descripcion }}</p>
           </ion-label>
-          <ion-button (click)="verMiembros(club.idClub)">
-            Ver Miembros
+        </div>
+        <div class="club-actions">
+          <ion-button fill="clear" (click)="verMiembros(club.idClub)">
+            <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
           </ion-button>
-        </ion-item>
+          <ion-button *ngIf="isLeader" fill="clear" (click)="goToEditarClub(club.idClub)">
+            <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
       </ion-card>
+    </div>
 
 
-      <!-- Componente de chat para la interacción en tiempo real -->
+    <!-- Sección desplazable: Chat -->
+    <div class="scrollable-chat">
       <app-club-chat [clubId]="club.idClub"></app-club-chat>
     </div>
   </div>

@@ -1,0 +1,80 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="page-content">
+  <form [formGroup]="clubForm" (ngSubmit)="guardarCambios()">
+    <ion-grid>
+      <ion-row>
+        <!-- Columna para el campo del nombre del club -->
+        <ion-col size="12" >
+          <ion-item>
+            <ion-label position="floating">Nombre del Club</ion-label>
+            <ion-input formControlName="nombreClub"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <!-- Columna para el campo de la descripción -->
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" auto-grow="true"></ion-textarea>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <!-- Columna para el selector de deporte -->
+        <ion-col size="12" >
+          <ion-item>
+            <ion-label>Deporte</ion-label>
+            <ion-select formControlName="deporteNombre" interface="popover">
+              <ion-select-option *ngFor="let deporte of deportes" [value]="deporte.nombre">
+                {{ deporte.nombre }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <!-- Columna para el máximo de miembros -->
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Máximo de Miembros</ion-label>
+            <ion-input type="number" formControlName="maxMiembros" min="1"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <!-- Fila de botones para cargar logo desde la cámara o galería -->
+      <ion-row>
+        <ion-col size="6" class="iconos-grandes">
+          <ion-button expand="block" fill="clear" (click)="takeLogoPicture()">
+            <ion-icon slot="icon-only" name="camera-outline" color="dark"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col size="6" class="iconos-grandes">
+          <ion-button expand="block" fill="clear" (click)="selectLogoFromGallery()">
+            <ion-icon slot="icon-only" name="image-outline" color="dark"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
+      <!-- Vista previa del logo -->
+      <ion-row *ngIf="logoUrl">
+        <ion-col size="12" class="logo-preview-container">
+          <img [src]="logoUrl" alt="Logo del Club" class="logo-preview-img" />
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <!-- Botones de acción alineados al centro en dispositivos grandes -->
+        <ion-col size="12">
+          <ion-button expand="block" type="submit" [disabled]="!clubForm.valid">
+            Guardar Cambios
+          </ion-button>
+          <ion-button expand="block" color="medium" (click)="cancelar()">
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

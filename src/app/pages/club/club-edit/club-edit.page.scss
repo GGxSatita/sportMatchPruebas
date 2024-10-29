@@ -1,0 +1,65 @@
+.page-content {
+  --background: var(--ion-color-light);
+  padding: 16px;
+}
+
+.logo-preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem; // Espacio adicional
+
+  .logo-preview-img {
+    width: 150px;          // Ajuste del tamaño a 150px para mantenerla compacta
+    height: 150px;
+    object-fit: cover;     // Para que la imagen no se deforme
+    border-radius: 10px;   // Bordes redondeados para una mejor estética
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  // Sombra sutil
+    border: 2px solid var(--ion-color-primary);  // Borde de color principal
+  }
+}
+
+
+.iconos-grandes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  ion-button {
+    --width: 80px;
+    --height: 80px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+    color: var(--ion-color-white);
+    box-shadow: 0 4px 10px rgba(255, 111, 0, 0.4);
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  ion-icon {
+    font-size: 50px;
+    color: var(--ion-color-white);
+  }
+}
+
+/* Estilo responsivo para pantallas medianas */
+@media (min-width: 768px) {
+  .page-content {
+    padding: 20px;
+  }
+}
+
+/* Estilo responsivo para pantallas grandes */
+@media (min-width: 1024px) {
+  .page-content {
+    padding: 40px;
+  }
+}

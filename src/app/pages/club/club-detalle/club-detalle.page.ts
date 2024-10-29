@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonGrid, IonRow, IonCol, IonAvatar, IonLabel, IonIcon, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonGrid, IonRow, IonCol, IonAvatar, IonLabel, IonIcon, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, AlertController } from '@ionic/angular/standalone';
 import { Club } from 'src/app/models/club';
 import { ActivatedRoute } from '@angular/router';
 import { ClubesService } from 'src/app/services/clubes.service';
@@ -19,11 +19,13 @@ export class ClubDetallePage implements OnInit {
   isMember: boolean = false;
   currentUserId: string | null = null;
   leaderName: string | null = null;
+  userClubId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private clubesService: ClubesService,
     private authService: AutenticacionService,
+    private alertController: AlertController // Inyectar AlertController para mostrar alertas
   ) {}
 
   async ngOnInit() {
@@ -35,6 +37,9 @@ export class ClubDetallePage implements OnInit {
 
     const currentUser = await this.authService.getCurrentUser();
     this.currentUserId = currentUser?.uid || '';
+
+    // Verificar si el usuario ya pertenece a un club
+    await this.checkUserClubStatus();
   }
 
   async loadClubDetails(clubId: string) {
@@ -48,7 +53,7 @@ export class ClubDetallePage implements OnInit {
             // Obtener el nombre del líder del club
             const leader = this.club.miembros.find(m => m.role === 'lider');
             this.leaderName = leader?.profile.name || 'Desconocido';
-            console.log('Club cargado:', this.club); // Verificar que el club se cargue
+            console.log('Club cargado:', this.club);
           }
         } else {
           console.error('No se encontró el club.');
@@ -59,9 +64,23 @@ export class ClubDetallePage implements OnInit {
     }
   }
 
+  async checkUserClubStatus() {
+    if (this.currentUserId) {
+      const userClub = await this.clubesService.getClubForUser(this.currentUserId);
+      this.userClubId = userClub ? userClub.idClub : null;
+      this.isMember = !!userClub;
+    }
+  }
 
   async unirseAlClub() {
     if (this.club && !this.isMember && this.club.miembros.length < this.club.maxMiembros) {
+      // Verificar si el usuario ya pertenece a otro club
+      if (this.userClubId && this.userClubId !== this.club.idClub) {
+        // Mostrar alerta si el usuario ya pertenece a otro club
+        await this.showAlert('Acceso Denegado', 'Ya perteneces a un club y no puedes unirte a otro.');
+        return;
+      }
+
       try {
         const userProfile = await this.authService.getUserProfile(this.currentUserId);
 
@@ -86,5 +105,14 @@ export class ClubDetallePage implements OnInit {
     } else {
       console.error('No puedes unirte a este club. Es posible que esté lleno o ya pertenezcas a otro club.');
     }
+  }
+
+  async showAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: message,
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 }

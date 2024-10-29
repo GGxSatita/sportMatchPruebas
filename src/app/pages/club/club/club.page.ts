@@ -13,23 +13,24 @@ import {
   IonList,
   IonCardContent,
   IonCardTitle,
-  IonCardHeader, IonCardSubtitle, IonAvatar } from '@ionic/angular/standalone';
+  IonCardHeader,
+  IonCardSubtitle,
+  IonAvatar,
+  AlertController, IonGrid, IonRow, IonCol, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ClubesService } from 'src/app/services/clubes.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ClubChatComponent } from 'src/app/components/club-chat/club-chat.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { Club } from 'src/app/models/club';
-import { Observable } from 'rxjs';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-club',
   templateUrl: './club.page.html',
   styleUrls: ['./club.page.scss'],
   standalone: true,
-  imports: [IonAvatar, IonCardSubtitle,
+  imports: [IonInfiniteScrollContent, IonInfiniteScroll, IonIcon, IonCol, IonRow, IonGrid, IonAvatar, IonCardSubtitle,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
@@ -53,13 +54,14 @@ export class ClubPage implements OnInit {
   club: Club | undefined;
   isLeader: boolean = false;
   userId: string | null = null;
+  isMember: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private clubesService: ClubesService,
     private authService: AutenticacionService,
-    private router : Router
-
+    private alertController: AlertController,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -80,6 +82,7 @@ export class ClubPage implements OnInit {
     this.clubesService.getClubById(clubId).subscribe((club) => {
       if (club) {
         this.club = club;
+        this.isMember = this.club.miembros.some(m => m.userId === this.userId);
         this.isLeader = this.club.miembros.some(
           (miembro) =>
             miembro.userId === this.userId && miembro.role === 'lider'
@@ -88,6 +91,56 @@ export class ClubPage implements OnInit {
         console.error('El club no se encontró o no tienes acceso.');
       }
     });
+  }
+
+  async abandonarClub() {
+    if (this.club && this.userId) {
+      if (this.isLeader) {
+        // El usuario es el líder, eliminar todos los miembros y el club
+        await this.eliminarClubCompleto();
+      } else {
+        // El usuario no es el líder, solo eliminarlo a él del club
+        try {
+          await this.clubesService.eliminarMiembro(this.club.idClub, this.userId);
+          this.isMember = false;
+          console.log('Usuario ha abandonado el club');
+          await this.showAlert('Club Abandonado', 'Has abandonado el club exitosamente.');
+          this.router.navigate(['/club-list']);
+        } catch (error) {
+          console.error('Error al abandonar el club:', error);
+          await this.showAlert('Error', 'Ocurrió un error al intentar abandonar el club.');
+        }
+      }
+    }
+  }
+
+  async eliminarClubCompleto() {
+    if (this.club) {
+      try {
+        // Llamar al nuevo método para eliminar el club y actualizar los miembros
+        await this.clubesService.eliminarClubYActualizarMiembros(this.club.idClub);
+        console.log('El club y el estado de los miembros han sido actualizados correctamente.');
+
+        // Mostrar alerta de confirmación
+        await this.showAlert('Club Eliminado', 'El club y todos los miembros han sido actualizados para reflejar la eliminación.');
+
+        // Redirigir a la lista de clubes
+        this.router.navigate(['/club-list']);
+      } catch (error) {
+        console.error('Error al eliminar el club y actualizar los miembros:', error);
+        await this.showAlert('Error', 'Ocurrió un error al intentar eliminar el club.');
+      }
+    }
+  }
+
+
+  async showAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: message,
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 
   eliminarMiembro(miembroId: string) {
@@ -100,8 +153,15 @@ export class ClubPage implements OnInit {
         });
     }
   }
+
   verMiembros(clubId: string) {
     this.router.navigate([`/club-miembros/${clubId}`]);
   }
 
+  goToEditarClub(clubId: string) {
+    this.router.navigate([`/club-edit/${clubId}`]);
+  }
+  goToEliminararClub(clubId: string) {
+    this.router.navigate([`/club-eliminar/${clubId}`]);
+  }
 }

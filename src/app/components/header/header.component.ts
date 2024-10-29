@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertController } from '@ionic/angular';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { Location } from '@angular/common';
-import { filter } from 'rxjs/operators';
+import { filter, Subscription } from 'rxjs';
 import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
 
 @Component({
   selector: 'app-header',
@@ -15,10 +16,11 @@ import { MatchPerfilPage } from 'src/app/pages/match-perfil/match-perfil.page';
   standalone: true,
   imports: [CommonModule, IonButtons, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle],
 })
-export class HeaderComponent implements OnInit {
-
+export class HeaderComponent implements OnInit, OnDestroy {
+  notificacionesNoLeidas : boolean = false;
   currentPage: string = ''; // Variable para almacenar la página actual
   pageTitle: string = ''; // Título personalizado de la página
+  notificacionesSubscription: Subscription;
 
   // Mapeo de rutas a nombres personalizados
   pageTitlesMap: { [key: string]: string } = {
@@ -46,7 +48,9 @@ export class HeaderComponent implements OnInit {
     private autenticacionService: AutenticacionService,
     private router: Router,
     private alertController: AlertController,
-    private location: Location // Inyectar el servicio Location para manejar el historial
+    private location: Location, // Inyectar el servicio Location para manejar el historial
+    private notificacionesService: NotificacionesService,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -57,8 +61,18 @@ export class HeaderComponent implements OnInit {
       this.currentPage = event.urlAfterRedirects; // Almacena la URL actual
       this.pageTitle = this.pageTitlesMap[this.currentPage] || ''; // Asigna el nombre de la página o un valor por defecto
     });
+    // Verificar notificaciones no leídas
+    this.notificacionesSubscription = this.notificacionesService.getNotificacionesUsuario(false).subscribe(notificaciones => {
+      this.notificacionesNoLeidas = notificaciones.length > 0;
+      this.cdRef.detectChanges();
+    });
+
   }
 
+  ngOnDestroy() {
+    // Evitar suscripciones activas cuando se destruye el componente
+    this.notificacionesSubscription.unsubscribe();
+  }
   goBack() {
     this.location.back(); // Navegar a la página anterior en el historial
   }
@@ -88,5 +102,8 @@ export class HeaderComponent implements OnInit {
   logout() {
     this.autenticacionService.logout();
     this.router.navigate(['/login']); // Redirige al login después de cerrar sesión
+  }
+  goToNotificaciones() {
+    this.router.navigate(['/notificaciones']); // Navega a la página de notificaciones
   }
 }

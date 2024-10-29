@@ -12,7 +12,7 @@ export class ClubCreationGuard implements CanActivate {
     private clubesService: ClubesService,
     private authService: AutenticacionService,
     private router: Router,
-    private alertController: AlertController // Inyectar AlertController
+    private alertController: AlertController
   ) {}
 
   async canActivate(

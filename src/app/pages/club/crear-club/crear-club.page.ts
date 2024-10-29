@@ -27,7 +27,7 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
 import { DeportesService } from 'src/app/services/deportes.service';
 import { Deporte } from 'src/app/models/deporte';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { StorageService } from 'src/app/services/storage.service'; // Importar el servicio de almacenamiento
+import { StorageService } from 'src/app/services/storage.service';
 import { Club } from 'src/app/models/club';
 
 @Component({
@@ -61,13 +61,14 @@ export class CrearClubPage implements OnInit {
   clubForm: FormGroup;
   deportes: Deporte[] = [];
   logoUrl: string | null = null;
+  isClubLeader: boolean = false; // Variable para determinar si el usuario es líder
 
   constructor(
     private fb: FormBuilder,
     private authService: AutenticacionService,
     private clubesService: ClubesService,
     private deportesService: DeportesService,
-    private storageService: StorageService, // Servicio para subir imágenes
+    private storageService: StorageService,
     private router: Router
   ) {
     this.clubForm = this.fb.group({
@@ -79,8 +80,9 @@ export class CrearClubPage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.cargarDeportes();
+    await this.verificarSiEsLiderDelClub(); // Verificar si el usuario es líder del club
   }
 
   // Método para cargar los deportes desde el servicio
@@ -88,6 +90,17 @@ export class CrearClubPage implements OnInit {
     this.deportesService.getDeportes().subscribe((data) => {
       this.deportes = data;
     });
+  }
+
+  // Método para verificar si el usuario actual es el líder del club
+  async verificarSiEsLiderDelClub() {
+    const currentUser = await this.authService.getCurrentUserAsync();
+    if (currentUser) {
+      const club = await this.clubesService.getClubForUser(currentUser.uid);
+      if (club) {
+        this.isClubLeader = club.adminId === currentUser.uid;
+      }
+    }
   }
 
   // Método para tomar una foto del logo
@@ -150,7 +163,6 @@ export class CrearClubPage implements OnInit {
     if (currentUser) {
       const club = await this.clubesService.getClubForUser(currentUser.uid);
       if (club) {
-        // Redirigir si el usuario ya pertenece a un club
         await this.router.navigate([`/club/${club.idClub}`]);
       }
     }
@@ -160,7 +172,7 @@ export class CrearClubPage implements OnInit {
   async crearClub() {
     if (this.clubForm.valid) {
       const clubData = this.clubForm.value;
-      const currentUser = this.authService.getCurrentUser();
+      const currentUser = await this.authService.getCurrentUserAsync();
       const userId = currentUser?.uid;
 
       if (userId) {
@@ -184,17 +196,16 @@ export class CrearClubPage implements OnInit {
             {
               userId: userId,
               profile: userProfile,
-              role: 'lider', // Usando el literal correcto
+              role: 'lider',
               fechaIngre: new Date(),
-              puntos: 0, // Valor inicial
+              puntos: 0,
             },
           ],
-          miembroIds:[userId]
+          miembroIds: [userId]
         };
 
         try {
           const clubId = await this.clubesService.createClub(newClub, userId);
-          // Redirigir al club recién creado usando el ID
           this.router.navigate([`/club/${clubId}`]);
         } catch (error) {
           console.error('Error creando el club:', error);
@@ -202,6 +213,4 @@ export class CrearClubPage implements OnInit {
       }
     }
   }
-
-
 }

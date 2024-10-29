@@ -9,6 +9,8 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { getDoc } from '@angular/fire/firestore';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { Router } from '@angular/router';
+import { NotificacionTipo } from 'src/app/models/notificacion';
 
 @Component({
   selector: 'app-club-miembros',
@@ -28,7 +30,8 @@ export class ClubMiembrosPage implements OnInit {
     private clubesService: ClubesService,
     private authService: AutenticacionService,
     private alertController: AlertController,
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private router : Router
   ) { }
 
   async ngOnInit() {
@@ -63,7 +66,17 @@ export class ClubMiembrosPage implements OnInit {
             // Eliminar al miembro del club
             await this.clubesService.eliminarMiembro(this.club.idClub, miembroId);
             console.log('Miembro eliminado correctamente');
-            this.cargarClub(this.club.idClub); // Refrescar la lista de miembros
+
+            // Enviar notificación al miembro eliminado
+            await this.notificacionesService.enviarNotificacion(
+              miembroId,
+              `Has sido eliminado del club ${this.club.nombreClub}.`,
+              'Expulsión de Club',
+              NotificacionTipo.ALERTA
+            );
+
+            // Refrescar la lista de miembros
+            this.cargarClub(this.club.idClub);
 
         } catch (error) {
             console.error('Error al eliminar el miembro:', error);
@@ -77,7 +90,8 @@ export class ClubMiembrosPage implements OnInit {
     } else {
         console.error('No tienes permisos para eliminar miembros.');
     }
-}
+  }
+
 
 
 
@@ -132,12 +146,25 @@ export class ClubMiembrosPage implements OnInit {
   async abandonarClub() {
     if (this.club && this.currentUserId) {
       try {
+        // Eliminar al miembro del club
         await this.clubesService.eliminarMiembro(this.club.idClub, this.currentUserId);
+
+        // Actualizar el perfil del usuario en la base de datos para reflejar que no pertenece a ningún club
+        await this.clubesService.actualizarEstadoUsuarioSinClub(this.currentUserId);
+
         console.log('Has abandonado el club');
-        // Redirigir o actualizar la página según sea necesario
+        this.router.navigate(['/menu-principal']); // Redirigir al menú principal o a otra página
       } catch (error) {
         console.error('Error al abandonar el club:', error);
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se pudo abandonar el club. Por favor, inténtalo de nuevo.',
+          buttons: ['OK'],
+        });
+        await alert.present();
       }
     }
   }
+
+
 }
