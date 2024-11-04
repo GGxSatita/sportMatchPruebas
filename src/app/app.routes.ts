@@ -118,7 +118,11 @@ export const routes: Routes = [
   {
     path: 'notificaciones',
     loadComponent: () => import('./pages/notificaciones/notificaciones.page').then( m => m.NotificacionesPage)
+  },  {
+    path: 'weather',
+    loadComponent: () => import('./pages/weather/weather.page').then( m => m.WeatherPage)
   }
+
 
 
 
