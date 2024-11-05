@@ -25,6 +25,7 @@ export class WeatherPage implements OnInit {
   error: string | null = null;
   weatherClass: string = 'default';
   dailyForecast: any[] = [];
+  dayOrNightClass: string = 'day'; // Define el estilo de día o noche
 
   // Array de tarjetas de información adicional
   weatherCards = [
@@ -45,16 +46,22 @@ export class WeatherPage implements OnInit {
       next: (response) => {
         this.weatherData = response;
         this.iconUrl = `https://openweathermap.org/img/wn/${response.weather[0].icon}@2x.png`;
-        this.temperature = response.main.temp;
+        this.temperature = Math.round(response.main.temp);
         this.description = response.weather[0].description;
         this.windSpeed = response.wind.speed;
         this.humidity = response.main.humidity;
         this.location = response.name;
 
-        this.weatherClass = this.getWeatherClass(response.weather[0].main);
-        this.weatherIcon = this.getWeatherIcon(response.weather[0].main);
+        // Determinar si es de día o de noche para aplicar la clase adecuada
+        const hour = new Date().getHours();
+        const isNight = hour >= 18 || hour < 6;
+        const dayOrNightClass = isNight ? 'night' : 'day';
 
-        // Actualizamos los valores en `weatherCards`
+        // Asignar la clase de clima y el ícono según el clima y el momento del día
+        this.weatherClass = `${dayOrNightClass} ${this.getWeatherClass(response.weather[0].main)}`;
+        this.weatherIcon = this.getWeatherIcon(response.weather[0].main, isNight);
+
+        // Actualizar los valores en `weatherCards` con las condiciones actuales
         this.weatherCards = [
           { icon: 'water-outline', label: 'Humedad', value: this.humidity + '%' },
           { icon: 'speedometer-outline', label: 'Viento', value: this.windSpeed + ' m/s' },
@@ -69,12 +76,13 @@ export class WeatherPage implements OnInit {
     });
   }
 
-  private getWeatherIcon(condition: string): string {
+
+  private getWeatherIcon(condition: string, isNight: boolean): string {
     switch (condition.toLowerCase()) {
       case 'clear':
-        return 'sunny-outline';
+        return isNight ? 'moon-outline' : 'sunny-outline';
       case 'clouds':
-        return 'cloudy-outline';
+        return isNight ? 'cloudy-night-outline' : 'cloudy-outline';
       case 'rain':
       case 'drizzle':
         return 'rainy-outline';
@@ -84,9 +92,9 @@ export class WeatherPage implements OnInit {
         return 'snow-outline';
       case 'mist':
       case 'fog':
-        return 'cloudy-night-outline';
+        return isNight ? 'cloudy-night-outline' : 'cloudy-outline';
       default:
-        return 'cloud-outline';
+        return 'cloud-outline'; // Icono por defecto
     }
   }
 

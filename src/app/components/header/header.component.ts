@@ -76,7 +76,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.weatherSubscription = this.weatherService.getWeatherByLocation().subscribe({
       next: (data) => {
-        this.temperature = data.main.temp;
+        this.temperature = Math.round(data.main.temp); // Redondea la temperatura
         this.weatherIcon = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
       },
       error: (error) => console.error("Error obteniendo datos del clima:", error)
@@ -86,7 +86,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // Evitar suscripciones activas cuando se destruye el componente
-    this.notificacionesSubscription.unsubscribe();
+    if (this.notificacionesSubscription) {
+      this.notificacionesSubscription.unsubscribe();
+    }
   }
   goBack() {
     this.location.back(); // Navegar a la página anterior en el historial
