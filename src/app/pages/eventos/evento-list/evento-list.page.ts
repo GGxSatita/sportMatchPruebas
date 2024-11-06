@@ -36,18 +36,18 @@ import { Sectores, Horario } from 'src/app/models/sector';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { AlertController } from '@ionic/angular';
-
+import { ReglasService } from 'src/app/services/reglas.service';
 
 @Component({
   selector: 'app-evento-list',
   templateUrl: './evento-list.page.html',
   styleUrls: ['./evento-list.page.scss'],
   standalone: true,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Add this line
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // Add this line
   imports: [
     CommonModule,
     FormsModule,
-    IonFab,        // Ensure you import all necessary Ionic components
+    IonFab, // Ensure you import all necessary Ionic components
     IonFabButton,
     IonFabList,
     IonIcon,
@@ -67,7 +67,6 @@ import { AlertController } from '@ionic/angular';
   ],
 })
 export class EventoListPage implements OnInit {
-
   sectores: Sectores[] = [];
   horariosDisponibles: Horario[] = [];
   selectedDate: string | null = null;
@@ -80,19 +79,21 @@ export class EventoListPage implements OnInit {
   eventosExpandido: { [key: string]: boolean } = {};
 
   eventosFiltrados: eventos[] = []; // Eventos que se mostrarán filtrados
-  idAlumno: string | null = null;   // ID del alumno autenticado
+  idAlumno: string | null = null; // ID del alumno autenticado
 
   constructor(
     private eventosService: EventosService,
     private sectoresService: SectoresService,
     private router: Router,
     private auth: Auth,
-    private alertController: AlertController
-
+    private alertController: AlertController,
+    private reglasService: ReglasService
   ) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
-    this.maxDate = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
+    this.maxDate = new Date(today.setFullYear(today.getFullYear() + 1))
+      .toISOString()
+      .split('T')[0];
   }
 
   ngOnInit(): void {
@@ -100,7 +101,6 @@ export class EventoListPage implements OnInit {
     this.loadEventos();
     this.obtenerAlumnoId();
   }
-
 
   toggleEventoExpandido(eventoId: string): void {
     this.eventosExpandido[eventoId] = !this.eventosExpandido[eventoId];
@@ -114,13 +114,36 @@ export class EventoListPage implements OnInit {
   }
 
   filtrarEventos(): void {
-    this.eventosFiltrados = this.eventos.filter(evento =>
-      evento.espera === true // Filtrar solo los eventos aprobados
+    this.eventosFiltrados = this.eventos.filter(
+      (evento) => evento.espera === true // Filtrar solo los eventos aprobados
     );
   }
 
+  async unirseAlMatch(evento: eventos) {
+    // Verificar si el usuario es el creador del evento
+    if (evento.idAlumno === this.idAlumno) {
+      // Redirigir a la página `qr-creador`
+      this.router.navigate(['/qr-creador'], {
+        queryParams: { eventId: evento.idEventosAlumnos },
+      });
+    } else {
+      // Redirigir a la página `qr-usuario`
+      this.router.navigate(['/qr-usuario'], {
+        queryParams: { eventId: evento.idEventosAlumnos },
+      });
+    }
+  }
 
-
+  // Ejemplo de función para obtener las reglas asociadas a un evento
+  async cargarReglasEvento(eventoId: string) {
+    try {
+      // No es necesario usar `.toPromise()` si `getReglasByEventId` ya retorna una `Promise`
+      const reglas = await this.reglasService.getReglaById(eventoId);
+      // Aquí iría la lógica para usar las reglas en el match, como verificar victorias
+    } catch (error) {
+      console.error('Error al cargar las reglas:', error);
+    }
+  }
 
   async obtenerAlumnoId() {
     const user = this.auth.currentUser;
@@ -141,11 +164,11 @@ export class EventoListPage implements OnInit {
     });
   }
 
-
-
   onSectorChange(event: any): void {
     this.selectedSectorId = event.detail.value;
-    const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
+    const selectedSector = this.sectores.find(
+      (sector) => sector.idSector === this.selectedSectorId
+    );
 
     if (selectedSector) {
       this.selectedSectorImage = selectedSector.image || null;
@@ -158,32 +181,46 @@ export class EventoListPage implements OnInit {
   }
 
   normalizeDayName(day: string): string {
-    return day.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return day
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
-
-
 
   filterHorarios(): void {
     if (this.selectedSectorId && this.selectedDate) {
-      const selectedSector = this.sectores.find(sector => sector.idSector === this.selectedSectorId);
+      const selectedSector = this.sectores.find(
+        (sector) => sector.idSector === this.selectedSectorId
+      );
       const dayOfWeek = this.getDayOfWeek(this.selectedDate);
 
       if (selectedSector) {
-        this.horariosDisponibles = selectedSector.horarios.map(horario => {
-          const isSameDayOfWeek = this.normalizeDayName(horario.dia) === dayOfWeek;
-          const isReserved = horario.fechasReservadas?.includes(this.selectedDate) || false;
-          return { ...horario, disponible: isSameDayOfWeek && !isReserved };
-        }).filter(horario => horario.dia === dayOfWeek);
+        this.horariosDisponibles = selectedSector.horarios
+          .map((horario) => {
+            const isSameDayOfWeek =
+              this.normalizeDayName(horario.dia) === dayOfWeek;
+            const isReserved =
+              horario.fechasReservadas?.includes(this.selectedDate) || false;
+            return { ...horario, disponible: isSameDayOfWeek && !isReserved };
+          })
+          .filter((horario) => horario.dia === dayOfWeek);
       }
     }
   }
 
   getDayOfWeek(dateString: string): string {
     const date = new Date(dateString);
-    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const days = [
+      'domingo',
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado',
+    ];
     return this.normalizeDayName(days[date.getDay()]);
   }
-
 
   selectHorario(horario: Horario): void {
     this.selectedHorario = horario;
@@ -198,7 +235,6 @@ export class EventoListPage implements OnInit {
 
     await alert.present();
   }
-
 
   inscribirseEnEvento(evento: eventos): void {
     if (!this.idAlumno) return;
@@ -222,34 +258,39 @@ export class EventoListPage implements OnInit {
 
     // Verificar si hay cupo disponible
     if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      this.presentAlert('Error', 'El evento ya ha alcanzado su capacidad máxima.');
-    return;
+      this.presentAlert(
+        'Error',
+        'El evento ya ha alcanzado su capacidad máxima.'
+      );
+      return;
     }
-
-
 
     // Agregar el ID del usuario a los participantes actuales
     evento.participantesActuales.push(this.idAlumno);
 
     // Actualizar el evento en Firebase
-    this.eventosService.updateEvento(evento.idEventosAlumnos, {
-      participantesActuales: evento.participantesActuales
-    }).then(() => {
-      this.presentAlert('Éxito', 'Te has inscrito en el evento exitosamente.');
-      this.loadEventos(); // Recargar la lista de eventos
-    }).catch(error => {
-      console.error('Error al inscribirse en el evento:', error);
-      this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
-    });
+    this.eventosService
+      .updateEvento(evento.idEventosAlumnos, {
+        participantesActuales: evento.participantesActuales,
+      })
+      .then(() => {
+        this.presentAlert(
+          'Éxito',
+          'Te has inscrito en el evento exitosamente.'
+        );
+        this.loadEventos(); // Recargar la lista de eventos
+      })
+      .catch((error) => {
+        console.error('Error al inscribirse en el evento:', error);
+        this.presentAlert(
+          'Error',
+          'Hubo un problema al inscribirse en el evento.'
+        );
+      });
 
     // Redirigir a la página de enfrentamiento espera
     this.router.navigate(['/enfrentamiento-espera']);
   }
-
-
-
-
-
 
   removeReservation(evento: eventos): void {
     this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {
@@ -259,8 +300,7 @@ export class EventoListPage implements OnInit {
   }
 
   getSectorNombre(sectorId: string): string {
-    const sector = this.sectores.find(s => s.idSector === sectorId);
+    const sector = this.sectores.find((s) => s.idSector === sectorId);
     return sector ? sector.nombre : 'Sector no encontrado';
   }
 }
-

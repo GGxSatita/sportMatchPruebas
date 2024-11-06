@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, deleteDoc, doc, updateDoc, collectionData, docData, getDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Firestore, collection, addDoc, deleteDoc, doc, updateDoc, collectionData, docData, getDoc, getDocs } from '@angular/fire/firestore';
+import { combineLatest, from, map, Observable, switchMap } from 'rxjs';
 import { eventosAdmin } from '../models/evento-admin';
 
 @Injectable({
@@ -56,8 +56,8 @@ export class EventoAdminService {
   getEventos(): Observable<eventosAdmin[]> {
     const eventosRef = collection(this.firestore, this.collectionName);
     return collectionData(eventosRef, { idField: 'id' }) as Observable<eventosAdmin[]>;
-  }
 
+  }
 
   getEvento(id: string): Observable<eventosAdmin | undefined> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);

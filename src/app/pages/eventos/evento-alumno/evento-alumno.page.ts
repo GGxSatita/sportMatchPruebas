@@ -1,7 +1,22 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  CUSTOM_ELEMENTS_SCHEMA,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonButton,
+  IonItemDivider,
+} from '@ionic/angular/standalone';
 import { EventosService } from 'src/app/services/evento.service';
 import { eventos } from 'src/app/models/evento';
 import { Auth } from '@angular/fire/auth';
@@ -10,8 +25,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
-import { AlertController } from '@ionic/angular';
-
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-evento-alumno',
@@ -33,7 +47,7 @@ import { AlertController } from '@ionic/angular';
     FormsModule,
     HeaderComponent,
     FooterComponent,
-  ]
+  ],
 })
 export class EventoAlumnoPage implements OnInit {
   eventosAprobados: eventos[] = [];
@@ -43,13 +57,13 @@ export class EventoAlumnoPage implements OnInit {
   eventosAprobadosOInscritos: eventos[] = [];
   eventosAdminInscritos: eventosAdmin[] = [];
 
-
   constructor(
     private eventosService: EventosService,
     private auth: Auth,
     private router: Router,
     private eventoAdminService: EventoAdminService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
@@ -71,10 +85,82 @@ export class EventoAlumnoPage implements OnInit {
       console.error('No hay usuario autenticado.');
     }
   }
+  //funcion para verificar aparicion de boton para unirse
+  isButtonEnabled(evento: any): boolean {
+    // Retorna true si el usuario es el creador o está inscrito en el evento
+    return (
+      evento.idAlumno === this.idAlumno ||
+      evento.participantesActuales.includes(this.idAlumno)
+    );
+  }
+  //funcion para usnirse al evento
+  async unirseEvento(evento: any) {
+    if (evento.idAlumno === this.idAlumno) {
+      // Redirigir a la página `qr-creador`
+      this.router.navigate(['/qr-creador'], {
+        queryParams: { eventId: evento.idEventosAlumnos },
+      });
+    } else {
+      // Redirigir a la página `qr-usuario`
+      this.router.navigate(['/qr-usuario'], {
+        queryParams: { eventId: evento.idEventosAlumnos },
+      });
+    }
+    // Verifica si el usuario ya está inscrito en el evento
+    if (evento.participantesActuales.includes(this.idAlumno)) {
+      const toast = await this.toastController.create({
+        message: 'Ya estás inscrito en este evento.',
+        duration: 2000,
+        color: 'warning',
+      });
+      await toast.present();
+      return;
+    }
 
+    // Verifica si hay espacio disponible en el evento
+    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+      const toast = await this.toastController.create({
+        message: 'El evento ha alcanzado el límite de participantes.',
+        duration: 2000,
+        color: 'danger',
+      });
+      await toast.present();
+      return;
+    }
 
-  configurarDesafio(evento: eventos) {
-    this.router.navigate(['/desafio'], { queryParams: { evento: JSON.stringify(evento) } });
+    // Confirmación antes de unirse al evento
+    const alert = await this.alertController.create({
+      header: 'Unirse al evento',
+      message: `¿Estás seguro de que deseas unirte a "${evento.titulo}"?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Unirse',
+          handler: () => {
+            // Lógica para unirse al evento (agregar el ID del usuario a la lista de participantes)
+            evento.participantesActuales.push(this.idAlumno);
+
+            // Muestra un mensaje de éxito
+            this.toastController
+              .create({
+                message: 'Te has unido al evento exitosamente.',
+                duration: 2000,
+                color: 'success',
+              })
+              .then((toast) => toast.present());
+
+            // Opcional: Actualiza en el backend o en la base de datos si es necesario
+            // this.eventoService.updateEvento(evento.id, { participantesActuales: evento.participantesActuales });
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
   async loadAlumnoIdAdmin() {
     const user = this.auth.currentUser;
@@ -86,20 +172,20 @@ export class EventoAlumnoPage implements OnInit {
     }
   }
 
-
   loadEventos(): void {
     this.eventosService.getEventos().subscribe((eventos) => {
       if (!this.idAlumno) return;
 
       // Filtrar eventos aprobados e inscritos por el alumno autenticado
-      this.eventosAprobadosOInscritos = eventos.filter(evento =>
-        (evento.espera && evento.idAlumno === this.idAlumno) ||
-        evento.participantesActuales?.includes(this.idAlumno)
+      this.eventosAprobadosOInscritos = eventos.filter(
+        (evento) =>
+          (evento.espera && evento.idAlumno === this.idAlumno) ||
+          evento.participantesActuales?.includes(this.idAlumno)
       );
 
       // Filtrar los eventos en espera específicamente del alumno autenticado
-      this.eventosEnEspera = eventos.filter(evento =>
-        !evento.espera && evento.idAlumno === this.idAlumno
+      this.eventosEnEspera = eventos.filter(
+        (evento) => !evento.espera && evento.idAlumno === this.idAlumno
       );
     });
   }
@@ -109,8 +195,10 @@ export class EventoAlumnoPage implements OnInit {
       if (!this.idAlumno) return;
 
       // Filtrar eventos administrados en los que el alumno está inscrito
-      this.eventosAdminInscritos = eventosAdmin.filter(eventoAdmin =>
-        eventoAdmin.participants.includes(this.idAlumno) && eventoAdmin.status === true
+      this.eventosAdminInscritos = eventosAdmin.filter(
+        (eventoAdmin) =>
+          eventoAdmin.participants.includes(this.idAlumno) &&
+          eventoAdmin.status === true
       );
     });
   }
@@ -134,26 +222,25 @@ export class EventoAlumnoPage implements OnInit {
             role: 'cancel',
             handler: () => {
               console.log('Eliminación de evento cancelada por el usuario.');
-            }
+            },
           },
           {
             text: 'Cancelar',
             handler: () => {
               const idEvento = evento.idEventosAlumnos;
-              this.eventosService.deleteEvento(idEvento).then(
-                () => {
+              this.eventosService
+                .deleteEvento(idEvento)
+                .then(() => {
                   console.log(`Evento ${idEvento} eliminado exitosamente.`);
                   // Actualizamos la lista de eventos después de eliminar
                   this.loadEventos();
-                }
-              ).catch(
-                (error: any) => {
+                })
+                .catch((error: any) => {
                   console.error('Error al eliminar el evento:', error);
-                }
-              );
-            }
-          }
-        ]
+                });
+            },
+          },
+        ],
       });
 
       await alert.present();
@@ -172,14 +259,18 @@ export class EventoAlumnoPage implements OnInit {
             text: 'Cancelar',
             role: 'cancel',
             handler: () => {
-              console.log('Cancelación de inscripción detenida por el usuario.');
-            }
+              console.log(
+                'Cancelación de inscripción detenida por el usuario.'
+              );
+            },
           },
           {
             text: 'Confirmar',
             handler: async () => {
               // Encontrar el índice del ID del alumno en la lista de participantes
-              const index = evento.participantesActuales.indexOf(this.idAlumno!);
+              const index = evento.participantesActuales.indexOf(
+                this.idAlumno!
+              );
 
               if (index > -1) {
                 // Eliminar el ID del alumno de la lista de participantes
@@ -187,25 +278,34 @@ export class EventoAlumnoPage implements OnInit {
 
                 try {
                   // Actualizar el evento con la nueva lista de participantes
-                  await this.eventosService.updateEvento(evento.idEventosAlumnos, { participantesActuales: evento.participantesActuales });
-                  console.log(`Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`);
+                  await this.eventosService.updateEvento(
+                    evento.idEventosAlumnos,
+                    { participantesActuales: evento.participantesActuales }
+                  );
+                  console.log(
+                    `Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`
+                  );
                   // Actualizamos la lista de eventos después de cancelar la inscripción
                   this.loadEventos();
                 } catch (error) {
-                  console.error('Error al cancelar la inscripción en el evento:', error);
+                  console.error(
+                    'Error al cancelar la inscripción en el evento:',
+                    error
+                  );
                 }
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
 
       await alert.present();
     } else {
-      console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+      console.error(
+        'No estás inscrito en este evento o no se permite cancelar la inscripción.'
+      );
     }
   }
-
 
   async cancelarInscripcionAdmin(evento: eventosAdmin) {
     if (evento.participants.includes(this.idAlumno!)) {
@@ -217,8 +317,10 @@ export class EventoAlumnoPage implements OnInit {
             text: 'Cancelar',
             role: 'cancel',
             handler: () => {
-              console.log('Cancelación de inscripción detenida por el usuario.');
-            }
+              console.log(
+                'Cancelación de inscripción detenida por el usuario.'
+              );
+            },
           },
           {
             text: 'Confirmar',
@@ -232,24 +334,32 @@ export class EventoAlumnoPage implements OnInit {
 
                 try {
                   // Actualizar el evento con la nueva lista de participantes
-                  await this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants });
-                  console.log(`Inscripción en el evento ${evento.idEventosAdmin} cancelada exitosamente.`);
+                  await this.eventoAdminService.updateEvento(
+                    evento.idEventosAdmin,
+                    { participants: evento.participants }
+                  );
+                  console.log(
+                    `Inscripción en el evento ${evento.idEventosAdmin} cancelada exitosamente.`
+                  );
                   // Actualizamos la lista de eventos después de cancelar la inscripción
                   this.loadEventosAdmin();
                 } catch (error) {
-                  console.error('Error al cancelar la inscripción en el evento:', error);
+                  console.error(
+                    'Error al cancelar la inscripción en el evento:',
+                    error
+                  );
                 }
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
 
       await alert.present();
     } else {
-      console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+      console.error(
+        'No estás inscrito en este evento o no se permite cancelar la inscripción.'
+      );
     }
   }
-
-
 }

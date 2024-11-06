@@ -1,0 +1,21 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+  <!-- Puntaje de los jugadores -->
+  <div class="score-board">
+    <div class="score">
+      <h3>Jugador</h3>
+      <p>Rondas ganadas: {{ playerWins }}</p>
+      <p>Rondas perdidas: {{ playerLosses }}</p>
+    </div>
+  </div>
+
+  <!-- Botón de victoria -->
+  <div class="result-button">
+    <ion-button expand="full" color="success" (click)="registerVictory()"
+      >Victoria</ion-button
+    >
+  </div>
+</ion-content>
+
+<app-footer></app-footer>

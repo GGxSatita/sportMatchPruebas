@@ -20,25 +20,42 @@
           <ion-card-content>
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
-            <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
+            <p>
+              <strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' :
+              'No Disponible' }}
+            </p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
-            <!-- Botón para redirigir a la configuración de reglas -->
-            <ion-button expand="full" (click)="configurarDesafio(evento)">
-              Configurar Reglas
+            <ion-button
+              expand="full"
+              color="primary"
+              [disabled]="!isButtonEnabled(evento)"
+              (click)="unirseEvento(evento)"
+            >
+              Unirse al evento
             </ion-button>
+            <!-- Botón para redirigir a la configuración de reglas -->
+            <!-- <ion-button expand="full" (click)="configurarDesafio(evento)">
+              Configurar Reglas
+            </ion-button> -->
             <!-- Botón para cancelar inscripción si el alumno está inscrito y no es el creador del evento -->
             <ion-button
               *ngIf="evento.participantesActuales && evento.participantesActuales.includes(idAlumno) && evento.idAlumno !== idAlumno"
-              expand="full" color="danger" (click)="cancelarInscripcion(evento)">
+              expand="full"
+              color="danger"
+              (click)="cancelarInscripcion(evento)"
+            >
               Cancelar inscripción
             </ion-button>
 
             <!-- Botón para eliminar evento si el alumno es el creador -->
-            <ion-button *ngIf="evento.idAlumno === idAlumno" expand="full" color="danger"
-              (click)="eliminarEvento(evento)">
+            <ion-button
+              *ngIf="evento.idAlumno === idAlumno"
+              expand="full"
+              color="danger"
+              (click)="eliminarEvento(evento)"
+            >
               Cancelar evento
-
             </ion-button>
           </ion-card-content>
         </ion-card>
@@ -65,13 +82,15 @@
           <ion-card-content>
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
-            <p><strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}</p>
+            <p>
+              <strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' :
+              'No Disponible' }}
+            </p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
 
     <ion-row>
       <ion-col size="12">
@@ -93,21 +112,25 @@
           <ion-card-content>
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
-            <p><strong>Disponibilidad:</strong> {{ evento.status ? 'Disponible' : 'No Disponible' }}</p>
+            <p>
+              <strong>Disponibilidad:</strong> {{ evento.status ? 'Disponible' :
+              'No Disponible' }}
+            </p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
             <!-- Botón para cancelar inscripción si el alumno está inscrito en el evento administrado -->
-            <ion-button *ngIf="evento.participants.includes(idAlumno)" expand="full" color="danger"
-              (click)="cancelarInscripcionAdmin(evento)">
+            <ion-button
+              *ngIf="evento.participants.includes(idAlumno)"
+              expand="full"
+              color="danger"
+              (click)="cancelarInscripcionAdmin(evento)"
+            >
               Cancelar inscripción
             </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
-
-
   </ion-grid>
 </ion-content>
 <app-footer></app-footer>

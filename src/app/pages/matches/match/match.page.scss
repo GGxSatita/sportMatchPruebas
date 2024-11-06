@@ -1,0 +1,23 @@
+.score-board {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.score {
+  background-color: #f0f0f0;
+  padding: 15px;
+  border-radius: 8px;
+  width: 80%;
+}
+
+.result-button {
+  display: flex;
+  justify-content: center;
+}
+
+ion-button {
+  --border-radius: 8px;
+  width: 80%;
+}

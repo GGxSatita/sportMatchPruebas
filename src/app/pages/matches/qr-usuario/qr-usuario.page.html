@@ -1,0 +1,39 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <ion-list lines="none">
+          <ion-card class="evento-card">
+            <ion-card-header>
+              <ion-card-title class="evento-titulo"
+                >Escanear Código QR</ion-card-title
+              >
+            </ion-card-header>
+
+            <ion-card-content>
+              <ion-card-content>
+                <div id="qr-reader" style="width: 100%; height: auto"></div>
+              </ion-card-content>
+              <ion-item lines="none">
+                <ion-label>
+                  <p>
+                    <ion-icon name="people-outline"></ion-icon> Total
+                    <!-- Participantes: {{ totalParticipantes }} -->
+                  </p>
+                  <p>
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <!-- Participantes Presentes: {{ participantesPresentes }} -->
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ion-card-content>
+          </ion-card>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<app-footer></app-footer>

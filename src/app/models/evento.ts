@@ -13,7 +13,6 @@ export class eventos {
     public participantesActuales: string[] = [],
     public status?: boolean,
     public idAlumno?: string,
-    public informacionAdicional?: string
-
+    public informacionAdicional?: string,
   ) {}
 }

@@ -12,6 +12,7 @@ export class eventosAdmin {
   hora?: string;
   sectorNombre?:string;
   capacidadAlumnos?: number;
+  reglas: boolean;
 
 
   constructor(

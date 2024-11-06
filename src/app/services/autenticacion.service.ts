@@ -9,7 +9,7 @@ import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, updateDoc, 
 import { Router } from '@angular/router';
 import { getMessaging, onMessage, getToken } from '@angular/fire/messaging';
 
-import { Desafio, ParticipantModel } from '../models/desafio';
+import { ParticipantModel } from '../models/reglas-evento';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
@@ -100,43 +100,6 @@ export class AutenticacionService {
 
   }
 
-
-  async createChallenge(userId: string, challengeData: any) {
-
-    try {
-      // Crear el desafío
-      const currentUser = await this.auth.currentUser;
-      if (!currentUser) throw new Error('Usuario no autenticado');
-      const eventId = challengeData.event;
-      const eventDoc = await getDoc(doc(this.firestore, `eventosAlumnos/${eventId}`)); // Asegúrate de que la colección y el ID del evento sean correctos
-      const event: eventos = eventDoc.data() as eventos;
-
-      const newChallenge: Desafio = {
-        id: '',
-        type: challengeData.type,
-        sport: challengeData.sport,
-        event: event,
-        status: 'PENDIENTE',
-        participants: [
-          {
-            id: currentUser.uid,
-            name: currentUser.displayName || 'Nombre del Jugador',
-            score: 0
-          } as ParticipantModel,
-          ...challengeData.participants
-        ],
-        rules: challengeData.rules,
-        results: null
-      };
-
-      const desafioRef = await addDoc(collection(this.firestore, 'desafios'), newChallenge);
-      await updateDoc(desafioRef, { id: desafioRef.id });
-
-      console.log('Desafío creado con ID:', desafioRef.id);
-    } catch (error) {
-      console.error('Error creando desafío:', error);
-    }
-  }
   getDesafiosDelJugador(): Observable<any> {
     const currentUser = this.auth.currentUser;
     return this.http.get(`http://localhost:4200/api/desafios?userId=${currentUser?.uid}`);

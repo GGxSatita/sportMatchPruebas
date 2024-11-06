@@ -1,13 +1,32 @@
-
-import {  inject,  CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonList, IonLabel, IonContent, IonAvatar, IonGrid, IonCol, IonRow, IonHeader, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
+import { inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonList,
+  IonLabel,
+  IonContent,
+  IonAvatar,
+  IonGrid,
+  IonCol,
+  IonRow,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+} from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular'; // Importa solo IonicModule
 import { AlertController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
@@ -17,9 +36,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 
-
 import { ClubesService } from 'src/app/services/clubes.service';
-
 
 @Component({
   selector: 'app-menu-principal',
@@ -51,13 +68,11 @@ import { ClubesService } from 'src/app/services/clubes.service';
     HeaderComponent,
     FooterComponent,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MenuPrincipalPage implements OnInit {
-
   eventos: eventosAdmin[] = [];
   alumnoId: string = '';
-
 
   constructor(
     private autenticacionService: AutenticacionService,
@@ -65,7 +80,7 @@ export class MenuPrincipalPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private eventoAdminService: EventoAdminService,
-
+    private navCtrl: NavController
   ) {}
 
   async ngOnInit() {
@@ -76,33 +91,40 @@ export class MenuPrincipalPage implements OnInit {
       }
 
       this.eventoAdminService.getEventos().subscribe((eventos) => {
-        this.eventos = eventos.filter(evento => evento.status === true);
+        this.eventos = eventos.filter((evento) => evento.status === true);
       });
     } catch (error) {
       console.error('Error al obtener el usuario:', error);
     }
   }
 
-
   async unirseAlEvento(eventoId: string) {
     try {
       // Obtén el evento específico para verificar su capacidad
-      const evento = this.eventos.find(e => e.idEventosAdmin === eventoId);
+      const evento = this.eventos.find((e) => e.idEventosAdmin === eventoId);
 
       if (evento) {
-        // Verifica si la cantidad de participantes ya ha alcanzado la capacidad máxima
+        // Verifica si la cantidad de participantes ha alcanzado la capacidad máxima
         if (evento.participants.length >= evento.capacidadAlumnos) {
           console.log('Este evento ya ha alcanzado su capacidad máxima.');
           return;
         }
 
-        // Si no ha alcanzado la capacidad, procede a unirse
+        // Si no ha alcanzado la capacidad, procede a unirse al evento
         await this.eventoAdminService.joinEvento(eventoId, this.alumnoId);
 
         // Actualiza el evento localmente para reflejar los cambios
         evento.participants.push(this.alumnoId);
-
         console.log('Te has unido al evento.');
+
+        // Redirigir a la página adecuada dependiendo del rol
+        if (evento.idCreator === this.alumnoId) {
+          // Si el usuario es el creador, redirigir a la página `qr-creador`
+          this.navCtrl.navigateForward(['/qr-creador']);
+        } else {
+          // Si el usuario es un participante, redirigir a la página `qr-usuario`
+          this.navCtrl.navigateForward(['/qr-usuario']);
+        }
       } else {
         console.error('Evento no encontrado.');
       }
@@ -111,39 +133,30 @@ export class MenuPrincipalPage implements OnInit {
     }
   }
 
-
-
-
   async goToClub() {
     const user = this.autenticacionService.getCurrentUser();
 
     if (user) {
-        try {
-            const club = await this.clubesService.getClubForUser(user.uid);
-            console.log('Club obtenido en goToClub:', club); // Log para verificar el club
-            if (club) {
-                this.router.navigate([`/club/${club.idClub}`]);
-            } else {
-                const alert = await this.alertController.create({
-                    header: 'No estás en un club',
-                    message: 'Actualmente no perteneces a ningún club.',
-                    buttons: ['OK'],
-                });
-                await alert.present();
-            }
-        } catch (error) {
-            console.error('Error al obtener el club del usuario:', error);
+      try {
+        const club = await this.clubesService.getClubForUser(user.uid);
+        console.log('Club obtenido en goToClub:', club); // Log para verificar el club
+        if (club) {
+          this.router.navigate([`/club/${club.idClub}`]);
+        } else {
+          const alert = await this.alertController.create({
+            header: 'No estás en un club',
+            message: 'Actualmente no perteneces a ningún club.',
+            buttons: ['OK'],
+          });
+          await alert.present();
         }
+      } catch (error) {
+        console.error('Error al obtener el club del usuario:', error);
+      }
     } else {
-        console.error('Usuario no autenticado');
+      console.error('Usuario no autenticado');
     }
-}
-
-
-
-
-
-
+  }
 
   goCrearClub() {
     this.router.navigate(['/crear-club']);
@@ -151,5 +164,4 @@ export class MenuPrincipalPage implements OnInit {
   goToVerClubes() {
     this.router.navigate(['/club-list']);
   }
-
 }
