@@ -30,6 +30,15 @@
   margin-top: 5px;
 }
 
+.weather-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+}
+
 .weather-card {
   display: flex;
   flex-direction: column;
@@ -37,8 +46,11 @@
   padding: 15px;
   font-size: 1rem;
   text-align: center;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
 }
-/* Fondo para condiciones climáticas de día */
+
 .day.sunny {
   background-color: #ffeb3b;
   color: #e65100;
@@ -74,9 +86,8 @@
   color: #333;
 }
 
-/* Fondo para condiciones climáticas de noche */
 .night.sunny {
-  background-color: #333366; /* Color oscuro para noche despejada */
+  background-color: #333366;
   color: #ffe680;
 }
 
@@ -109,31 +120,32 @@
   background-color: #222222;
   color: #ffffff;
 }
+
 .weekly-forecast {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
   padding: 10px;
+}
 
-  .day-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 80px;
-    padding: 10px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.day-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
 
-    p {
-      margin: 4px 0;
-    }
+.day-card p {
+  margin: 4px 0;
+}
 
-    img {
-      width: 50px;
-      height: 50px;
-    }
-  }
+.day-card img {
+  width: 50px;
+  height: 50px;
 }
