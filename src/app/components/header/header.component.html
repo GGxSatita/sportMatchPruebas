@@ -14,6 +14,11 @@
 
     <!-- Botón de cerrar sesión, oculto en la página de recuperar contraseña -->
     <ion-buttons slot="end">
+      <ion-button (click)="goToWeatherPage()">
+        <img *ngIf="weatherIcon" [src]="weatherIcon" alt="Weather Icon" width="24" height="24">
+        <span *ngIf="temperature !== null">{{ temperature }}°C</span>
+      </ion-button>
+
       <ion-button (click)="goToNotificaciones()">
         <ion-icon
           name="notifications"

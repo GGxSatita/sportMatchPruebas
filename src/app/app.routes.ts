@@ -98,7 +98,7 @@ export const routes: Routes = [
     path: 'enfrentamiento-espera',
     loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
   },
-      {
+  {
     path: 'club-miembros/:id',
     loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
   },
@@ -113,12 +113,25 @@ export const routes: Routes = [
   },
    {
     path: 'club-eliminar/:id',
-    loadComponent: () => import('./pages/club/club-eliminar/club-eliminar.page').then( m => m.ClubEliminarPage)
+    loadComponent: () => import('./pages/club/club-eliminar/club-eliminar.page').then( m => m.ClubEliminarPage),
+    canActivate:[authGuard]
+  },
+   {
+    path: 'club-edit/:id',
+    loadComponent: () => import('./pages/club/club-edit/club-edit.page').then( m => m.ClubEditPage),
+    canActivate:[authGuard]
   },
   {
     path: 'notificaciones',
-    loadComponent: () => import('./pages/notificaciones/notificaciones.page').then( m => m.NotificacionesPage)
+    loadComponent: () => import('./pages/notificaciones/notificaciones.page').then( m => m.NotificacionesPage),
+    canActivate:[authGuard]
+  },
+  {
+    path: 'weather',
+    loadComponent: () => import('./pages/weather/weather.page').then( m => m.WeatherPage),
+    canActivate:[authGuard]
   }
+
 
 
 

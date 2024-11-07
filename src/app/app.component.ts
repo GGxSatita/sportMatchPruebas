@@ -5,12 +5,16 @@ import { AutenticacionService } from './services/autenticacion.service';
 import { Router } from '@angular/router';
 import Push from 'push.js';
 import { notifications } from 'ionicons/icons';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
-  imports: [IonApp, IonRouterOutlet],
+  imports: [
+    IonApp,
+    IonRouterOutlet,
+  ],
 })
 export class AppComponent implements OnInit {
 

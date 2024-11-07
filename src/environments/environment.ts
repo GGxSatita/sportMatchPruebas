@@ -13,6 +13,7 @@ export const environment = {
     messagingSenderId: '276809292205',
     appId: '1:276809292205:web:fcef7335a06702d4496924',
   },
+  openWeatherMapApiKey: "62d9861a3ebfc8b2993fd3d57bdca6fc"
 };
 
 /*
