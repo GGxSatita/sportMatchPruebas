@@ -10,7 +10,10 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class NotificationService {
-  constructor(private firestore: Firestore, public authService: AutenticacionService) {}
+  constructor(
+    private firestore: Firestore,
+    public authService: AutenticacionService
+    ) {}
 
   // Obtener las notificaciones de un usuario actual, diferenciando entre leídas y no leídas
   getNotificacionesUsuario(leidas: boolean): Observable<Notificacion[]> {
@@ -55,24 +58,24 @@ export class NotificationService {
     }
   }
 
-  // Enviar una nueva notificación personalizada a un usuario, con un tipo de notificación opcional
-  async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
-    try {
-      const notificationRef = doc(this.firestore, `users/${userId}/notifications/${new Date().getTime()}`);
-      const notificationData: Notificacion = {
-        titulo,
-        mensaje,
-        tipo,
-        timestamp: new Date(),
-        leida: false,
-      };
+  // // Enviar una nueva notificación personalizada a un usuario, con un tipo de notificación opcional
+  // async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
+  //   try {
+  //     const notificationRef = doc(this.firestore, `users/${userId}/notifications/${new Date().getTime()}`);
+  //     const notificationData: Notificacion = {
+  //       titulo,
+  //       mensaje,
+  //       tipo,
+  //       timestamp: new Date(),
+  //       leida: false,
+  //     };
 
-      await setDoc(notificationRef, notificationData);
-      console.log('Notificación enviada al usuario:', userId);
-    } catch (error) {
-      console.error('Error al enviar la notificación:', error);
-    }
-  }
+  //     await setDoc(notificationRef, notificationData);
+  //     console.log('Notificación enviada al usuario:', userId);
+  //   } catch (error) {
+  //     console.error('Error al enviar la notificación:', error);
+  //   }
+  // }
     // Método para verificar si hay al menos una notificación sin leer
     hayNotificacionesNoLeidas(): Observable<boolean> {
       return new Observable((observer) => {
@@ -90,5 +93,50 @@ export class NotificationService {
         });
       });
     }
+// Método para enviar una notificación local y push al mismo tiempo
+async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
+  try {
+    // Notificación local en Firestore
+    const notificationRef = doc(this.firestore, `users/${userId}/notifications/${new Date().getTime()}`);
+    const notificationData: Notificacion = {
+      titulo,
+      mensaje,
+      tipo,
+      timestamp: new Date(),
+      leida: false,
+    };
+    await setDoc(notificationRef, notificationData);
+    console.log('Notificación local enviada al usuario:', userId);
 
+    // Enviar notificación push
+    this.enviarPushNotification(userId, titulo, mensaje);
+  } catch (error) {
+    console.error('Error al enviar la notificación:', error);
+  }
+}
+
+// Método para enviar una notificación push
+private async enviarPushNotification(userId: string, titulo: string, mensaje: string) {
+  const messagePayload = {
+    notification: {
+      title: titulo,
+      body: mensaje,
+    },
+    to: `/topics/${userId}`, // Suscribir cada usuario a su propio "topic" para notificaciones individualizadas
+  };
+
+  try {
+    await fetch('https://fcm.googleapis.com/fcm/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `key=TU_SERVER_KEY`, // Reemplaza TU_SERVER_KEY con tu clave de servidor FCM
+      },
+      body: JSON.stringify(messagePayload),
+    });
+    console.log('Notificación push enviada al usuario:', userId);
+  } catch (error) {
+    console.error('Error al enviar la notificación push:', error);
+  }
+}
 }

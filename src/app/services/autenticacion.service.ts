@@ -17,6 +17,7 @@ import { ModelsAuth } from '../models/auth.models';
 import { User } from '@angular/fire/auth';
 import { take } from 'rxjs/operators';
 
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 
 
 
