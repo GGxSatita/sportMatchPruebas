@@ -66,7 +66,6 @@ export class LoginComponent implements OnInit {
     await alert.present();
   }
 
-
   async login() {
     if (!this.form.email || !this.form.password) {
       this.showEmailError = !this.form.email;
@@ -83,13 +82,19 @@ export class LoginComponent implements OnInit {
       const sancionActiva = await this.autenticacionService.obtenerSancionActiva(user.uid);
 
       if (sancionActiva) {
-        // Convertir fechaExpiracionSancion a Date si es Timestamp
         const fechaExpiracionSancion = sancionActiva.fechaExpiracionSancion instanceof Timestamp
           ? sancionActiva.fechaExpiracionSancion.toDate()
           : sancionActiva.fechaExpiracionSancion;
 
         const fechaExpiracion = fechaExpiracionSancion.toLocaleString();
-        const mensajeSancion = `Tu cuenta está sancionada hasta ${fechaExpiracion}. Motivo: ${sancionActiva.razon}`;
+
+        // Crear mensaje de sanción con formato mejorado
+        const mensajeSancion = `⚠️ Tu cuenta ha sido suspendida temporalmente ⚠️
+
+  📅 Válido hasta: ${fechaExpiracion}
+  📌 Motivo: ${sancionActiva.razon}
+
+  Por favor, contacta a soporte si tienes alguna pregunta o crees que esto es un error.`;
 
         // Desconectar al usuario inmediatamente
         await this.autenticacionService.logout();
@@ -100,13 +105,12 @@ export class LoginComponent implements OnInit {
         console.log('Login exitoso');
         this.router.navigate(['/menu-principal']);
       }
-
     } catch (error) {
-      // Capturar y mostrar mensaje de error
       const errorMessage = error instanceof Error ? error.message : 'Error inesperado al iniciar sesión.';
       await this.showErrorAlert(errorMessage);
     }
   }
+
 
 
 
