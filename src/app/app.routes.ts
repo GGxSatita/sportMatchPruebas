@@ -121,6 +121,7 @@ export const routes: Routes = [
       import('./pages/matches/qr-creador/qr-creador.page').then(
         (m) => m.QrCreadorPage
       ),
+       canActivate: [authGuard],
   },
   {
     path: 'qr-usuario',
@@ -128,12 +129,14 @@ export const routes: Routes = [
       import('./pages/matches/qr-usuario/qr-usuario.page').then(
         (m) => m.QrUsuarioPage
       ),
+       canActivate: [authGuard],
   },
   {
     path: 'match',
     loadComponent: () =>
       import('./pages/matches/match/match.page').then((m) => m.MatchPage),
-  },  {
+  },
+  {
     path: 'crear-reglas',
     loadComponent: () => import('./pages/crear-reglas/crear-reglas.page').then( m => m.CrearReglasPage)
   },

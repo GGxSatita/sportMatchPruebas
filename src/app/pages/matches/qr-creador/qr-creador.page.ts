@@ -56,11 +56,14 @@ export class QrCreadorPage implements OnInit, AfterViewInit {
 
 
 
-  marcarComoAceptado(idAlumno: string) {
-    this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno, true).then(() => {
-      this.obtenerAsistencia(); // Recargar la lista después de actualizar el estado
-    });
-  }
+marcarComoAceptado(idAlumno: string) {
+  this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno).then(() => {
+    this.obtenerAsistencia(); // Recargar la lista después de actualizar el estado
+  }).catch(error => {
+    console.error('Error al actualizar el estado del participante:', error);
+  });
+}
+
 
   generateQRCode() {
     try {

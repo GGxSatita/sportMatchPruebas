@@ -157,52 +157,48 @@ getParticipantesDeEvento(eventId: string): Observable<string[]> {
     });
   }
 
-actualizarEstadoParticipante(
-  eventId: string,
-  idAlumno: string,
-  nuevoEstado: boolean
-): Promise<void> {
-  const eventoDocRef = doc(this.firestore, `${this.collectionName}/${eventId}`);
 
-  return this.getEvento(eventId).then((evento) => {
-    if (evento && evento.asistencia) {
-      console.log("Array de asistencia antes de actualizar:", evento.asistencia);
 
-      // Intentamos actualizar el estado solo si encontramos el idAlumno
-      let cambioRealizado = false;
-      const nuevaAsistencia = evento.asistencia.map((participante) => {
-        if (participante.idAlumno === idAlumno) {
-          cambioRealizado = true;
-          return { ...participante, estado: nuevoEstado };
-        }
-        return participante;
-      });
+   async actualizarEstadoParticipante(eventId: string, alumnoId: string): Promise<void> {
+    const eventoDocRef = doc(this.firestore, `${this.collectionName}/${eventId}`);
 
-      if (!cambioRealizado) {
-        console.warn("No se encontró el participante en el array de asistencia.");
-        return Promise.reject("No se detectaron cambios en los datos de asistencia.");
+    try {
+      // Obtener el documento del evento
+      const eventoSnap = await getDoc(eventoDocRef);
+
+      if (!eventoSnap.exists()) {
+        throw new Error('El evento no existe.');
       }
 
-      console.log("Array de asistencia después de actualizar:", nuevaAsistencia);
+      const eventoData = eventoSnap.data() as eventos;
 
-      // Actualizar en Firestore solo si hubo un cambio
-      return updateDoc(eventoDocRef, { asistencia: nuevaAsistencia })
-        .then(() => {
-          console.log(`Estado del participante ${idAlumno} actualizado a ${nuevoEstado ? 'aceptado' : 'pendiente'}`);
-        })
-        .catch((error) => {
-          console.error("Error al actualizar en Firestore:", error);
-          throw error;
-        });
-    } else {
-      console.error("No se encontró el evento o el array de asistencia está vacío.");
-      return Promise.reject("Evento o asistencia no encontrado.");
+      // Asegurar que la lista de asistencia es un array
+      let asistencia = eventoData.asistencia || [];
+
+      // Buscar al alumno en la lista de asistencia y actualizar su estado
+      const participante = asistencia.find((p) => p.idAlumno === alumnoId);
+
+      if (participante) {
+        participante.estado = true; // Cambia el estado del alumno a "true" (aceptado)
+        console.log(`Estado del participante ${alumnoId} actualizado a aceptado.`);
+      } else {
+        throw new Error(`El alumno con ID ${alumnoId} no está en la lista de asistencia del evento.`);
+      }
+
+      // Actualizar el documento en Firestore con la lista de asistencia modificada
+      await updateDoc(eventoDocRef, { asistencia: asistencia });
+
+    } catch (error) {
+      console.error("Error al actualizar el estado del participante:", error);
+      throw error;
     }
-  }).catch(error => {
-    console.error("Error al actualizar el estado del participante:", error);
-    throw error;
-  });
-}
+  }
+
+
+
+
+
+
 
 
 

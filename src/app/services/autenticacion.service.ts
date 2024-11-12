@@ -241,5 +241,11 @@ export class AutenticacionService {
     }
   }
 
+  // Dentro de AutenticacionService
+getUserId(): string | null {
+  return this.auth.currentUser ? this.auth.currentUser.uid : null;
+}
+
+
 
 }
