@@ -26,22 +26,23 @@ export class EventosService {
   constructor(private firestore: Firestore) { }
 
 
-getAlumnoNombre(idAlumno: string): Promise<string | null> {
-  const alumnoDoc = doc(this.firestore, `Users/${idAlumno}`);
-  return getDoc(alumnoDoc).then((docSnapshot) => {
-    if (docSnapshot.exists()) {
-      const data = docSnapshot.data() as any;
-      const nombre = data.name; // Asegurándonos de acceder al campo 'name'
-      console.log("Nombre del alumno obtenido:", nombre);
-      return nombre || null;
-    }
-    console.warn(`El documento para el alumno con ID ${idAlumno} no existe.`);
-    return null;
-  }).catch(error => {
-    console.error("Error obteniendo el nombre del alumno:", error);
-    return null;
-  });
-}
+ // Obtener el nombre del alumno
+  getAlumnoNombre(idAlumno: string): Promise<string | null> {
+    const alumnoDoc = doc(this.firestore, `Users/${idAlumno}`);
+    return getDoc(alumnoDoc).then((docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data() as any;
+        const nombre = data.name;
+        console.log("Nombre del alumno obtenido:", nombre);
+        return nombre || null;
+      }
+      console.warn(`El documento para el alumno con ID ${idAlumno} no existe.`);
+      return null;
+    }).catch(error => {
+      console.error("Error obteniendo el nombre del alumno:", error);
+      return null;
+    });
+  }
 
 
 
@@ -71,15 +72,18 @@ getAlumnoNombre(idAlumno: string): Promise<string | null> {
     );
   }
 
-getEvento(id: string): Observable<eventos | undefined> {
-  const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
-  return docData(eventoDoc).pipe(
-    map((data) => {
-      console.log("Datos del evento obtenido:", data); // Verificar el contenido completo del documento
-      return data as eventos;
-    })
-  );
-}
+  getEvento(eventId: string): Promise<eventos | undefined> {
+    const eventoDoc = doc(this.firestore, `${this.collectionName}/${eventId}`);
+    return getDoc(eventoDoc).then((snapshot) => {
+      if (snapshot.exists()) {
+        console.log('Evento encontrado:', snapshot.data());
+        return snapshot.data() as eventos;
+      } else {
+        console.warn(`No se encontró el evento con ID ${eventId}`);
+        return undefined;
+      }
+    });
+  }
 
 
   getEventosConReglas(): Observable<eventos[]> {
@@ -121,23 +125,21 @@ getParticipantesDeEvento(eventId: string): Observable<string[]> {
 
 }
 
-getParticipantesConEstado(eventId: string): Observable<{ idAlumno: string, estado: 'pendiente' | 'aceptado' }[]> {
-  return this.getEvento(eventId).pipe(
-    map((evento) => {
+  // Obtener participantes con estado
+  getParticipantesConEstado(eventId: string): Promise<{ idAlumno: string, estado: boolean }[]> {
+    return this.getEvento(eventId).then((evento) => {
       if (evento && evento.asistencia) {
         return evento.asistencia;
       } else {
         console.warn("No se encontró la asistencia para el evento:", eventId);
         return [];
       }
-    })
-  );
-}
+    });
+  }
 
-
-getParticipantesConNombres(eventId: string): Observable<{ nombre: string, idAlumno: string, estado: 'pendiente' | 'aceptado' }[]> {
-  return this.getEvento(eventId).pipe(
-    switchMap((evento) => {
+ // Obtener participantes con nombres
+  getParticipantesConNombres(eventId: string): Promise<{ nombre: string, idAlumno: string, estado: boolean }[]> {
+    return this.getEvento(eventId).then(async (evento) => {
       if (evento && evento.asistencia) {
         const observables = evento.asistencia.map(async (participante) => {
           const nombre = await this.getAlumnoNombre(participante.idAlumno);
@@ -147,34 +149,71 @@ getParticipantesConNombres(eventId: string): Observable<{ nombre: string, idAlum
             estado: participante.estado
           };
         });
-        return from(Promise.all(observables));
+        return Promise.all(observables);
       } else {
         console.warn("No se encontró la asistencia para el evento:", eventId);
-        return from([[]]);
+        return [];
       }
-    })
-  );
-}
+    });
+  }
 
-
-
-
-
-actualizarEstadoParticipante(eventId: string, idAlumno: string, nuevoEstado: 'pendiente' | 'aceptado'): Promise<void> {
+actualizarEstadoParticipante(
+  eventId: string,
+  idAlumno: string,
+  nuevoEstado: boolean
+): Promise<void> {
   const eventoDocRef = doc(this.firestore, `${this.collectionName}/${eventId}`);
-  return this.getEvento(eventId).toPromise().then((evento) => {
-    if (evento) {
-      const nuevaAsistencia = evento.asistencia.map((participante) =>
-        participante.idAlumno === idAlumno ? { ...participante, estado: nuevoEstado } : participante
-      );
-      return updateDoc(eventoDocRef, { asistencia: nuevaAsistencia });
+
+  return this.getEvento(eventId).then((evento) => {
+    if (evento && evento.asistencia) {
+      console.log("Array de asistencia antes de actualizar:", evento.asistencia);
+
+      // Intentamos actualizar el estado solo si encontramos el idAlumno
+      let cambioRealizado = false;
+      const nuevaAsistencia = evento.asistencia.map((participante) => {
+        if (participante.idAlumno === idAlumno) {
+          cambioRealizado = true;
+          return { ...participante, estado: nuevoEstado };
+        }
+        return participante;
+      });
+
+      if (!cambioRealizado) {
+        console.warn("No se encontró el participante en el array de asistencia.");
+        return Promise.reject("No se detectaron cambios en los datos de asistencia.");
+      }
+
+      console.log("Array de asistencia después de actualizar:", nuevaAsistencia);
+
+      // Actualizar en Firestore solo si hubo un cambio
+      return updateDoc(eventoDocRef, { asistencia: nuevaAsistencia })
+        .then(() => {
+          console.log(`Estado del participante ${idAlumno} actualizado a ${nuevoEstado ? 'aceptado' : 'pendiente'}`);
+        })
+        .catch((error) => {
+          console.error("Error al actualizar en Firestore:", error);
+          throw error;
+        });
     } else {
-      // En caso de que el evento no exista, simplemente retornamos una promesa vacía
-      return Promise.resolve();
+      console.error("No se encontró el evento o el array de asistencia está vacío.");
+      return Promise.reject("Evento o asistencia no encontrado.");
     }
+  }).catch(error => {
+    console.error("Error al actualizar el estado del participante:", error);
+    throw error;
   });
 }
 
 
 
 }
+
+
+
+
+
+
+
+
+
+

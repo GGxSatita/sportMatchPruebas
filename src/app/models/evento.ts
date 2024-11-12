@@ -11,7 +11,7 @@ export class eventos {
     public sectorNombre?: string,
     public capacidadMaxima: number = 0,
     public participantesActuales: string[] = [],
-    public asistencia: { name: string,idAlumno: string, estado: 'pendiente' | 'aceptado' }[] = [],
+    public asistencia: { name: string,idAlumno: string, estado: boolean  }[] = [],
     public status?: boolean,
     public idAlumno?: string,
     public informacionAdicional?: string,

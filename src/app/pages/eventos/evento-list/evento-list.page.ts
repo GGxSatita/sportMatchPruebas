@@ -240,7 +240,8 @@ export class EventoListPage implements OnInit {
     await alert.present();
   }
 
- inscribirseEnEvento(evento: eventos): void {
+
+inscribirseEnEvento(evento: eventos): void {
   if (!this.idAlumno) return;
 
   // Obtener el nombre del alumno desde el perfil o la base de datos
@@ -275,7 +276,7 @@ export class EventoListPage implements OnInit {
       // Agregar el ID del usuario a los participantes actuales y el nombre a asistencia
       evento.participantesActuales.push(this.idAlumno);
       if (!Array.isArray(evento.asistencia)) evento.asistencia = [];
-      evento.asistencia.push({ idAlumno: this.idAlumno, name: nombreAlumno, estado: 'pendiente' });
+      evento.asistencia.push({ idAlumno: this.idAlumno, name: nombreAlumno, estado: false }); // Use `false` for pending
 
       // Actualizar el evento en Firebase
       this.eventosService.updateEvento(evento.idEventosAlumnos, {
@@ -299,6 +300,7 @@ export class EventoListPage implements OnInit {
     this.presentAlert('Error', `No se pudo obtener el nombre del alumno con ID: ${this.idAlumno}`);
   });
 }
+
 
 
 

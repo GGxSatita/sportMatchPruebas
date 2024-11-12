@@ -18,9 +18,11 @@ import { EventosService } from 'src/app/services/evento.service';
 })
 export class QrCreadorPage implements OnInit, AfterViewInit {
   eventId: string = '';
-  asistencia: { nombre: string, idAlumno: string, estado: 'pendiente' | 'aceptado' }[] = []; // Incluye nombre
+  asistencia: { nombre: string, idAlumno: string, estado: boolean }[] = []; // Estado ahora es booleano
+
 
   constructor(
+
     private eventosService: EventosService,
     private route: ActivatedRoute
   ) {}
@@ -35,22 +37,30 @@ export class QrCreadorPage implements OnInit, AfterViewInit {
     this.generateQRCode();
   }
 
- obtenerAsistencia() {
-    this.eventosService.getParticipantesConNombres(this.eventId).subscribe(
-      (asistencia) => {
+
+  obtenerAsistencia() {
+    this.eventosService.getParticipantesConNombres(this.eventId)
+      .then((asistencia) => {
         console.log("Asistencia obtenida con nombres:", asistencia);
-        this.asistencia = asistencia;
-      },
-      (error) => console.error('Error obteniendo asistencia:', error)
-    );
+
+        // Convert `estado` to boolean by casting it as a string first
+        this.asistencia = asistencia.map(participante => ({
+          ...participante,
+          estado: (participante.estado as unknown as string) === 'aceptado'  // Convert 'aceptado' to true, otherwise false
+        }));
+      })
+      .catch((error) => console.error('Error obteniendo asistencia:', error));
   }
-    marcarComoAceptado(idAlumno: string) {
-    this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno, 'aceptado').then(() => {
-      this.obtenerAsistencia(); // Recargar la lista
+
+
+
+
+
+  marcarComoAceptado(idAlumno: string) {
+    this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno, true).then(() => {
+      this.obtenerAsistencia(); // Recargar la lista después de actualizar el estado
     });
   }
-
-
 
   generateQRCode() {
     try {
@@ -68,4 +78,13 @@ export class QrCreadorPage implements OnInit, AfterViewInit {
       console.error('Error generando el código QR:', error);
     }
   }
+
+  simulateQRCodeScan() {
+    this.asistencia.forEach(participante => {
+      if (!participante.estado) {  // Verifica si está en "pendiente" (estado === false)
+        this.marcarComoAceptado(participante.idAlumno);
+      }
+    });
+  }
+
 }
