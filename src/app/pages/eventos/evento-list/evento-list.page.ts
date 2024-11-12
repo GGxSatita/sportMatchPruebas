@@ -38,6 +38,9 @@ import { Auth } from '@angular/fire/auth';
 import { AlertController } from '@ionic/angular';
 import { ReglasService } from 'src/app/services/reglas.service';
 
+import {  User } from '@angular/fire/auth';
+import { doc, Firestore, getDoc } from '@angular/fire/firestore';
+
 @Component({
   selector: 'app-evento-list',
   templateUrl: './evento-list.page.html',
@@ -80,6 +83,7 @@ export class EventoListPage implements OnInit {
 
   eventosFiltrados: eventos[] = []; // Eventos que se mostrarán filtrados
   idAlumno: string | null = null; // ID del alumno autenticado
+
 
   constructor(
     private eventosService: EventosService,
@@ -236,61 +240,68 @@ export class EventoListPage implements OnInit {
     await alert.present();
   }
 
-  inscribirseEnEvento(evento: eventos): void {
-    if (!this.idAlumno) return;
+ inscribirseEnEvento(evento: eventos): void {
+  if (!this.idAlumno) return;
 
-    // Verificar que participantesActuales sea un array
-    if (!Array.isArray(evento.participantesActuales)) {
-      evento.participantesActuales = [];
-    }
+  // Obtener el nombre del alumno desde el perfil o la base de datos
+  this.eventosService.getAlumnoNombre(this.idAlumno).then((nombreAlumno) => {
+    console.log("Nombre del alumno obtenido:", nombreAlumno); // Verificar el valor obtenido
 
-    // Verificar si el creador está intentando inscribirse
-    if (evento.idAlumno === this.idAlumno) {
-      this.presentAlert('Error', 'El creador del evento no puede inscribirse.');
+    if (!nombreAlumno) {
+      this.presentAlert('Error', `No se pudo obtener el nombre del alumno con ID: ${this.idAlumno}`);
       return;
     }
 
-    // Verificar si el usuario ya está inscrito
-    if (evento.participantesActuales.includes(this.idAlumno)) {
-      this.presentAlert('Error', 'Ya estás inscrito en este evento.');
-      return;
-    }
+    // Proceder con la inscripción solo si el nombre del alumno está disponible
+    if (Array.isArray(evento.participantesActuales)) {
+      // Verificar si el creador está intentando inscribirse
+      if (evento.idAlumno === this.idAlumno) {
+        this.presentAlert('Error', 'El creador del evento no puede inscribirse.');
+        return;
+      }
 
-    // Verificar si hay cupo disponible
-    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      this.presentAlert(
-        'Error',
-        'El evento ya ha alcanzado su capacidad máxima.'
-      );
-      return;
-    }
+      // Verificar si el usuario ya está inscrito
+      if (evento.participantesActuales.includes(this.idAlumno)) {
+        this.presentAlert('Error', 'Ya estás inscrito en este evento.');
+        return;
+      }
 
-    // Agregar el ID del usuario a los participantes actuales
-    evento.participantesActuales.push(this.idAlumno);
+      // Verificar si hay cupo disponible
+      if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+        this.presentAlert('Error', 'El evento ya ha alcanzado su capacidad máxima.');
+        return;
+      }
 
-    // Actualizar el evento en Firebase
-    this.eventosService
-      .updateEvento(evento.idEventosAlumnos, {
+      // Agregar el ID del usuario a los participantes actuales y el nombre a asistencia
+      evento.participantesActuales.push(this.idAlumno);
+      if (!Array.isArray(evento.asistencia)) evento.asistencia = [];
+      evento.asistencia.push({ idAlumno: this.idAlumno, name: nombreAlumno, estado: 'pendiente' });
+
+      // Actualizar el evento en Firebase
+      this.eventosService.updateEvento(evento.idEventosAlumnos, {
         participantesActuales: evento.participantesActuales,
+        asistencia: evento.asistencia,
       })
       .then(() => {
-        this.presentAlert(
-          'Éxito',
-          'Te has inscrito en el evento exitosamente.'
-        );
-        this.loadEventos(); // Recargar la lista de eventos
+        this.presentAlert('Éxito', 'Te has inscrito en el evento exitosamente.');
+        this.loadEventos();
       })
       .catch((error) => {
         console.error('Error al inscribirse en el evento:', error);
-        this.presentAlert(
-          'Error',
-          'Hubo un problema al inscribirse en el evento.'
-        );
+        this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
       });
 
-    // Redirigir a la página de enfrentamiento espera
-    this.router.navigate(['/enfrentamiento-espera']);
-  }
+      // Redirigir a la página de enfrentamiento espera
+      this.router.navigate(['/enfrentamiento-espera']);
+    }
+  }).catch(error => {
+    console.error("Error al obtener el nombre del alumno:", error);
+    this.presentAlert('Error', `No se pudo obtener el nombre del alumno con ID: ${this.idAlumno}`);
+  });
+}
+
+
+
 
   removeReservation(evento: eventos): void {
     this.eventosService.deleteEvento(evento.idEventosAlumnos).then(() => {

@@ -1,9 +1,21 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>QR Creador</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
 <ion-content>
   <div id="qrcode" style="text-align: center;"></div>
+
+  <div *ngIf="asistencia.length > 0">
+    <h3>Participantes en el evento:</h3>
+    <ion-list>
+      <ion-item *ngFor="let participante of asistencia">
+        Nombre: {{ participante.nombre || participante.idAlumno }}
+        <span *ngIf="participante.estado === 'pendiente'">(Pendiente)</span>
+        <span *ngIf="participante.estado === 'aceptado'">(Aceptado)</span>
+      </ion-item>
+    </ion-list>
+  </div>
+  <div *ngIf="asistencia.length === 0">
+    <p>No hay participantes en este evento.</p>
+  </div>
 </ion-content>
+
+<app-footer></app-footer>

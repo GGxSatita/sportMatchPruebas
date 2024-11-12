@@ -361,6 +361,7 @@ export class EventoAddPage implements OnInit {
         idAlumno: this.idAlumno,
         capacidadMaxima: this.newEvento.capacidadMaxima,
         participantesActuales: [],
+        asistencia: [],
         informacionAdicional: this.newEvento.informacionAdicional || '',
         status: status,
       };
@@ -416,4 +417,7 @@ export class EventoAddPage implements OnInit {
       'Desconocido'
     );
   }
+
+
+
 }
