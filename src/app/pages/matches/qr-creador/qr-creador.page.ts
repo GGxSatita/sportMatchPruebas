@@ -8,6 +8,22 @@ import { IonHeader } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { EventosService } from 'src/app/services/evento.service';
+import {
+  IonFab,
+  IonFabButton,
+  IonFabList,
+  IonIcon,
+  IonContent,
+  IonTitle,
+  IonToolbar,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonButton,
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-qr-creador',
@@ -43,10 +59,10 @@ export class QrCreadorPage implements OnInit, AfterViewInit {
       .then((asistencia) => {
         console.log("Asistencia obtenida con nombres:", asistencia);
 
-        // Convert `estado` to boolean by casting it as a string first
+        // Aquí nos aseguramos de que `estado` sea booleano
         this.asistencia = asistencia.map(participante => ({
           ...participante,
-          estado: (participante.estado as unknown as string) === 'aceptado'  // Convert 'aceptado' to true, otherwise false
+          estado: Boolean(participante.estado) // Asegura que `estado` sea booleano
         }));
       })
       .catch((error) => console.error('Error obteniendo asistencia:', error));
@@ -56,14 +72,13 @@ export class QrCreadorPage implements OnInit, AfterViewInit {
 
 
 
-marcarComoAceptado(idAlumno: string) {
-  this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno).then(() => {
-    this.obtenerAsistencia(); // Recargar la lista después de actualizar el estado
-  }).catch(error => {
-    console.error('Error al actualizar el estado del participante:', error);
-  });
-}
-
+  marcarComoAceptado(idAlumno: string) {
+    this.eventosService.actualizarEstadoParticipante(this.eventId, idAlumno).then(() => {
+      this.obtenerAsistencia(); // Recargar la lista después de actualizar el estado
+    }).catch(error => {
+      console.error('Error al actualizar el estado del participante:', error);
+    });
+  }
 
   generateQRCode() {
     try {

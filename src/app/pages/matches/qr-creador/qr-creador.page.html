@@ -1,20 +1,40 @@
 <app-header></app-header>
 
 <ion-content>
-  <div id="qrcode" style="text-align: center;"></div>
+  <div id="qrcode" style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+    <div style="width: 100%; height: auto; max-width: 300px; max-height: 300px;">
+      <!-- Aquí se insertará el código QR -->
+    </div>
+  </div>
 
-  <div *ngIf="asistencia.length > 0">
-    <h3>Participantes en el evento:</h3>
+  <div *ngIf="asistencia.length > 0" style="padding: 20px;">
+    <h3 style="text-align: center; font-weight: bold;">Participantes en el evento</h3>
     <ion-list>
-      <ion-item *ngFor="let participante of asistencia">
-        Nombre: {{ participante.nombre || participante.idAlumno }}
-        <span *ngIf="!participante.estado">(Pendiente)</span>
-        <span *ngIf="participante.estado">(Aceptado)</span>
+      <ion-item *ngFor="let participante of asistencia" lines="none" class="participante-item">
+        <ion-avatar slot="start">
+          <ion-icon
+            [name]="participante.estado ? 'checkmark-circle' : 'alert-circle'"
+            [color]="participante.estado ? 'success' : 'warning'"
+            size="large">
+          </ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 style="font-weight: bold;">{{ participante.nombre || participante.idAlumno }}</h2>
+          <p style="color: gray;">
+            <span [style.color]="participante.estado ? 'green' : 'red'" [style.fontWeight]="'bold'">
+              {{ participante.estado ? 'Aceptado' : 'Pendiente' }}
+            </span>
+          </p>
+        </ion-label>
+
+        <ion-button slot="end" fill="clear" color="danger">
+          <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+        </ion-button>
 
       </ion-item>
     </ion-list>
   </div>
-  <div *ngIf="asistencia.length === 0">
+  <div *ngIf="asistencia.length === 0" style="text-align: center; padding: 20px;">
     <p>No hay participantes en este evento.</p>
   </div>
 </ion-content>
