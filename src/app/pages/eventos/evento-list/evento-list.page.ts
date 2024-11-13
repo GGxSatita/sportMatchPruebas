@@ -113,6 +113,8 @@ export class EventoListPage implements OnInit {
     });
   }
 
+
+
   filtrarEventos(): void {
     const ahora = new Date(); // Fecha y hora actuales
 
@@ -215,49 +217,67 @@ export class EventoListPage implements OnInit {
   }
 
 
+
+
   inscribirseEnEvento(evento: eventos): void {
     if (!this.idAlumno) return;
 
-    // Verificar que participantesActuales sea un array
-    if (!Array.isArray(evento.participantesActuales)) {
-      evento.participantesActuales = [];
-    }
+    // Obtener el nombre del alumno desde el perfil o la base de datos
+    this.eventosService.getAlumnoNombre(this.idAlumno).then((nombreAlumno) => {
+      console.log("Nombre del alumno obtenido:", nombreAlumno); // Verificar el valor obtenido
 
-    // Verificar si el creador está intentando inscribirse
-    if (evento.idAlumno === this.idAlumno) {
-      this.presentAlert('Error', 'El creador del evento no puede inscribirse.');
-      return;
-    }
+      if (!nombreAlumno) {
+        this.presentAlert('Error', `No se pudo obtener el nombre del alumno con ID: ${this.idAlumno}`);
+        return;
+      }
 
-    // Verificar si el usuario ya está inscrito
-    if (evento.participantesActuales.includes(this.idAlumno)) {
-      this.presentAlert('Error', 'Ya estás inscrito en este evento.');
-      return;
-    }
+      // Proceder con la inscripción solo si el nombre del alumno está disponible
+      if (Array.isArray(evento.participantesActuales)) {
+        // Verificar si el creador está intentando inscribirse
+        if (evento.idAlumno === this.idAlumno) {
+          this.presentAlert('Error', 'El creador del evento no puede inscribirse.');
+          return;
+        }
 
-    // Verificar si hay cupo disponible
-    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      this.presentAlert('Error', 'El evento ya ha alcanzado su capacidad máxima.');
-    return;
-    }
+        // Verificar si el usuario ya está inscrito
+        if (evento.participantesActuales.includes(this.idAlumno)) {
+          this.presentAlert('Error', 'Ya estás inscrito en este evento.');
+          return;
+        }
 
+        // Verificar si hay cupo disponible
+        if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+          this.presentAlert('Error', 'El evento ya ha alcanzado su capacidad máxima.');
+          return;
+        }
 
+        // Agregar el ID del usuario a los participantes actuales y el nombre a asistencia
+        evento.participantesActuales.push(this.idAlumno);
+        if (!Array.isArray(evento.asistencia)) evento.asistencia = [];
+        evento.asistencia.push({ idAlumno: this.idAlumno, name: nombreAlumno, estado: false }); // Use `false` for pending
 
-    // Agregar el ID del usuario a los participantes actuales
-    evento.participantesActuales.push(this.idAlumno);
+        // Actualizar el evento en Firebase
+        this.eventosService.updateEvento(evento.idEventosAlumnos, {
+          participantesActuales: evento.participantesActuales,
+          asistencia: evento.asistencia,
+        })
+        .then(() => {
+          this.presentAlert('Éxito', 'Te has inscrito en el evento exitosamente.');
+          this.loadEventos();
+        })
+        .catch((error) => {
+          console.error('Error al inscribirse en el evento:', error);
+          this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
+        });
 
-    // Actualizar el evento en Firebase
-    this.eventosService.updateEvento(evento.idEventosAlumnos, {
-      participantesActuales: evento.participantesActuales
-    }).then(() => {
-      this.presentAlert('Éxito', 'Te has inscrito en el evento exitosamente.');
-      this.loadEventos(); // Recargar la lista de eventos
+        // Redirigir a la página de enfrentamiento espera
+        this.router.navigate(['/enfrentamiento-espera']);
+      }
     }).catch(error => {
-      console.error('Error al inscribirse en el evento:', error);
-      this.presentAlert('Error', 'Hubo un problema al inscribirse en el evento.');
+      console.error("Error al obtener el nombre del alumno:", error);
+      this.presentAlert('Error', `No se pudo obtener el nombre del alumno con ID: ${this.idAlumno}`);
     });
   }
-
 
 
 

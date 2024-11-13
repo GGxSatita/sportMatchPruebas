@@ -130,7 +130,19 @@ export const routes: Routes = [
     path: 'weather',
     loadComponent: () => import('./pages/weather/weather.page').then( m => m.WeatherPage),
     canActivate:[authGuard]
+  },  {
+    path: 'crea-reglas',
+    loadComponent: () => import('./pages/desafios/crea-reglas/crea-reglas.page').then( m => m.CreaReglasPage)
+  },
+  {
+    path: 'qr-creador',
+    loadComponent: () => import('./pages/desafios/qr-creador/qr-creador.page').then( m => m.QrCreadorPage)
+  },
+  {
+    path: 'qr-usuario',
+    loadComponent: () => import('./pages/desafios/qr-usuario/qr-usuario.page').then( m => m.QrUsuarioPage)
   }
+
 
 
 

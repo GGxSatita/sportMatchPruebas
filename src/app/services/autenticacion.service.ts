@@ -31,7 +31,6 @@ export class AutenticacionService {
   router: Router = inject(Router);
   http: any;
 
-
   constructor(private firestore: Firestore) { }
 
   async createUser(email: string, password: string) {
@@ -291,6 +290,9 @@ export class AutenticacionService {
     }
   }
 
+  getUserId(): string | null {
+    return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
 
 
 }
