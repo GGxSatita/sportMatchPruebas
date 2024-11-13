@@ -76,6 +76,8 @@ export class EventoAlumnoPage implements OnInit {
     // Aquí puedes navegar a una nueva página o mostrar un modal con más información.
   }
 
+
+
   async loadAlumnoId() {
     const user = this.auth.currentUser;
     if (user) {
@@ -249,63 +251,65 @@ export class EventoAlumnoPage implements OnInit {
     }
   }
 
-  async cancelarInscripcion(evento: eventos) {
-    if (evento.participantesActuales?.includes(this.idAlumno!)) {
-      const alert = await this.alertController.create({
-        header: 'Cancelar inscripción',
-        message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel',
-            handler: () => {
-              console.log(
-                'Cancelación de inscripción detenida por el usuario.'
-              );
-            },
+ async cancelarInscripcion(evento: eventos) {
+  if (evento.participantesActuales?.includes(this.idAlumno!)) {
+    const alert = await this.alertController.create({
+      header: 'Cancelar inscripción',
+      message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancelación de inscripción detenida por el usuario.');
           },
-          {
-            text: 'Confirmar',
-            handler: async () => {
-              // Encontrar el índice del ID del alumno en la lista de participantes
-              const index = evento.participantesActuales.indexOf(
-                this.idAlumno!
-              );
+        },
+        {
+          text: 'Confirmar',
+          handler: async () => {
+            // Encontrar el índice del ID del alumno en la lista de participantes
+            const index = evento.participantesActuales.indexOf(this.idAlumno!);
 
-              if (index > -1) {
-                // Eliminar el ID del alumno de la lista de participantes
-                evento.participantesActuales.splice(index, 1);
+            if (index > -1) {
+              // Eliminar el ID del alumno de la lista de participantes
+              evento.participantesActuales.splice(index, 1);
 
-                try {
-                  // Actualizar el evento con la nueva lista de participantes
-                  await this.eventosService.updateEvento(
-                    evento.idEventosAlumnos,
-                    { participantesActuales: evento.participantesActuales }
-                  );
-                  console.log(
-                    `Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`
-                  );
-                  // Actualizamos la lista de eventos después de cancelar la inscripción
-                  this.loadEventos();
-                } catch (error) {
-                  console.error(
-                    'Error al cancelar la inscripción en el evento:',
-                    error
-                  );
-                }
+              try {
+                // Actualizar el evento con la nueva lista de participantes
+                await this.eventosService.updateEvento(evento.idEventosAlumnos, {
+                  participantesActuales: evento.participantesActuales
+                });
+
+                // Eliminar el usuario de la lista de asistencia en Firestore
+                evento.asistencia = evento.asistencia.filter(
+                  (asistencia) => asistencia.idAlumno !== this.idAlumno
+                );
+
+                await this.eventosService.updateEvento(evento.idEventosAlumnos, {
+                  asistencia: evento.asistencia
+                });
+
+                console.log(
+                  `Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`
+                );
+
+                // Actualizamos la lista de eventos después de cancelar la inscripción
+                this.loadEventos();
+              } catch (error) {
+                console.error('Error al cancelar la inscripción en el evento:', error);
               }
-            },
+            }
           },
-        ],
-      });
+        },
+      ],
+    });
 
-      await alert.present();
-    } else {
-      console.error(
-        'No estás inscrito en este evento o no se permite cancelar la inscripción.'
-      );
-    }
+    await alert.present();
+  } else {
+    console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
   }
+}
+
 
   async cancelarInscripcionAdmin(evento: eventosAdmin) {
     if (evento.participants.includes(this.idAlumno!)) {
