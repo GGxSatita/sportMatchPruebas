@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import Push from 'push.js';
 import { notifications } from 'ionicons/icons';
 import { HttpClientModule } from '@angular/common/http';
+import { NotificacionNativaService } from './services/notificacion-nativa.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',
@@ -24,9 +26,12 @@ export class AppComponent implements OnInit {
   private ioniciconseService: IoniciconseService = inject(IoniciconseService)
 
 
-  constructor(private router: Router) {
+
+  constructor(private router: Router, private notificacionesNativas : NotificacionNativaService) {
 
     // this.registrarse()
+
+    this.init()
 
     //usar los iconos cuando no tengo internet
     this.ioniciconseService.loadAllIcons();
@@ -35,4 +40,9 @@ export class AppComponent implements OnInit {
 
   }
 
+  init(){
+    if(Capacitor.isNativePlatform()){
+      this.notificacionesNativas.init();
+    }
+  }
 }

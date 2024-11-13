@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import {
   ActionPerformed,
@@ -6,55 +6,71 @@ import {
   PushNotifications,
   Token,
 } from '@capacitor/push-notifications';
+import { AlertController } from '@ionic/angular';
+import { push } from 'firebase/database';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificacionNativaService {
-  constructor() {
-    this.initializePushNotifications();
-  }
 
-  private initializePushNotifications() {
-    // Solicitar permiso para las notificaciones
-    PushNotifications.requestPermissions().then(permission => {
-      if (permission.receive === 'granted') {
-        // Registrar el dispositivo para recibir notificaciones
+  constructor(private alertController: AlertController) {}
+
+  init(){
+    console.log('Initializing NotificationPushService');
+    PushNotifications.requestPermissions().then(result=>{
+      if (result.receive === 'granted') {
+        // Register with Apple / Google to receive push via APNS/FCM
         PushNotifications.register();
+      } else {
+        // Show some error
+        //Agregar un aler controller o similar que diga que debe habilitar las notificaciones
       }
     });
-
-    // Escuchar el token de registro de notificaciones
-    PushNotifications.addListener('registration', (token: Token) => {
-      console.log('Token de registro:', token.value);
-      // Aquí puedes enviar el token al backend para vincularlo con el usuario
-    });
-
-    // Manejar errores de registro
-    PushNotifications.addListener('registrationError', (error: any) => {
-      console.error('Error de registro de notificaciones:', error);
-    });
-
-    // Escuchar cuando se recibe una notificación en primer plano
-    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotification) => {
-      console.log('Notificación recibida en primer plano:', notification);
-      // Aquí puedes manejar la notificación directamente
-    });
-
-    // Escuchar cuando el usuario hace clic en una notificación
-    PushNotifications.addListener('pushNotificationActionPerformed', (action: PushNotificationActionPerformed) => {
-      console.log('Acción de notificación realizada:', action);
-      // Maneja la acción, por ejemplo, redirigir a una página específica
-    });
+    this.addListener();
   }
 
-  // Método para obtener el token (opcional, por si necesitas usarlo en otro componente)
-  public getToken() {
-    return PushNotifications.requestPermissions().then(permission => {
-      if (permission.receive === 'granted') {
-        return PushNotifications.register();
+  addListener(){
+    PushNotifications.addListener('registration',
+    (token:Token)=>{
+      this.presentAlert('Importante', `Registro provideExperimentalCheckNoChangesForDebug, el token es : ${token.value}`)
       }
-      return null;
-    });
+    );
+    PushNotifications.addListener('registrationError',
+      (error:any)=>{
+        this.presentAlert('Error',`Registro fallido`)
+      }
+    );
+    PushNotifications.addListener('pushNotificationActionPerformed',
+      (notification: ActionPerformed)=>{
+        this.presentAlert('Notificación en segundo plano', `${JSON.stringify(notification)}`)
+      }
+    )
+
   }
+
+
+  async presentAlert(
+    header: string,
+    message: string,
+    buttonText: string = 'OK',
+    subHeader: string = '',
+    cssClass: string = ''
+  ): Promise<void> {
+    const alert = await this.alertController.create({
+      header,
+      subHeader,
+      message,
+      buttons: [
+        {
+          text: buttonText,
+          role: 'confirm'
+        }
+      ],
+      cssClass
+    });
+
+    await alert.present();
+  }
+
 }
