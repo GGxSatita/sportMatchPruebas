@@ -246,7 +246,9 @@ export class EventoAddPage implements OnInit {
 
   onSubmit(): void {
     if (this.selectedHorario && this.selectedDate && this.selectedSectorId) {
-      const sector = this.sectores.find(s => s.idSector === this.selectedSectorId);
+      const sector = this.sectores.find(
+        (s) => s.idSector === this.selectedSectorId
+      );
 
       if (!sector) {
         this.presentAlert('Error', 'Sector no encontrado.');
@@ -254,44 +256,46 @@ export class EventoAddPage implements OnInit {
       }
 
       const enEspera = sector.visible === true;
-
-      // Extraer solo la fecha en formato YYYY-MM-DD
       const fechaReservada = this.formatDate(this.selectedDate);
-
-      // Determinamos el valor del status en función de tus reglas de negocio
-      const status = !enEspera; // Si está en espera, el horario está bloqueado (status = false)
+      const status = !enEspera;
 
       const nuevoEvento: eventos = {
         ...this.newEvento,
         idSector: this.selectedSectorId,
         espera: enEspera,
         image: this.selectedSectorImage || '',
-        fechaReservada: fechaReservada, // Guardar solo la fecha
+        fechaReservada: fechaReservada,
         sectorNombre: this.getSectorNombre(this.selectedSectorId),
         hora: this.newEvento.hora,
         idAlumno: this.idAlumno,
         capacidadMaxima: this.newEvento.capacidadMaxima,
         participantesActuales: [],
+        asistencia: [],
         informacionAdicional: this.newEvento.informacionAdicional || '',
-        status: status // Asignamos el valor de status aquí
+        status: status,
       };
 
       console.log('Evento a guardar:', nuevoEvento);
 
-      this.eventosService.createEvento(nuevoEvento).then(() => {
-        const message = enEspera
-          ? 'El evento ha sido creado y está en espera de confirmación.'
-          : 'Evento creado exitosamente y hora bloqueada.';
-        this.presentAlert('Éxito', message);
-        this.resetForm();
-        this.loadEventos();
+      this.eventosService
+        .createEvento(nuevoEvento)
+        .then((eventoCreado) => {
+          const message = enEspera
+            ? 'El evento ha sido creado y está en espera de confirmación.'
+            : 'Evento creado exitosamente y hora bloqueada.';
 
-        // Redirigir a la página eventos-list después de crear el evento
-        this.router.navigate(['/evento-list']);
-      }).catch(error => {
-        console.error('Error al crear el evento:', error);
-        this.presentAlert('Error', 'Ocurrió un error al crear el evento.');
-      });
+          this.presentAlert('Éxito', message);
+
+          // Redirigir a la página de creación de reglas con el ID del evento
+
+
+          this.resetForm();
+          this.loadEventos();
+        })
+        .catch((error) => {
+          console.error('Error al crear el evento:', error);
+          this.presentAlert('Error', 'Ocurrió un error al crear el evento.');
+        });
     }
   }
 

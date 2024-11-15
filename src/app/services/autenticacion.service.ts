@@ -34,7 +34,9 @@ export class AutenticacionService {
   router: Router = inject(Router);
   http: any;
 
+
   private reportesCollection = collection(this.firestore, 'Reportes');
+
 
   constructor(private firestore: Firestore) { }
 
@@ -313,6 +315,9 @@ export class AutenticacionService {
     }
   }
 
+  getUserId(): string | null {
+    return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
 
 
 }

@@ -5,6 +5,8 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { importProvidersFrom } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 
 // Firebase imports
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -19,6 +21,7 @@ import { Capacitor } from '@capacitor/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { environment } from './environments/environment';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
 
 // if ('serviceWorker' in navigator) {
 //   navigator.serviceWorker.register('/firebase-messaging-sw.js')
@@ -43,6 +46,9 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular({ innerHTMLTemplatesEnabled: true, backButtonText: '' }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+
+    importProvidersFrom(HttpClientModule),
+    provideHttpClient(),
 
     // Firebase Initialization
     provideFirebaseApp(() => {
