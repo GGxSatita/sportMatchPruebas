@@ -271,7 +271,7 @@ export class EventoListPage implements OnInit {
         });
 
         // Redirigir a la página de enfrentamiento espera
-        this.router.navigate(['/enfrentamiento-espera']);
+        this.router.navigate(['/evento-alumno']);
       }
     }).catch(error => {
       console.error("Error al obtener el nombre del alumno:", error);
@@ -295,4 +295,3 @@ export class EventoListPage implements OnInit {
     return sector ? sector.nombre : 'Sector no encontrado';
   }
 }
-

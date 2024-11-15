@@ -3,6 +3,9 @@ import { Models } from 'src/app/models/models';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Auth } from '@angular/fire/auth';
+import { Timestamp } from '@angular/fire/firestore';
+
 
 @Component({
   selector: 'app-login',
@@ -18,6 +21,8 @@ export class LoginComponent implements OnInit {
   // Flags para mostrar errores
   showEmailError = false;
   showPasswordError = false;
+
+  private auth = inject(Auth);
 
   constructor() {
     this.initForm();
@@ -61,7 +66,6 @@ export class LoginComponent implements OnInit {
     await alert.present();
   }
 
-  // Método de inicio de sesión
   async login() {
     if (!this.form.email || !this.form.password) {
       this.showEmailError = !this.form.email;
@@ -71,17 +75,43 @@ export class LoginComponent implements OnInit {
     }
 
     try {
-      const user = await this.autenticacionService.login(this.form.email, this.form.password);
-      if (user) {
+      const userCredential = await this.autenticacionService.login(this.form.email, this.form.password);
+      const user = userCredential.user;
+
+      // Verificar si el usuario tiene una sanción activa
+      const sancionActiva = await this.autenticacionService.obtenerSancionActiva(user.uid);
+
+      if (sancionActiva) {
+        const fechaExpiracionSancion = sancionActiva.fechaExpiracionSancion instanceof Timestamp
+          ? sancionActiva.fechaExpiracionSancion.toDate()
+          : sancionActiva.fechaExpiracionSancion;
+
+        const fechaExpiracion = fechaExpiracionSancion.toLocaleString();
+
+        // Crear mensaje de sanción con formato mejorado
+        const mensajeSancion = `⚠️ Tu cuenta ha sido suspendida temporalmente ⚠️
+
+  📅 Válido hasta: ${fechaExpiracion}
+  📌 Motivo: ${sancionActiva.razon}
+
+  Por favor, contacta a soporte si tienes alguna pregunta o crees que esto es un error.`;
+
+        // Desconectar al usuario inmediatamente
+        await this.autenticacionService.logout();
+
+        // Mostrar alerta con los detalles de la sanción
+        await this.showErrorAlert(mensajeSancion);
+      } else {
         console.log('Login exitoso');
         this.router.navigate(['/menu-principal']);
       }
     } catch (error) {
-      // Verifica si el error es de tipo `Error` para acceder a la propiedad `message`
       const errorMessage = error instanceof Error ? error.message : 'Error inesperado al iniciar sesión.';
       await this.showErrorAlert(errorMessage);
     }
   }
+
+
 
 
 

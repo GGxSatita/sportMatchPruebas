@@ -16,6 +16,9 @@ import { Observable } from 'rxjs';
 import { ModelsAuth } from '../models/auth.models';
 import { User } from '@angular/fire/auth';
 import { take } from 'rxjs/operators';
+import { Reporte } from '../models/reportes';
+
+import { Timestamp } from '@angular/fire/firestore';
 
 
 
@@ -30,6 +33,10 @@ export class AutenticacionService {
   authState = authState(this.auth);
   router: Router = inject(Router);
   http: any;
+
+
+  private reportesCollection = collection(this.firestore, 'Reportes');
+
 
   constructor(private firestore: Firestore) { }
 
@@ -48,40 +55,25 @@ export class AutenticacionService {
     }
   }
 
-  async login(email: string, password: string) {
+
+   // Método de inicio de sesión
+   async login(email: string, password: string) {
     try {
-      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      const userID = userCredential.user;
-      const userDocRef = doc(this.firestore, `Users/${userID.uid}`);
-      const userDocSnap = await getDoc(userDocRef);
+      const userCredential = await signInWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-      // Intentar obtener el token de mensajería solo si los permisos están habilitados
-      let messagingToken: string | null = null;
-      try {
-        messagingToken = await getToken(getMessaging());
-      } catch (error: any) {
-        if (error.code === 'messaging/permission-blocked') {
-          console.warn('El permiso de notificación fue bloqueado por el usuario. Las notificaciones no estarán disponibles.');
-        } else {
-          console.error('Error al obtener el token de mensajería:', error);
-        }
-      }
-
-      // Crear o actualizar el documento de usuario en Firestore
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, {
-          email: userID.email,
-          name: userID.displayName || "Usuario",
-          lastLogin: new Date(),
-          isLoggedIn: true,
-          messagingToken: messagingToken || null // Evita error si el token es nulo
-        });
-      } else {
-        await updateDoc(userDocRef, {
-          lastLogin: new Date(),
-          isLoggedIn: true,
-          messagingToken: messagingToken || null // Evita error si el token es nulo
-        });
+      // Verificar si el usuario tiene una sanción activa
+      const sancionActiva = await this.obtenerSancionActiva(user.uid);
+      if (sancionActiva) {
+        throw new Error(
+          `Tu cuenta está sancionada hasta ${new Date(
+            sancionActiva.fechaExpiracionSancion
+          ).toLocaleString()}. Motivo: ${sancionActiva.razon}`
+        );
       }
 
       return userCredential;
@@ -91,6 +83,39 @@ export class AutenticacionService {
     }
   }
 
+
+
+
+  async obtenerSancionActiva(usuarioId: string): Promise<Reporte | null> {
+    const reportesRef = collection(this.firestore, 'Reportes');
+    const q = query(
+      reportesRef,
+      where('reportadoId', '==', usuarioId),
+      where('estado', '==', 'Cerrado')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const sanciones = querySnapshot.docs.map((doc) => {
+      const reporte = doc.data() as Reporte;
+
+      // Verificar si fechaExpiracionSancion es un Timestamp y convertirlo a Date si es necesario
+      const fechaExpiracion = reporte.fechaExpiracionSancion instanceof Timestamp
+        ? reporte.fechaExpiracionSancion.toDate()
+        : reporte.fechaExpiracionSancion;
+
+      return {
+        ...reporte,
+        fechaExpiracionSancion: fechaExpiracion,
+      };
+    });
+
+    // Filtrar la sanción activa, asegurándonos de que fechaExpiracionSancion es una Date
+    const sancionActiva = sanciones.find((reporte) =>
+      reporte.fechaExpiracionSancion instanceof Date && reporte.fechaExpiracionSancion > new Date()
+    );
+
+    return sancionActiva || null;
+  }
 
 
 
