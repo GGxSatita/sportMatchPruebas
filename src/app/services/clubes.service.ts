@@ -20,6 +20,8 @@ import { Club } from '../models/club';
 import { CollectionReference } from 'firebase/firestore';
 import { ChatMessage } from '../models/chatMessage';
 import { map } from 'rxjs/operators';
+import { AutenticacionService } from './autenticacion.service';
+import { NotificacionNativaService } from './notificacion-nativa.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +29,13 @@ import { map } from 'rxjs/operators';
 export class ClubesService {
   private clubsCollection: CollectionReference<Club>;
 
-  constructor(private firestore: Firestore) {
+
+  constructor(
+    private firestore: Firestore,
+    private authService :AutenticacionService,
+    private notificacionNativaService : NotificacionNativaService
+  ) {
+
     // Obtén la referencia de la colección 'clubs'
     this.clubsCollection = collection(this.firestore, 'clubs') as CollectionReference<Club>;
   }
@@ -49,7 +57,7 @@ export class ClubesService {
         });
 
         // Actualizar el perfil del usuario para reflejar que no pertenece a ningún club
-        const userRef = doc(this.firestore, `users/${userId}`);
+        const userRef = doc(this.firestore, `Users/${userId}`);
         await updateDoc(userRef, {
           clubId: null // Asegúrate de que este campo refleje la relación con el club
         });
@@ -143,9 +151,8 @@ export class ClubesService {
     return snapshot.docs.map((doc) => doc.data()['nombre'] as string);
   }
 
-  // Método para eliminar un miembro del club
 // Método para eliminar un miembro del club
-async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
+async eliminarMiembro(clubId: string, miembroId: string, nombreClub:string): Promise<void> {
   const clubRef = doc(this.firestore, `clubs/${clubId}`);
   const clubSnap = await getDoc(clubRef);
 
@@ -160,6 +167,16 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
               miembros: updatedMembers,
               miembroIds: updatedMemberIds,
           });
+          // Marcar la expulsión en el perfil del miembro
+          await this.marcarExpulsion(miembroId, nombreClub);
+
+      // Enviar notificación push al usuario
+      const mensaje = `Has sido expulsado del club ${nombreClub}.`;
+      await this.enviarNotificacionExpulsion(miembroId, mensaje);
+
+      console.log(`Miembro ${miembroId} eliminado del club ${clubId} y notificado.`);
+
+      console.log(`Miembro ${miembroId} eliminado del club ${clubId} y notificado.`);
       } else {
           console.error('Los miembros no están definidos o no son un array.');
       }
@@ -168,7 +185,17 @@ async eliminarMiembro(clubId: string, miembroId: string): Promise<void> {
       throw new Error('Club no encontrado');
   }
 }
+// Nuevo método para integrar con NotificacionNativaService
+private async enviarNotificacionExpulsion(userId: string, mensaje: string): Promise<void> {
+  try {
+    // Llama al servicio de notificaciones nativas para enviar la notificación push
+    await this.notificacionNativaService.enviarPushNotification(userId, mensaje);
+    console.log('Notificación de expulsión enviada correctamente al usuario:', userId);
+  } catch (error) {
+    console.error('Error al enviar la notificación de expulsión:', error);
+  }
 
+}
 
 
 // Método para obtener el club al que pertenece un usuario
@@ -228,7 +255,7 @@ async getClubForUser(userId: string): Promise<Club | null> {
   async marcarExpulsion(userId: string, clubName: string): Promise<void> {
     try {
       // Obtén la referencia del documento del usuario
-      const userRef = doc(this.firestore, `users/${userId}`);
+      const userRef = doc(this.firestore, `Users/${userId}`);
       const userSnap = await getDoc(userRef);
 
       if (userSnap.exists()) {
@@ -251,7 +278,7 @@ async getClubForUser(userId: string): Promise<Club | null> {
 
 // En ClubesService
 getUserDocRef(userId: string): DocumentReference {
-  return doc(this.firestore, `users/${userId}`);
+  return doc(this.firestore, `Users/${userId}`);
 }
 // En ClubesService
 async eliminarClubYActualizarMiembros(clubId: string): Promise<void> {
@@ -265,7 +292,7 @@ async eliminarClubYActualizarMiembros(clubId: string): Promise<void> {
 
       // Actualizar cada miembro del club para reflejar que ya no pertenecen a ningún club
       const updateMemberPromises = clubData.miembroIds.map(async (userId) => {
-        const userRef = doc(this.firestore, `users/${userId}`);
+        const userRef = doc(this.firestore, `Users/${userId}`);
         return await updateDoc(userRef, { clubId: null });
       });
 
@@ -292,7 +319,7 @@ async eliminarClubYActualizarMiembros(clubId: string): Promise<void> {
 // Método para actualizar el perfil del usuario al abandonar el club
 async actualizarEstadoUsuarioSinClub(userId: string): Promise<void> {
   try {
-    const userRef = doc(this.firestore, `users/${userId}`);
+    const userRef = doc(this.firestore, `Users/${userId}`);
     await updateDoc(userRef, {
       clubId: null // Actualiza este campo para reflejar que el usuario no pertenece a ningún club
     });

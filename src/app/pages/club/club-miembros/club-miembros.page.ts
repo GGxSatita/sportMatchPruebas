@@ -61,7 +61,8 @@ export class ClubMiembrosPage implements OnInit {
     if (this.isLeader && this.club) {
       try {
         // Eliminar al miembro del club
-        await this.clubesService.eliminarMiembro(this.club.idClub, miembroId);
+        const nombreClub = this.club?.nombreClub || 'el club';
+        await this.clubesService.eliminarMiembro(this.club.idClub, miembroId, this.club.nombreClub);
         console.log('Miembro eliminado correctamente');
 
         // Enviar notificación local y push al miembro eliminado
@@ -71,6 +72,7 @@ export class ClubMiembrosPage implements OnInit {
           'Expulsión de Club',
           NotificacionTipo.ALERTA
         );
+
 
         // Refrescar la lista de miembros
         this.cargarClub(this.club.idClub);
@@ -144,7 +146,7 @@ export class ClubMiembrosPage implements OnInit {
     if (this.club && this.currentUserId) {
       try {
         // Eliminar al miembro del club
-        await this.clubesService.eliminarMiembro(this.club.idClub, this.currentUserId);
+        await this.clubesService.eliminarMiembro(this.club.idClub, this.currentUserId, this.club.nombreClub);
 
         // Actualizar el perfil del usuario en la base de datos para reflejar que no pertenece a ningún club
         await this.clubesService.actualizarEstadoUsuarioSinClub(this.currentUserId);
