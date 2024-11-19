@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, setDoc, collection, query, where, collectionData, updateDoc, getDocs } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, collection, query, where, collectionData, updateDoc, getDocs, getDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { AutenticacionService } from './autenticacion.service';
 import { Notificacion, NotificacionTipo } from '../models/notificacion';
@@ -10,6 +10,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class NotificationService {
+  private pushNotificationApiUrl = "https://us-central1-sportmach-fc07f.cloudfunctions.net/sendDynamicNotification";
   constructor(
     private firestore: Firestore,
     public authService: AutenticacionService
@@ -116,28 +117,42 @@ export class NotificationService {
     }
   }
 
-// Método para enviar una notificación push
-private async enviarPushNotification(userId: string, titulo: string, mensaje: string) {
-  const messagePayload = {
-    notification: {
-      title: titulo,
-      body: mensaje,
-    },
-    to: `/topics/${userId}`, // Suscribir cada usuario a su propio "topic" para notificaciones individualizadas
-  };
+  // Método para enviar una notificación push
+  private async enviarPushNotification(userId: string, titulo: string, mensaje: string) {
+    try {
+      // Obtén el token FCM del usuario desde Firestore
+      const userDocRef = doc(this.firestore, `Users/${userId}`);
+      const userDocSnap = await getDoc(userDocRef);
+      const userData = userDocSnap.data();
 
-  try {
-    await fetch('https://fcm.googleapis.com/fcm/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `key=TU_SERVER_KEY`, // Reemplaza TU_SERVER_KEY con tu clave de servidor FCM
-      },
-      body: JSON.stringify(messagePayload),
-    });
-    console.log('Notificación push enviada al usuario:', userId);
-  } catch (error) {
-    console.error('Error al enviar la notificación push:', error);
+      if (!userData || !userData['fcmToken']) {
+        console.error('Token FCM no encontrado para el usuario:', userId);
+        return;
+      }
+
+      // Envía la solicitud a la función de Firebase
+      const response = await fetch(this.pushNotificationApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokens: [userData['fcmToken']],
+          message: {
+            title: titulo,
+            content: mensaje,
+          },
+          data: {},
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Notificación push enviada al usuario:', userId);
+      } else {
+        console.error('Error al enviar la notificación push:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error al enviar la notificación push:', error);
+    }
   }
-}
 }

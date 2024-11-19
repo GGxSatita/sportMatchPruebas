@@ -171,7 +171,10 @@ async eliminarMiembro(clubId: string, miembroId: string, nombreClub:string): Pro
           await this.marcarExpulsion(miembroId, nombreClub);
 
       // Enviar notificación push al usuario
-      const mensaje = `Has sido expulsado del club ${nombreClub}.`;
+      const mensaje = {
+        title: 'Expulsión de club',
+        content: `Has sido expulsado del club ${nombreClub}.`,
+      };
       await this.enviarNotificacionExpulsion(miembroId, mensaje);
 
       console.log(`Miembro ${miembroId} eliminado del club ${clubId} y notificado.`);
@@ -186,15 +189,15 @@ async eliminarMiembro(clubId: string, miembroId: string, nombreClub:string): Pro
   }
 }
 // Nuevo método para integrar con NotificacionNativaService
-private async enviarNotificacionExpulsion(userId: string, mensaje: string): Promise<void> {
+private async enviarNotificacionExpulsion(userId: string, message: { title: string; content: string; }): Promise<void> {
   try {
     // Llama al servicio de notificaciones nativas para enviar la notificación push
-    await this.notificacionNativaService.enviarPushNotification(userId, mensaje);
+    await this.notificacionNativaService.enviarPushNotification(userId, message);
+
     console.log('Notificación de expulsión enviada correctamente al usuario:', userId);
   } catch (error) {
     console.error('Error al enviar la notificación de expulsión:', error);
   }
-
 }
 
 

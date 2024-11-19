@@ -6,14 +6,14 @@ import {
   Token,
 } from '@capacitor/push-notifications';
 import { AlertController } from '@ionic/angular';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { AutenticacionService } from './autenticacion.service';
 
 @Injectable({
   providedIn: 'root'
 })export class NotificacionNativaService {
   // private pushNotificationApiUrl = "https://us-central1-sportmach-fc07f.cloudfunctions.net/sendPushNotification";
-  private pushNotificationApiUrl = "http://127.0.0.1:5001/sportmach-fc07f/us-central1/sendDynamicNotification";
+  private pushNotificationApiUrl = "https://us-central1-sportmach-fc07f.cloudfunctions.net/sendDynamicNotification"
 
   constructor(
     private alertController: AlertController,
@@ -22,29 +22,42 @@ import { AutenticacionService } from './autenticacion.service';
   ) {}
 
   // Método para enviar notificación push
-  public async enviarPushNotification(userId: string, mensaje: string) {
-    try {
-      const response = await fetch(this.pushNotificationApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: userId,
-          message: mensaje
-        })
-      });
+  // public async enviarPushNotification(userId: string, mensaje: string) {
+  //   try {
+  //     const response = await fetch(this.pushNotificationApiUrl, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({
+  //         userId: userId,
+  //         message: mensaje
+  //       })
+  //     });
 
-      if (response.ok) {
-        console.log('Notificación push enviada al usuario:', userId);
-      } else {
-        console.error('Error al enviar la notificación push:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error en la solicitud de notificación push:', error);
-    }
-  }
+  //     if (response.ok) {
+  //       console.log('Notificación push enviada al usuario:', userId);
+  //     } else {
+  //       console.error('Error al enviar la notificación push:', response.statusText);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error en la solicitud de notificación push:', error);
+  //   }
+  // }
 
+  // init() {
+  //   console.log('Initializing NotificationPushService');
+  //   PushNotifications.requestPermissions().then(result => {
+  //     if (result.receive === 'granted') {
+  //       PushNotifications.register();
+  //     } else {
+  //       this.presentAlert('Atención', 'Por favor, habilita las notificaciones en la configuración del dispositivo.');
+  //     }
+  //   }).catch(error => {
+  //     console.error('Error en solicitud de permisos:', error);
+  //   });
+  //   this.addListener();
+  // }
   init() {
     console.log('Initializing NotificationPushService');
     PushNotifications.requestPermissions().then(result => {
@@ -59,6 +72,43 @@ import { AutenticacionService } from './autenticacion.service';
     this.addListener();
   }
 
+  public async enviarPushNotification(userId: string, message: { title: string; content: string; }) {
+    try {
+      // Obtén el token FCM del usuario desde Firestore
+      const userDocRef = doc(this.firestore, `Users/${userId}`);
+      const userDocSnap = await getDoc(userDocRef);
+      const userData = userDocSnap.data();
+
+      if (!userData || !userData['fcmToken']) {
+        console.error('Token FCM no encontrado para el usuario:', userId);
+        return;
+      }
+
+      // Envía la solicitud a la función de Firebase
+      const response = await fetch(this.pushNotificationApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokens: [userData['fcmToken']],
+          message: {
+            title: message.title,
+            content: message.content,
+          },
+          data: {},
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Notificación push enviada al usuario:', userId);
+      } else {
+        console.error('Error al enviar la notificación push:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud de notificación push:', error);
+    }
+  }
   addListener() {
     PushNotifications.addListener('registration', async (token: Token) => {
       console.info('Registration token: ', token.value);
