@@ -1,0 +1,30 @@
+/* Estilo para los modales */
+.modal-participantes,
+.modal-reporte {
+  --background: white;
+  --height: 80%;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+/* Estilo para los botones del footer */
+.boton-qr,
+.boton-lista,
+.boton-chat {
+  animation: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.boton-qr:hover,
+.boton-lista:hover,
+.boton-chat:hover {
+  transform: scale(1.1);
+}
+
+/* Asegurando que el footer no interfiera */
+ion-footer {
+  z-index: 10; /* Asegura que el footer no quede debajo de otros elementos */
+  position: relative;
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+}

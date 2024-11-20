@@ -130,17 +130,26 @@ export const routes: Routes = [
     path: 'weather',
     loadComponent: () => import('./pages/weather/weather.page').then( m => m.WeatherPage),
     canActivate:[authGuard]
-  },  {
+  },
+  {
     path: 'crea-reglas',
-    loadComponent: () => import('./pages/desafios/crea-reglas/crea-reglas.page').then( m => m.CreaReglasPage)
+    loadComponent: () => import('./pages/desafios/crea-reglas/crea-reglas.page').then( m => m.CreaReglasPage),
+    canActivate:[authGuard]
   },
   {
     path: 'qr-creador',
-    loadComponent: () => import('./pages/desafios/qr-creador/qr-creador.page').then( m => m.QrCreadorPage)
+    loadComponent: () => import('./pages/desafios/qr-creador/qr-creador.page').then( m => m.QrCreadorPage),
+    canActivate:[authGuard]
   },
   {
     path: 'qr-usuario',
-    loadComponent: () => import('./pages/desafios/qr-usuario/qr-usuario.page').then( m => m.QrUsuarioPage)
+    loadComponent: () => import('./pages/desafios/qr-usuario/qr-usuario.page').then( m => m.QrUsuarioPage),
+    canActivate:[authGuard]
+  },
+  {
+    path: 'vista-usaurio',
+    loadComponent: () => import('./pages/desafios/vista-usaurio/vista-usaurio.page').then( m => m.VistaUsaurioPage),
+    canActivate:[authGuard]
   }
 
 
