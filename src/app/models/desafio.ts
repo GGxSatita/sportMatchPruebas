@@ -6,10 +6,10 @@ export type ChallengeStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'FINALIZADO';
 export type ChallengeType = 'PUNTOS' | 'GOLES' | 'SETS' | 'PARTIDO' | 'OBJETIVO';
 
 export interface ParticipantModel {
-  id: string; // ID del alumno (UID de Firebase)
-  name: string; // Nombre del jugador o equipo
-  score: number; // Puntos acumulados o goles anotados
-  setsWon?: number; // Sets ganados (para deportes de sets)
+  id: string; // ID único del participante
+  name: string; // Nombre del participante
+  score: number; // Contador de puntos acumulados
+  victories: number; // Contador de victorias
 }
 
 export interface RulesModel {
@@ -27,13 +27,12 @@ export interface ResultModel {
 }
 
 export interface Desafio {
-  id: string; // ID del desafío
-  type: ChallengeType; // Tipo de desafío
+  id: string; // ID único del desafío
+  type: ChallengeType; // Tipo de desafío (goles, puntos, etc.)
   sport: Deporte; // Deporte asociado
-  status: ChallengeStatus; // Estado del desafío
+  status: ChallengeStatus; // Estado del desafío (en progreso, finalizado, etc.)
   participants: ParticipantModel[]; // Lista de participantes
   rules: RulesModel; // Reglas del desafío
-  results?: ResultModel; // Resultado del desafío, si aplica
+  results?: ResultModel; // Resultado del desafío
 }
-
 

@@ -7,6 +7,10 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  getDocs,
+  query,
+  where,
+  QueryDocumentSnapshot,
 } from '@angular/fire/firestore';
 import { ReglasModel } from '../models/reglas-evento';
 
@@ -14,6 +18,7 @@ import { ReglasModel } from '../models/reglas-evento';
   providedIn: 'root',
 })
 export class ReglasService {
+  private reglasCollection = collection(this.firestore, 'reglas');
   private collectionName = 'reglas';
 
   constructor(private firestore: Firestore) {}
@@ -23,12 +28,14 @@ export class ReglasService {
     await addDoc(reglasRef, { ...reglas });
   }
 
-  async getReglaById(id: string): Promise<ReglasModel | undefined> {
-    const reglaDoc = doc(this.firestore, `${this.collectionName}/${id}`);
-    const docSnapshot = await getDoc(reglaDoc);
-    return docSnapshot.exists()
-      ? (docSnapshot.data() as ReglasModel)
-      : undefined;
+  async getReglasByEventId(eventId: string): Promise<ReglasModel | null> {
+    const reglasQuery = query(this.reglasCollection, where('eventId', '==', eventId));
+    const querySnapshot = await getDocs(reglasQuery);
+
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data() as ReglasModel;
+    }
+    return null;
   }
 
   async updateReglas(id: string, reglas: Partial<ReglasModel>): Promise<void> {

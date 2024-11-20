@@ -271,7 +271,7 @@ export class EventoListPage implements OnInit {
         });
 
         // Redirigir a la página de enfrentamiento espera
-        this.router.navigate(['/enfrentamiento-espera']);
+        this.router.navigate(['/evento-list']);
       }
     }).catch(error => {
       console.error("Error al obtener el nombre del alumno:", error);

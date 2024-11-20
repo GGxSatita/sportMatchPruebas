@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { EventosService } from 'src/app/services/evento.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 
 
@@ -33,6 +33,7 @@ export class QrUsuarioPage implements OnInit {
     private eventosService: EventosService,
     private route: ActivatedRoute,
      private authService: AutenticacionService,
+     private router: Router
   ) { }
 
   ngOnInit() {
@@ -107,6 +108,10 @@ export class QrUsuarioPage implements OnInit {
   onScanFailure(error: any) {
     console.warn(`Error de escaneo: ${error}`);
   }
-
+  irAEnfrentamiento() {
+    this.router.navigate(['/enfrentamiento'], {
+      queryParams: { eventId: this.eventId } // Pasar el ID del evento como parámetro
+    });
+  }
 
 }
