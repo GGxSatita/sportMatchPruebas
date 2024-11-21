@@ -21,6 +21,8 @@ import { Noticias } from 'src/app/models/noticias';
 import { NoticiasService } from 'src/app/services/noticias.service';
 import { Timestamp } from 'firebase/firestore';
 import { NoticiasComponent } from 'src/app/components/noticias/noticias.component';
+import { Capacitor } from '@capacitor/core';
+import { NotificacionNativaService } from 'src/app/services/notificacion-nativa.service';
 
 @Component({
   selector: 'app-menu-principal',
@@ -83,10 +85,23 @@ export class MenuPrincipalPage implements OnInit {
     private eventoAdminService: EventoAdminService,
     private notificacionesService: NotificacionesService,
     private noticiasService: NoticiasService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificacionesNativas: NotificacionNativaService // Inyección del servicio de notificaciones nativas
   ) {}
 
   async ngOnInit() {
+    // Verificar si la plataforma es nativa y el usuario está autenticado antes de inicializar notificaciones
+    if (Capacitor.isNativePlatform()) {
+      const user = await this.autenticacionService.getCurrentUserAsync();
+      if (user) {
+        // Inicializar el servicio de notificaciones
+        this.notificacionesNativas.init();
+      } else {
+        console.log('Usuario no autenticado; no se registrará el token FCM');
+      }
+    }
+
+
     await this.cargarNoticias();
 
     try {

@@ -20,6 +20,7 @@ import { Reporte } from '../models/reportes';
 
 import { Timestamp } from '@angular/fire/firestore';
 
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 
 
 

@@ -101,7 +101,7 @@ export class ClubPage implements OnInit {
       } else {
         // El usuario no es el líder, solo eliminarlo a él del club
         try {
-          await this.clubesService.eliminarMiembro(this.club.idClub, this.userId);
+          await this.clubesService.eliminarMiembro(this.club.idClub, this.userId, this.club.nombreClub);
           this.isMember = false;
           console.log('Usuario ha abandonado el club');
           await this.showAlert('Club Abandonado', 'Has abandonado el club exitosamente.');
@@ -144,9 +144,13 @@ export class ClubPage implements OnInit {
   }
 
   eliminarMiembro(miembroId: string) {
+
+    console.log("Intentando eliminar miembro con ID:", miembroId);
+    console.log("Club actual:", this.club);
+
     if (this.isLeader && this.club) {
       this.clubesService
-        .eliminarMiembro(this.club.idClub, miembroId)
+        .eliminarMiembro(this.club.idClub, miembroId, this.club.nombreClub)
         .then(() => {
           console.log('Miembro eliminado');
           this.cargarClub(this.club!.idClub);

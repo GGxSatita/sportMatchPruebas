@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "276809292205",
+    "firebase_url": "https://sportmach-fc07f-default-rtdb.firebaseio.com",
+    "project_id": "sportmach-fc07f",
+    "storage_bucket": "sportmach-fc07f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276809292205:android:df962f4c938192d9496924",
+        "android_client_info": {
+          "package_name": "app.web.sportmach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWDN613Z3vUJwdk-R2In6UAsc8Sp3_bus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
