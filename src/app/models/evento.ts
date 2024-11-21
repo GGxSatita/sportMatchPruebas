@@ -16,6 +16,5 @@ export class eventos {
     public status?: boolean,
     public idAlumno?: string,
     public informacionAdicional?: string
-
   ) {}
 }

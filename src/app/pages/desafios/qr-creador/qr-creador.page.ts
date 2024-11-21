@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as QRCode from 'qrcode-generator';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,7 +41,8 @@ export class QrCreadorPage implements OnInit {
   constructor(
 
     private eventosService: EventosService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -103,6 +104,11 @@ export class QrCreadorPage implements OnInit {
       if (!participante.estado) {  // Verifica si está en "pendiente" (estado === false)
         this.marcarComoAceptado(participante.idAlumno);
       }
+    });
+  }
+  irAEnfrentamiento() {
+    this.router.navigate(['/enfrentamiento'], {
+      queryParams: { eventId: this.eventId } // Pasar el ID del evento como parámetro
     });
   }
 }

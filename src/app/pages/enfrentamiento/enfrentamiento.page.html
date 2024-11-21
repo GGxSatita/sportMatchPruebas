@@ -1,15 +1,61 @@
 <app-header></app-header>
-<ion-content class="ion-padding">
-  <div class="center-content">
-    <div class="animation"> <!-- Aquí va tu animación -->
-      <ion-label class="match-label">Match en curso</ion-label>
+
+<ion-content>
+  <div class="container">
+    <!-- Botón de refresh -->
+    <h1 class="title">Enfrentamiento</h1>
+
+    <!-- Mostrar puntos para ganar -->
+    <div *ngIf="maxPoints" class="info-container">
+      <p><strong>Puntos para ganar:</strong> {{ maxPoints }}</p>
     </div>
-    <ion-item lines="none">
-      <ion-button expand="block" (click)="victory()">Victoria</ion-button>
-    </ion-item>
-    <ion-item lines="none">
-      <ion-button expand="block" color="danger" (click)="defeat()">Derrota</ion-button>
-    </ion-item>
+
+    <!-- Mostrar al ganador -->
+    <div *ngIf="ganador" class="ganador-container animate-winner">
+      <h2>¡El ganador es: {{ ganador }}!</h2>
+    </div>
+
+    <!-- Lista de participantes -->
+    <ion-list>
+      <ion-item
+        *ngFor="let participante of participantes"
+        [class.animate-points]="participante.id === animatingParticipantId"
+      >
+        <ion-avatar slot="start">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ participante.name }}</h2>
+          <p>Puntaje: {{ participante.score }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Incrementar puntaje del usuario actual -->
+    <div *ngIf="currentParticipante" class="increment-container">
+      <h2>{{ currentParticipante.name }}</h2>
+      <p>Puntaje actual: {{ currentParticipante.score }}</p>
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="incrementarPuntaje(currentParticipante.id)"
+        class="increment-button"
+      >
+        Incrementar Puntaje
+      </ion-button>
+    </div>
+    <div *ngIf="ganador" class="action-buttons">
+      <ion-button expand="block" color="primary" (click)="volverAlInicio()"
+        >Volver al Inicio</ion-button
+      >
+      <ion-button
+        expand="block"
+        color="secondary"
+        (click)="volverAListaEventos()"
+        >Volver a la Lista de Eventos</ion-button
+      >
+    </div>
   </div>
 </ion-content>
+
 <app-footer></app-footer>

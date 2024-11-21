@@ -23,23 +23,22 @@ import {
   IonItem,
   IonButton,
 } from '@ionic/angular/standalone';
+import { FooterComponent } from "../../../components/footer/footer.component";
+import { HeaderComponent } from "../../../components/header/header.component";
 
 @Component({
   selector: 'app-crea-reglas',
   templateUrl: './crea-reglas.page.html',
   styleUrls: ['./crea-reglas.page.scss'],
   standalone: true,
-  imports: [    IonButton,
+  imports: [IonButton,
     IonItem,
     IonCol,
     IonRow,
     IonContent,
-    IonTitle,
-    IonToolbar,
-    IonHeader,
     IonLabel,
     IonInput,
-    ReactiveFormsModule,]
+    ReactiveFormsModule, FooterComponent, HeaderComponent]
 })
 export class CreaReglasPage implements OnInit {
 
@@ -71,7 +70,7 @@ export class CreaReglasPage implements OnInit {
         const newReglas: ReglasModel = {
           id: uuidv4(),
           creatorId: userId,
-          eventId: this.route.snapshot.queryParams['eventId'] || null,
+          eventId: this.route.snapshot.queryParams['eventoId'] || null,
           ...reglasData,
         };
         try {

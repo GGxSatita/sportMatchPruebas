@@ -1,5 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Firestore, doc, setDoc, collection, query, where, collectionData, updateDoc, getDocs, getDoc } from '@angular/fire/firestore';
+import { Injectable, Injector } from '@angular/core';
+import {
+  Firestore,
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  collectionData,
+  updateDoc,
+  getDocs, getDoc,
+} from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { AutenticacionService } from './autenticacion.service';
 import { Notificacion, NotificacionTipo } from '../models/notificacion';
@@ -10,32 +20,29 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class NotificationService {
-  private pushNotificationApiUrl = "https://us-central1-sportmach-fc07f.cloudfunctions.net/sendDynamicNotification";
-  constructor(
-    private firestore: Firestore,
-    public authService: AutenticacionService
-    ) {}
+  constructor(private firestore: Firestore, public authService: AutenticacionService) {}
 
   // Obtener las notificaciones de un usuario actual, diferenciando entre leídas y no leídas
   getNotificacionesUsuario(leidas: boolean): Observable<Notificacion[]> {
     return new Observable((observer) => {
       from(this.authService.getCurrentUserAsync()).subscribe((user: User | null) => {
         if (user) {
-          const notificacionesRef = collection(this.firestore, `Users/${user.uid}/notifications`);
+          const notificacionesRef = collection(this.firestore, `users/${user.uid}/notifications`);
           const q = query(notificacionesRef, where('leida', '==', leidas));
 
-          collectionData(q, { idField: 'id' }).subscribe((notificaciones) => {
-            observer.next(notificaciones as Notificacion[]);
-          });
+            collectionData(q, { idField: 'id' }).subscribe((notificaciones) => {
+              observer.next(notificaciones as Notificacion[]);
+            });
+          }
         }
-      });
+      );
     });
   }
 
   // Marcar una notificación específica como leída
   async marcarComoLeida(notificacionId: string, userId: string): Promise<void> {
     try {
-      const notificacionRef = doc(this.firestore, `Users/${userId}/notifications/${notificacionId}`);
+      const notificacionRef = doc(this.firestore, `users/${userId}/notifications/${notificacionId}`);
       await updateDoc(notificacionRef, { leida: true });
       console.log(`Notificación ${notificacionId} marcada como leída.`);
     } catch (error) {
@@ -50,39 +57,46 @@ export class NotificationService {
       const q = query(notificacionesRef, where('leida', '==', false));
       const snapshot = await getDocs(q);
 
-      const updatePromises = snapshot.docs.map((doc) => updateDoc(doc.ref, { leida: true }));
+      const updatePromises = snapshot.docs.map((doc) =>
+        updateDoc(doc.ref, { leida: true })
+      );
       await Promise.all(updatePromises);
 
-      console.log(`Todas las notificaciones de ${userId} han sido marcadas como leídas.`);
+      console.log(
+        `Todas las notificaciones de ${userId} han sido marcadas como leídas.`
+      );
     } catch (error) {
-      console.error('Error al marcar todas las notificaciones como leídas:', error);
+      console.error(
+        'Error al marcar todas las notificaciones como leídas:',
+        error
+      );
     }
   }
 
-  // // Enviar una nueva notificación personalizada a un usuario, con un tipo de notificación opcional
-  // async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
-  //   try {
-  //     const notificationRef = doc(this.firestore, `users/${userId}/notifications/${new Date().getTime()}`);
-  //     const notificationData: Notificacion = {
-  //       titulo,
-  //       mensaje,
-  //       tipo,
-  //       timestamp: new Date(),
-  //       leida: false,
-  //     };
+  // Enviar una nueva notificación personalizada a un usuario, con un tipo de notificación opcional
+  async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
+    try {
+      const notificationRef = doc(this.firestore, `users/${userId}/notifications/${new Date().getTime()}`);
+      const notificationData: Notificacion = {
+        titulo,
+        mensaje,
+        tipo,
+        timestamp: new Date(),
+        leida: false,
+      };
 
-  //     await setDoc(notificationRef, notificationData);
-  //     console.log('Notificación enviada al usuario:', userId);
-  //   } catch (error) {
-  //     console.error('Error al enviar la notificación:', error);
-  //   }
-  // }
+      await setDoc(notificationRef, notificationData);
+      console.log('Notificación enviada al usuario:', userId);
+    } catch (error) {
+      console.error('Error al enviar la notificación:', error);
+    }
+  }
     // Método para verificar si hay al menos una notificación sin leer
     hayNotificacionesNoLeidas(): Observable<boolean> {
       return new Observable((observer) => {
         from(this.authService.getCurrentUserAsync()).subscribe((user: User | null) => {
           if (user) {
-            const notificacionesRef = collection(this.firestore, `Users/${user.uid}/notifications`);
+            const notificacionesRef = collection(this.firestore, `users/${user.uid}/notifications`);
             const q = query(notificacionesRef, where('leida', '==', false));
 
             collectionData(q).pipe(
@@ -94,65 +108,5 @@ export class NotificationService {
         });
       });
     }
-// Método para enviar una notificación local y push al mismo tiempo
-  async enviarNotificacion(userId: string, mensaje: string, titulo: string, tipo: NotificacionTipo = NotificacionTipo.AVISO) {
-    try {
-      // Notificación local en Firestore
-      const notificationRef = doc(this.firestore, `Users/${userId}/notifications/${new Date().getTime()}`);
-      const notificationData: Notificacion = {
-        titulo,
-        mensaje,
-        tipo,
-        timestamp: new Date(),
-        leida: false,
-      };
-      await setDoc(notificationRef, notificationData);
-      console.log('Notificación local enviada al usuario:', userId);
 
-      // Enviar notificación push a través de la función de Firebase
-      await this.enviarPushNotification(userId, titulo, mensaje);
-      console.log("Notificación push enviada al usuario:", userId);
-    } catch (error) {
-      console.error('Error al enviar la notificación:', error);
-    }
-  }
-
-  // Método para enviar una notificación push
-  private async enviarPushNotification(userId: string, titulo: string, mensaje: string) {
-    try {
-      // Obtén el token FCM del usuario desde Firestore
-      const userDocRef = doc(this.firestore, `Users/${userId}`);
-      const userDocSnap = await getDoc(userDocRef);
-      const userData = userDocSnap.data();
-
-      if (!userData || !userData['fcmToken']) {
-        console.error('Token FCM no encontrado para el usuario:', userId);
-        return;
-      }
-
-      // Envía la solicitud a la función de Firebase
-      const response = await fetch(this.pushNotificationApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tokens: [userData['fcmToken']],
-          message: {
-            title: titulo,
-            content: mensaje,
-          },
-          data: {},
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Notificación push enviada al usuario:', userId);
-      } else {
-        console.error('Error al enviar la notificación push:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error al enviar la notificación push:', error);
-    }
-  }
 }

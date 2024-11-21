@@ -1,12 +1,18 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-
   <!-- Lector QR -->
-  <div *ngIf="qrScannerVisible" id="qr-reader" style="width: 100%; height: auto; margin-top: 20px;"></div>
+  <div
+    *ngIf="qrScannerVisible"
+    id="qr-reader"
+    style="width: 100%; height: auto; margin-top: 20px"
+  ></div>
 
   <!-- Modal para la lista de jugadores -->
-  <ion-modal [isOpen]="modalParticipantesAbierto" (ionModalDidDismiss)="cerrarListaJugadores()">
+  <ion-modal
+    [isOpen]="modalParticipantesAbierto"
+    (ionModalDidDismiss)="cerrarListaJugadores()"
+  >
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -21,21 +27,33 @@
 
       <ion-content>
         <!-- Lista de Participantes -->
-        <div *ngIf="asistencia.length > 0" style="padding: 20px;">
-          <h3 style="text-align: center; font-weight: bold;">Participantes en el evento</h3>
+        <div *ngIf="asistencia.length > 0" style="padding: 20px">
+          <h3 style="text-align: center; font-weight: bold">
+            Participantes en el evento
+          </h3>
           <ion-list>
-            <ion-item *ngFor="let participante of asistencia" lines="none" class="participante-item">
+            <ion-item
+              *ngFor="let participante of asistencia"
+              lines="none"
+              class="participante-item"
+            >
               <ion-avatar slot="start">
                 <ion-icon
                   [name]="participante.estado ? 'checkmark-circle' : 'alert-circle'"
                   [color]="participante.estado ? 'success' : 'warning'"
-                  size="large">
+                  size="large"
+                >
                 </ion-icon>
               </ion-avatar>
               <ion-label>
-                <h2 style="font-weight: bold;">{{ participante.nombre || participante.idAlumno }}</h2>
-                <p style="color: gray;">
-                  <span [style.color]="participante.estado ? 'green' : 'red'" [style.fontWeight]="'bold'">
+                <h2 style="font-weight: bold">
+                  {{ participante.nombre || participante.idAlumno }}
+                </h2>
+                <p style="color: gray">
+                  <span
+                    [style.color]="participante.estado ? 'green' : 'red'"
+                    [style.fontWeight]="'bold'"
+                  >
                     {{ participante.estado ? 'Aceptado' : 'Pendiente' }}
                   </span>
                 </p>
@@ -45,7 +63,8 @@
                 slot="end"
                 fill="clear"
                 color="danger"
-                (click)="abrirFormularioReporte(participante)">
+                (click)="abrirFormularioReporte(participante)"
+              >
                 <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
               </ion-button>
             </ion-item>
@@ -53,7 +72,10 @@
         </div>
 
         <!-- Mensaje si no hay participantes -->
-        <div *ngIf="asistencia.length === 0" style="text-align: center; padding: 20px;">
+        <div
+          *ngIf="asistencia.length === 0"
+          style="text-align: center; padding: 20px"
+        >
           <p>No hay participantes en este evento.</p>
         </div>
       </ion-content>
@@ -61,7 +83,10 @@
   </ion-modal>
 
   <!-- Modal para el formulario de reporte -->
-  <ion-modal [isOpen]="modalAbierto" (ionModalDidDismiss)="cerrarFormularioReporte()">
+  <ion-modal
+    [isOpen]="modalAbierto"
+    (ionModalDidDismiss)="cerrarFormularioReporte()"
+  >
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -79,9 +104,15 @@
           <ion-list>
             <ion-item>
               <ion-label>Motivo</ion-label>
-              <ion-select [(ngModel)]="reporteForm.razon" name="razon" placeholder="Seleccionar">
+              <ion-select
+                [(ngModel)]="reporteForm.razon"
+                name="razon"
+                placeholder="Seleccionar"
+              >
                 <ion-select-option value="Retraso">Retraso</ion-select-option>
-                <ion-select-option value="Mala competitividad">Mala competitividad</ion-select-option>
+                <ion-select-option value="Mala competitividad"
+                  >Mala competitividad</ion-select-option
+                >
                 <ion-select-option value="Tóxico">Tóxico</ion-select-option>
                 <ion-select-option value="Otro">Otro</ion-select-option>
               </ion-select>
@@ -91,7 +122,8 @@
               <ion-textarea
                 [(ngModel)]="reporteForm.detallesAdicionales"
                 name="detallesAdicionales"
-                placeholder="Proporcione más detalles (opcional)">
+                placeholder="Proporcione más detalles (opcional)"
+              >
               </ion-textarea>
             </ion-item>
           </ion-list>
@@ -107,6 +139,27 @@
     </ng-template>
   </ion-modal>
 
+  <ion-card-content>
+    <ion-card-content>
+      <div id="qr-reader" style="width: 100%; height: auto"></div>
+    </ion-card-content>
+    <ion-item lines="none">
+      <ion-label>
+        <p>
+          <ion-icon name="people-outline"></ion-icon> Total
+          <!-- Participantes: {{ totalParticipantes }} -->
+        </p>
+        <p>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <!-- Participantes Presentes: {{ participantesPresentes }} -->
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-card-content>
+
+  <div style="text-align: center; margin-top: 20px">
+    <ion-button (click)="irAEnfrentamiento()">Ir a Enfrentamiento</ion-button>
+  </div>
 </ion-content>
 
 <ion-footer>
@@ -122,7 +175,11 @@
 
         <!-- Botón Lista de jugadores -->
         <ion-col>
-          <ion-button expand="block" fill="clear" (click)="abrirListaJugadores()">
+          <ion-button
+            expand="block"
+            fill="clear"
+            (click)="abrirListaJugadores()"
+          >
             <ion-icon name="people-outline" size="large"></ion-icon>
           </ion-button>
         </ion-col>

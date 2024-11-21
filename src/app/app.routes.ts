@@ -82,17 +82,9 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/club/club-detalle/club-detalle.page').then( m => m.ClubDetallePage),
     canActivate:[authGuard]
   },
-      {
-    path: 'desafio',
-    loadComponent: () => import('./pages/desafio/desafio.page').then( m => m.DesafioPage)
-  },
   {
-    path: 'desafio-list',
-    loadComponent: () => import('./pages/desafio-list/desafio-list.page').then( m => m.DesafioListPage)
-  },
-  {
-    path: 'enfrentamiento',
-    loadComponent: () => import('./pages/enfrentamiento/enfrentamiento.page').then( m => m.EnfrentamientoPage)
+    path: 'enfrentamiento', loadComponent: () => import('./pages/enfrentamiento/enfrentamiento.page').then(m => m.EnfrentamientoPage),
+    canActivate: [authGuard]
   },
   {
     path: 'enfrentamiento-espera',

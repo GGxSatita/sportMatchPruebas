@@ -287,7 +287,7 @@ export class EventoAddPage implements OnInit {
           this.presentAlert('Éxito', message);
 
           // Redirigir a la página de creación de reglas con el ID del evento
-
+          this.goToCrearReglas(eventoCreado.id);
 
           this.resetForm();
           this.loadEventos();
@@ -297,6 +297,15 @@ export class EventoAddPage implements OnInit {
           this.presentAlert('Error', 'Ocurrió un error al crear el evento.');
         });
     }
+  }
+  goToCrearReglas(eventoId: string): void {
+    if (!eventoId) {
+      console.error('Error: No se proporcionó un ID de evento para redirigir.');
+      return;
+    }
+    this.router.navigate(['/crea-reglas'], { queryParams: { eventoId } }).catch((error) => {
+      console.error('Error al redirigir a la página de creación de reglas:', error);
+    });
   }
 
 

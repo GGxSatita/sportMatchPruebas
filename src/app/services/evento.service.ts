@@ -46,13 +46,16 @@ export class EventosService {
 
 
 
-  createEvento(evento: eventos): Promise<void> {
+  createEvento(evento: eventos): Promise<{id: string}> {
     const eventosRef = collection(this.firestore, this.collectionName);
     return addDoc(eventosRef, { ...evento })
       .then((docRef) => {
         console.log('Evento creado con ID:', docRef.id);
         // Actualizar el evento con el ID generado
-        return updateDoc(docRef, { idEventosAlumnos: docRef.id });
+        return updateDoc(docRef, { idEventosAlumnos: docRef.id })
+        .then(()=>{
+          return { id:docRef.id}
+        });
       })
       .catch((error) => {
         console.error('Error al crear evento:', error);

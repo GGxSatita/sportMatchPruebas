@@ -3,6 +3,7 @@ import { Firestore, doc, setDoc, collection, query, where, collectionData } from
 import { from, Observable } from 'rxjs';
 import { AutenticacionService } from './autenticacion.service';
 import { User } from '@angular/fire/auth';
+import { Notificacion, NotificacionTipo } from '../models/notificacion';
 
 @Injectable({
   providedIn: 'root',
@@ -43,8 +44,31 @@ export class NotificacionesService {
     }
   }
 
+  async enviarNotificacion(
+    userId: string,
+    mensaje: string,
+    titulo: string,
+    tipo: NotificacionTipo = NotificacionTipo.AVISO
+  ): Promise<void> {
+    try {
+      const notificationRef = doc(
+        this.firestore,
+        `users/${userId}/notifications/${new Date().getTime()}`
+      );
+      const notificationData: Notificacion = {
+        titulo,
+        mensaje,
+        tipo,
+        timestamp: new Date(),
+        leida: false,
+      };
 
-
-
+      await setDoc(notificationRef, notificationData);
+      console.log('Notificación enviada al usuario:', userId);
+    } catch (error) {
+      console.error('Error al enviar la notificación:', error);
+      throw error;
+    }
+  }
 
 }

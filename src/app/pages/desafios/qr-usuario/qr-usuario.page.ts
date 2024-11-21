@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { EventosService } from 'src/app/services/evento.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 
 @Component({
@@ -44,7 +44,8 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
   constructor(
     private eventosService: EventosService,
     private route: ActivatedRoute,
-    private authService: AutenticacionService
+    private authService: AutenticacionService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -124,14 +125,20 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
 
     try {
       if (eventId && alumnoId) {
-        await this.eventosService.actualizarEstadoParticipante(eventId, alumnoId);
+        await this.eventosService.actualizarEstadoParticipante(
+          eventId,
+          alumnoId
+        );
         alert('Asistencia registrada exitosamente para el alumno!');
         this.obtenerAsistencia(); // Recargar la lista después de registrar la asistencia
       } else {
         alert('Error: Información incompleta.');
       }
     } catch (error) {
-      console.error('Error al actualizar la asistencia del participante:', error);
+      console.error(
+        'Error al actualizar la asistencia del participante:',
+        error
+      );
       alert('Error al registrar la asistencia.');
     }
   }
@@ -194,5 +201,9 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     // Aquí puedes redirigir o abrir la funcionalidad de chat
   }
 
-
+  irAEnfrentamiento() {
+    this.router.navigate(['/enfrentamiento'], {
+      queryParams: { eventId: this.eventId }, // Pasar el ID del evento como parámetro
+    });
+  }
 }
