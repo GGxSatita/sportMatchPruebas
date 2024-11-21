@@ -36,3 +36,9 @@ export interface Desafio {
   results?: ResultModel; // Resultado del desafío
 }
 
+export interface ScoreModel {
+  id: string; // ID único del usuario
+  name: string; // Nombre del usuario
+  score: number; // Puntuación acumulada
+  victories: number; // Número de victorias
+}

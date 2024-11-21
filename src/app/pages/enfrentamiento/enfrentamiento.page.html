@@ -3,12 +3,6 @@
 <ion-content>
   <div class="container">
     <!-- Botón de refresh -->
-    <div class="refresh-container">
-      <ion-button fill="clear" shape="round" (click)="refreshParticipantes()" class="refresh-button">
-        <ion-icon name="refresh-outline"></ion-icon>
-      </ion-button>
-    </div>
-
     <h1 class="title">Enfrentamiento</h1>
 
     <!-- Mostrar puntos para ganar -->
@@ -23,7 +17,10 @@
 
     <!-- Lista de participantes -->
     <ion-list>
-      <ion-item *ngFor="let participante of participantes" [class.animate-points]="participante.id === animatingParticipantId">
+      <ion-item
+        *ngFor="let participante of participantes"
+        [class.animate-points]="participante.id === animatingParticipantId"
+      >
         <ion-avatar slot="start">
           <ion-icon name="person-circle-outline"></ion-icon>
         </ion-avatar>
@@ -46,6 +43,17 @@
       >
         Incrementar Puntaje
       </ion-button>
+    </div>
+    <div *ngIf="ganador" class="action-buttons">
+      <ion-button expand="block" color="primary" (click)="volverAlInicio()"
+        >Volver al Inicio</ion-button
+      >
+      <ion-button
+        expand="block"
+        color="secondary"
+        (click)="volverAListaEventos()"
+        >Volver a la Lista de Eventos</ion-button
+      >
     </div>
   </div>
 </ion-content>

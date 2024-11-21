@@ -7,12 +7,13 @@ export type ChallengeType =
   | 'PARTIDO'
   | 'OBJETIVO';
 
-export interface ParticipantModel {
-  id: string; // ID del alumno (UID de Firebase)
-  name: string; // Nombre del jugador o equipo
-  score: number; // Puntos acumulados o goles anotados
-  setsWon?: number; // Sets ganados (para deportes de sets)
-}
+  export interface ParticipantModel {
+    id: string; // ID del usuario
+    name: string;
+    victories: number;
+    score: number;
+    eventId?: string; // Relación con el evento
+  }
 
 export interface ReglasModel {
   id: string; // ID único de las reglas
