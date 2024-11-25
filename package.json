@@ -40,6 +40,7 @@
     "firebase": "^10.14.1",
     "firebase-admin": "^12.6.0",
     "firestore": "^1.1.6",
+    "gsap": "^3.12.5",
     "html5-qrcode": "^2.3.8",
     "ionicons": "^7.2.1",
     "lottie-web": "^5.12.2",

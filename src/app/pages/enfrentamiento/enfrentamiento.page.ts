@@ -1,22 +1,24 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantesService } from 'src/app/services/participantes.service';
 import { ReglasService } from 'src/app/services/reglas.service';
 import { ParticipantModel } from 'src/app/models/desafio';
-import { AutenticacionService } from 'src/app/services/autenticacion.service';
-import { interval, Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
+import { gsap } from 'gsap';
 import {
-  IonList,
   IonContent,
+  IonList,
   IonItem,
+  IonLabel,
   IonAvatar,
   IonIcon,
-  IonLabel,
   IonButton,
 } from '@ionic/angular/standalone';
-import { FooterComponent } from '../../components/footer/footer.component';
 import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
+import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { EventosService } from 'src/app/services/evento.service';
 
 @Component({
   selector: 'app-enfrentamiento',
@@ -24,16 +26,16 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./enfrentamiento.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    IonButton,
-    IonLabel,
-    IonIcon,
-    IonAvatar,
-    IonItem,
     IonContent,
     IonList,
-    FooterComponent,
+    IonItem,
+    IonLabel,
+    IonAvatar,
+    IonIcon,
+    IonButton,
     HeaderComponent,
+    FooterComponent,
+    CommonModule,
   ],
 })
 export class EnfrentamientoPage implements OnInit, OnDestroy {
@@ -45,41 +47,34 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
   currentParticipante: ParticipantModel | null = null;
   animatingParticipantId: string | null = null;
   eventId: string = '';
+  eventName: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private participantesService: ParticipantesService,
     private reglasService: ReglasService,
+    private eventosService: EventosService,
     private authService: AutenticacionService,
     private router: Router
   ) {}
 
   async ngOnInit() {
-    this.currentUserId = this.authService.getUserId() || '';
-
-    if (!this.currentUserId) {
-      console.error('Error: Usuario no autenticado');
-      return;
-    }
-
     this.eventId = this.route.snapshot.queryParamMap.get('eventId')!;
     if (!this.eventId) {
       console.error('Error: No se proporcionó eventId');
       return;
     }
 
-    // Cargar reglas del evento
-    await this.loadReglas();
+    this.eventName = await this.obtenerTituloDelEvento(this.eventId);
+    this.currentUserId = (await this.authService.getCurrentUserAsync())?.uid || '';
 
-    // Registrar al usuario actual
+    await this.loadReglas();
     await this.registrarParticipante();
 
-    // Configurar auto-refresh
+    this.refreshParticipantes();
     this.autoRefreshSubscription = interval(10000).subscribe(() => {
       this.refreshParticipantes();
     });
-
-    this.refreshParticipantes();
   }
 
   ngOnDestroy() {
@@ -88,23 +83,24 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     }
   }
 
+  async obtenerTituloDelEvento(eventId: string): Promise<string> {
+    const evento = await this.eventosService.getEvento(eventId);
+    return evento?.titulo || 'Evento Sin Nombre';
+  }
+
   private async loadReglas() {
-    try {
-      const reglas = await this.reglasService.getReglasByEventId(this.eventId);
-      this.maxPoints = reglas?.pointsToWin || 0;
-    } catch (error) {
-      console.error('Error al cargar las reglas:', error);
-    }
+    const reglas = await this.reglasService.getReglasByEventId(this.eventId);
+    this.maxPoints = reglas?.pointsToWin || 0;
   }
 
   private async registrarParticipante() {
     const currentUser = await this.authService.getCurrentUserAsync();
-    const userName = currentUser?.displayName || 'Usuario Anónimo';
     const participante: ParticipantModel = {
-      id: this.currentUserId,
-      name: userName,
+      id: currentUser?.uid || '',
+      name: currentUser?.displayName || 'Usuario Anónimo',
       victories: 0,
       score: 0,
+      equipo: '', // No aplica para enfrentamientos normales
     };
     await this.participantesService.addParticipante(participante, this.eventId);
   }
@@ -119,57 +115,45 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       }
     );
   }
+  incrementarRonda() {
+    this.participantes.forEach(async (participante) => {
+      participante.score += 1; // Incrementa el puntaje de todos los participantes
+      this.animarTarjeta(participante.id); // Realiza la animación de la tarjeta
+      await this.participantesService.addParticipante(participante, this.eventId); // Actualiza en Firestore
+    });
 
-  async incrementarPuntaje(participanteId: string) {
-    const participante = this.participantes.find(
-      (p) => p.id === participanteId
-    );
-
-    if (participante) {
-      if (this.ganador) {
-        console.warn('El enfrentamiento ya tiene un ganador:', this.ganador);
-        return;
-      }
-
-      participante.score += 1;
-
-      // Verificar si el participante alcanzó el máximo de puntos
-      if (participante.score >= this.maxPoints) {
-        this.ganador = participante.name;
-
-        // Guardar puntaje del ganador
-        await this.participantesService.guardarPuntaje(participante, true);
-
-        // Guardar puntaje de los perdedores
-        const perdedores = this.participantes.filter(
-          (p) => p.id !== participanteId
-        );
-        for (const perdedor of perdedores) {
-          await this.participantesService.guardarPuntaje(perdedor, false);
-        }
-
-        console.log(`¡Ganador declarado!: ${this.ganador}`);
-      }
-
-      // Animar puntos
-      this.animatingParticipantId = participanteId;
-      setTimeout((): void => (this.animatingParticipantId = null), 500);
-
-      console.log(
-        `Puntaje actualizado para ${participante.name}: ${participante.score}`
-      );
-      this.participantesService.addParticipante(participante, this.eventId); // Actualizar participante en Firestore
-    }
+    this.verificarGanador(); // Verifica si alguno alcanzó el puntaje máximo
   }
+  async incrementarPuntaje(participanteId: string) {
+    const participante = this.participantes.find((p) => p.id === participanteId);
+    if (!participante) return;
 
-  private definirGanador(nombreGanador: string) {
-    this.ganador = nombreGanador;
+    if (this.ganador) {
+      console.warn('Ya existe un ganador:', this.ganador);
+      return;
+    }
+
+    participante.score += 1;
+
+    this.animarTarjeta(participante.id);
+
+    if (participante.score >= this.maxPoints) {
+      this.ganador = participante.name;
+
+      // Guardar puntaje del ganador
+      await this.participantesService.guardarPuntaje(participante, true);
+    } else {
+      // Guardar puntaje del participante sin victoria
+      await this.participantesService.guardarPuntaje(participante, false);
+    }
+
+    await this.participantesService.addParticipante(participante, this.eventId);
   }
 
   private verificarGanador() {
     const ganador = this.participantes.find((p) => p.score >= this.maxPoints);
     if (ganador && !this.ganador) {
-      this.definirGanador(ganador.name);
+      this.ganador = ganador.name;
     }
   }
 
@@ -177,13 +161,26 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     this.currentParticipante =
       this.participantes.find((p) => p.id === this.currentUserId) || null;
   }
-  // Método para volver al inicio
+
   volverAlInicio() {
-    this.router.navigate(['/inicio']); // Ajusta la ruta según tu aplicación
+    this.router.navigate(['/menu-principal']);
   }
 
-  // Método para volver a la lista de eventos
   volverAListaEventos() {
-    this.router.navigate(['/eventos']); // Ajusta la ruta según tu aplicación
+    this.router.navigate(['/evento-list']);
+  }
+
+  animarTarjeta(participanteId: string) {
+    const playerCard = document.getElementById(`card-${participanteId}`);
+    if (playerCard) {
+      gsap.fromTo(
+        playerCard,
+        { scale: 1, backgroundColor: '#fff' },
+        { scale: 1.1, backgroundColor: '#ffcc00', duration: 0.5, yoyo: true, repeat: 1 }
+      );
+    }
+  }
+  handleImageError(event: any) {
+    event.target.src = 'assets/img/default-profile.png'; // Imagen por defecto si la URL falla
   }
 }

@@ -6,10 +6,13 @@ export type ChallengeStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'FINALIZADO';
 export type ChallengeType = 'PUNTOS' | 'GOLES' | 'SETS' | 'PARTIDO' | 'OBJETIVO';
 
 export interface ParticipantModel {
-  id: string; // ID único del participante
-  name: string; // Nombre del participante
-  score: number; // Contador de puntos acumulados
-  victories: number; // Contador de victorias
+  id: string; // ID del usuario
+  name: string;
+  victories: number;
+  score: number;
+  equipo?: string; // Nombre del equipo al que pertenece el jugador
+  eventId?: string; // Relación con el evento
+  photo?: string
 }
 
 export interface RulesModel {
@@ -37,8 +40,9 @@ export interface Desafio {
 }
 
 export interface ScoreModel {
-  id: string; // ID único del usuario
-  name: string; // Nombre del usuario
-  score: number; // Puntuación acumulada
+  id: string;        // ID único del usuario
+  name: string;      // Nombre del usuario
+  score: number;     // Puntuación acumulada
   victories: number; // Número de victorias
+  rank: string;      // Rango del jugador (Principiante, Intermedio, Avanzado, Experto, etc.)
 }

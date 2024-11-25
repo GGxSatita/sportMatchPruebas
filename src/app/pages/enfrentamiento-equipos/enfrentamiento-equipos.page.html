@@ -1,0 +1,71 @@
+<app-header></app-header>
+
+<ion-content>
+  <div class="container">
+    <!-- Nombre del evento -->
+    <h1 class="title" *ngIf="eventName; else loading">Enfrentamiento por Equipos: {{ eventName }}</h1>
+    <ng-template #loading>
+      <h1 class="title">Cargando...</h1>
+    </ng-template>
+
+    <!-- Selección de equipo -->
+    <div *ngIf="mostrarSeleccionEquipo" class="equipo-selection">
+      <h3>Selecciona tu equipo:</h3>
+      <ion-radio-group [(ngModel)]="equipoSeleccionado">
+        <ion-item *ngFor="let equipo of equipos">
+          <ion-label>{{ equipo.name }}</ion-label>
+          <ion-radio slot="start" [value]="equipo.name"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+      <ion-button expand="block" (click)="unirseAEquipo()" [disabled]="!equipoSeleccionado">
+        Unirse al equipo
+      </ion-button>
+    </div>
+
+    <!-- Mostrar puntajes y participantes -->
+    <div *ngIf="!mostrarSeleccionEquipo" class="equipos-container">
+      <div class="equipo" *ngFor="let equipo of equipos">
+        <h3>{{ equipo.name }}</h3>
+        <p>Puntaje: {{ equipo.score }}</p>
+        <ion-list>
+          <ion-item
+            *ngFor="let participante of getParticipantesPorEquipo(equipo.name)"
+            [id]="'card-' + participante.id"
+          >
+            <ion-avatar slot="start">
+              <img
+                [src]="participante.photo || 'assets/img/default-profile.png'"
+                alt="Foto de perfil de {{ participante.name }}"
+                (error)="handleImageError($event)"
+              />
+            </ion-avatar>
+            <ion-label>
+              <h2 class="player-name">{{ participante.name }}</h2>
+              <p>Puntaje: {{ participante.score }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
+
+    <!-- Botón Ronda Ganada -->
+    <div *ngIf="!mostrarSeleccionEquipo" class="ronda-container">
+      <ion-button expand="block" color="success" (click)="incrementarRondaEquipo()">
+        Ronda Ganada
+      </ion-button>
+    </div>
+
+    <!-- Mensaje de equipo ganador -->
+    <div *ngIf="ganador" class="ganador-container animate-winner">
+      <h2>¡El equipo ganador es: {{ ganador }}!</h2>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="action-buttons">
+      <ion-button expand="block" color="primary" (click)="volverAlInicio()">Home</ion-button>
+      <ion-button expand="block" color="secondary" (click)="volverAListaEventos()">Eventos</ion-button>
+    </div>
+  </div>
+</ion-content>
+
+<app-footer></app-footer>

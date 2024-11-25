@@ -87,6 +87,10 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'enfrentamiento-equipos',
+    loadComponent: () => import('./pages/enfrentamiento-equipos/enfrentamiento-equipos.page').then( m => m.EnfrentamientoEquiposPage)
+  },
+  {
     path: 'enfrentamiento-espera',
     loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
   },
@@ -142,7 +146,8 @@ export const routes: Routes = [
     path: 'vista-usaurio',
     loadComponent: () => import('./pages/desafios/vista-usaurio/vista-usaurio.page').then( m => m.VistaUsaurioPage),
     canActivate:[authGuard]
-  }
+  },
+
 
 
 

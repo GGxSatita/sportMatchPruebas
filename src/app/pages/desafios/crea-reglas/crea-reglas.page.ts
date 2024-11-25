@@ -22,28 +22,42 @@ import {
   IonCol,
   IonItem,
   IonButton,
+  IonToggle,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
-import { FooterComponent } from "../../../components/footer/footer.component";
-import { HeaderComponent } from "../../../components/header/header.component";
+import { FooterComponent } from '../../../components/footer/footer.component';
+import { HeaderComponent } from '../../../components/header/header.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-crea-reglas',
   templateUrl: './crea-reglas.page.html',
   styleUrls: ['./crea-reglas.page.scss'],
   standalone: true,
-  imports: [IonButton,
+  imports: [
+    IonButton,
     IonItem,
     IonCol,
     IonRow,
     IonContent,
     IonLabel,
     IonInput,
-    ReactiveFormsModule, FooterComponent, HeaderComponent]
+    IonToggle,
+    IonSelect,
+    IonSelectOption,
+    ReactiveFormsModule,
+    FooterComponent,
+    HeaderComponent,
+    CommonModule
+  ],
 })
 export class CreaReglasPage implements OnInit {
-
   reglasForm: FormGroup;
   botonConfigurarDesafioDisabled = false;
+
+  // Valores para puntos de victoria
+  puntos: number[] = Array.from({ length: 10 }, (_, i) => i + 1); // [1, 2, ..., 10]
 
   constructor(
     private fb: FormBuilder,
@@ -54,9 +68,11 @@ export class CreaReglasPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Inicialización del formulario
     this.reglasForm = this.fb.group({
-      pointsToWin: ['', Validators.required],
-      reglasAdicionales: [''],
+      pointsToWin: [null, Validators.required], // Campo requerido
+      reglasAdicionales: [''], // Campo opcional
+      esPorEquipos: [false], // Valor booleano predeterminado
     });
   }
 
@@ -73,6 +89,7 @@ export class CreaReglasPage implements OnInit {
           eventId: this.route.snapshot.queryParams['eventoId'] || null,
           ...reglasData,
         };
+
         try {
           await this.reglasService.createReglas(newReglas);
           console.log('Reglas guardadas:', newReglas);

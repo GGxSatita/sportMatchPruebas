@@ -10,7 +10,7 @@ import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { DeportesService } from 'src/app/services/deportes.service';
-import { Models } from 'src/app/models/models';
+import { Models, ScoreModel } from 'src/app/models/models';
 import { Router } from '@angular/router';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Deporte } from 'src/app/models/deporte';
@@ -32,6 +32,7 @@ export class UserPerfilPage implements OnInit {
   firestoreService: FirestoreService = inject(FirestoreService);
   storageService: StorageService = inject(StorageService);
   deportesService: DeportesService = inject(DeportesService);
+  userScore: ScoreModel | null = null; // Para almacenar el puntaje y rango del usuario
 
   profileForm: FormGroup;
   user: { email: string, name: string, photo: string };
@@ -68,6 +69,7 @@ export class UserPerfilPage implements OnInit {
     this.deportesService.getDeportes().subscribe((deportes: Deporte[]) => {
       this.deportes = deportes;
     });
+    this.getUserScore();
   }
 
   toggleEditMode() {
@@ -170,6 +172,27 @@ export class UserPerfilPage implements OnInit {
       console.error('Error al refrescar los datos del usuario:', error);
     } finally {
       this.cargando = false;
+    }
+  }
+  async getUserScore() {
+    try {
+      const currentUser = await this.autenticacionService.getCurrentUserAsync();
+      if (!currentUser) {
+        console.warn('No se encontró al usuario actual.');
+        return;
+      }
+
+      const userId = currentUser.uid; // ID del usuario actual
+      const scorePath = `scores/${userId}`; // Ruta del documento en Firestore
+      this.userScore = await this.firestoreService.getDocument<ScoreModel>(scorePath);
+
+      if (this.userScore) {
+        console.log('Puntaje del usuario obtenido:', this.userScore);
+      } else {
+        console.warn('No se encontró el puntaje del usuario en la base de datos.');
+      }
+    } catch (error) {
+      console.error('Error al obtener el puntaje del usuario:', error);
     }
   }
 

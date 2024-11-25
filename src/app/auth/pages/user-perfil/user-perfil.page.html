@@ -40,6 +40,18 @@
               <p>{{ userProfile.deporteFavorito }}</p>
             </ion-item>
           </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="userScore">
+            <ion-item lines="none" class="info-item">
+              <ion-icon name="trophy-outline" slot="start" class="info-icon"></ion-icon>
+              <p>Puntaje: {{ userScore.score }}</p>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="userScore">
+            <ion-item lines="none" class="info-item">
+              <ion-icon name="medal-outline" slot="start" class="info-icon"></ion-icon>
+              <p>Rango: {{ userScore.rank }}</p>
+            </ion-item>
+          </ion-col>
         </ion-row>
       </ion-grid>
 

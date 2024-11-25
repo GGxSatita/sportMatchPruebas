@@ -36,9 +36,12 @@
                 "output": "/"
               }
             ],
-            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
-  "src/global.scss",
-  "src/theme/variables.scss"],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/global.scss",
+              "src/theme/variables.scss",
+              "node_modules/animate.css/animate.min.css"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -113,9 +116,12 @@
                 "output": "assets"
               }
             ],
-            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
-  "src/global.scss",
-  "src/theme/variables.scss"],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/global.scss",
+              "src/theme/variables.scss",
+              "node_modules/animate.css/animate.min.css"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -135,9 +141,7 @@
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@ionic/angular-toolkit"
-    ],
+    "schematicCollections": ["@ionic/angular-toolkit"],
     "analytics": "2282153e-536b-4b29-b876-522a86888d66"
   },
   "schematics": {

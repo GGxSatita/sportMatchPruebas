@@ -3,14 +3,26 @@
   <ion-row>
     <ion-col size="12">
       <form [formGroup]="reglasForm">
-        <!-- Campos del formulario -->
+        <!-- Selección de puntos para ganar -->
         <ion-item>
           <ion-label position="stacked">Puntos para ganar</ion-label>
-          <ion-input formControlName="pointsToWin" type="number"></ion-input>
+          <ion-select formControlName="pointsToWin">
+            <ion-select-option *ngFor="let point of puntos" [value]="point">
+              {{ point }}
+            </ion-select-option>
+          </ion-select>
         </ion-item>
+
+        <!-- Campo para reglas adicionales -->
         <ion-item>
           <ion-label position="stacked">Reglas Adicionales</ion-label>
           <ion-input formControlName="reglasAdicionales"></ion-input>
+        </ion-item>
+
+        <!-- Selección de juego por equipos -->
+        <ion-item>
+          <ion-label>Juego por equipos</ion-label>
+          <ion-toggle formControlName="esPorEquipos"></ion-toggle>
         </ion-item>
 
         <!-- Botón para guardar reglas -->

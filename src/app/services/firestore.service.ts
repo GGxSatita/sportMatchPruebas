@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, serverTimestamp , doc, collection, setDoc, updateDoc, docData} from '@angular/fire/firestore';
+import { Firestore, serverTimestamp , doc, collection, setDoc, updateDoc, docData, getDoc} from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ModelsAuth } from '../models/auth.models';
 
@@ -59,5 +59,21 @@ export class FirestoreService {
     // Referencia al documento y suscripción a los cambios
     const refDocument = doc(this.firestore, path);
     return docData(refDocument) as Observable<tipo>;
+  }
+  async getDocument<T>(path: string): Promise<T | null> {
+    try {
+      const docRef = doc(this.firestore, path);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        return docSnap.data() as T;
+      } else {
+        console.warn(`El documento en la ruta ${path} no existe.`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error al obtener el documento en la ruta ${path}:`, error);
+      return null;
+    }
   }
 }

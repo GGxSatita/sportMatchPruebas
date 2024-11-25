@@ -8,6 +8,7 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { EventosService } from 'src/app/services/evento.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { ReglasService } from 'src/app/services/reglas.service';
 
 @Component({
   selector: 'app-qr-usuario',
@@ -43,6 +44,7 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
 
   constructor(
     private eventosService: EventosService,
+    private reglasService: ReglasService,
     private route: ActivatedRoute,
     private authService: AutenticacionService,
     private router: Router
@@ -201,9 +203,21 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     // Aquí puedes redirigir o abrir la funcionalidad de chat
   }
 
-  irAEnfrentamiento() {
-    this.router.navigate(['/enfrentamiento'], {
-      queryParams: { eventId: this.eventId }, // Pasar el ID del evento como parámetro
-    });
+  async irAEnfrentamiento() {
+    try {
+      const reglas = await this.reglasService.getReglasByEventId(this.eventId);
+
+      if (reglas?.esPorEquipos) {
+        this.router.navigate(['/enfrentamiento-equipos'], {
+          queryParams: { eventId: this.eventId },
+        });
+      } else {
+        this.router.navigate(['/enfrentamiento'], {
+          queryParams: { eventId: this.eventId },
+        });
+      }
+    } catch (error) {
+      console.error('Error al verificar las reglas del evento:', error);
+    }
   }
 }
