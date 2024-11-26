@@ -6,7 +6,6 @@ import { Reporte } from '../models/reportes';
 @Injectable({
   providedIn: 'root'
 })
-
 export class ReportesService {
 
   private reportesCollection = collection(this.firestore, 'Reportes');
