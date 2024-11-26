@@ -9,6 +9,8 @@ import { EventosService } from 'src/app/services/evento.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { ReglasService } from 'src/app/services/reglas.service';
+import { ReportesService } from 'src/app/services/reportes.service';
+import { Reporte } from 'src/app/models/reportes';
 
 @Component({
   selector: 'app-qr-usuario',
@@ -47,7 +49,8 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     private reglasService: ReglasService,
     private route: ActivatedRoute,
     private authService: AutenticacionService,
-    private router: Router
+    private router: Router,
+    private reportesService: ReportesService 
   ) {}
 
   ngOnInit() {
@@ -168,21 +171,47 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     this.modalAbierto = false;
     this.reporteForm = { razon: '', reportadoId: '', detallesAdicionales: '' }; // Reinicia el formulario
   }
-
-  enviarReporte() {
-    const reporte = {
-      ...this.reporteForm,
-      usuarioId: this.authService.getUserId(),
-      fechaCreacion: new Date(),
-      estado: 'Abierto',
-      visibleUsuario: true,
+  
+  async enviarReporte() {
+    const usuarioId = this.authService.getUserId();
+  
+    if (!usuarioId) {
+      alert('Error: No se pudo obtener el ID del usuario autenticado.');
+      return;
+    }
+  
+    // Validación del valor de razón para que coincida con los valores permitidos
+    const razonValida = ['Retraso', 'Mala competitividad', 'Tóxico', 'Otro'].includes(this.reporteForm.razon)
+      ? this.reporteForm.razon
+      : 'Otro'; // Asignar "Otro" si la razón no es válida.
+  
+    // Construcción del objeto de reporte
+    const reporte: Reporte = {
+      usuarioId: usuarioId,
+      reportadoId: this.reporteForm.reportadoId, // ID de la persona reportada
+      tipoReporte: razonValida, // Se utiliza la razón como tipo de reporte
+      razon: razonValida as 'Retraso' | 'Mala competitividad' | 'Tóxico' | 'Otro', // Cast explícito al tipo permitido
+      mensaje: this.reporteForm.detallesAdicionales || 'No se proporcionó un mensaje adicional', // Mensaje predeterminado si no se proporciona
+      estado: 'Abierto', // Estado inicial del reporte
+      fechaCreacion: new Date(), // Fecha de creación actual
+      visibleUsuario: true, // El reporte es visible para el usuario
+      detallesAdicionales: this.reporteForm.detallesAdicionales || undefined, // Detalles adicionales opcionales
     };
-
-    // Aquí puedes usar un servicio para guardar el reporte en tu backend
-    console.log('Reporte enviado:', reporte);
-
-    this.cerrarFormularioReporte(); // Cierra el modal
+  
+    try {
+      // Intento de enviar el reporte al servicio
+      await this.reportesService.crearReporte(reporte);
+      alert('Reporte enviado exitosamente.');
+      this.cerrarFormularioReporte(); // Cierra el formulario o modal
+    } catch (error) {
+      console.error('Error al enviar el reporte:', error);
+      alert('Error al enviar el reporte. Por favor, intenta nuevamente.');
+    }
   }
+  
+  
+
+  
 
   onScanFailure(error: any) {
     console.warn(`Error de escaneo: ${error}`);
