@@ -53,7 +53,20 @@
   <ng-template>
 
 
+
     <ion-content>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cerrarFormularioReporte()">
+              <ion-icon name="arrow-back"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title>Lista de Participantes</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
       <form (ngSubmit)="enviarReporte()">
         <ion-list>
           <ion-item>
