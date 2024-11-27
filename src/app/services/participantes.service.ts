@@ -169,7 +169,26 @@ export class ParticipantesService {
       }
     }
   }
+  async getParticipanteByEventAndUser(
+    eventId: string,
+    userId: string
+  ): Promise<ParticipantModel | null> {
+    const participanteRef = doc(
+      this.firestore,
+      `eventos/${eventId}/participantes/${userId}`
+    );
+    const participanteSnapshot = await getDoc(participanteRef);
 
+    if (participanteSnapshot.exists()) {
+      console.log('Participante encontrado:', participanteSnapshot.data());
+      return participanteSnapshot.data() as ParticipantModel;
+    } else {
+      console.warn(
+        `No se encontró al participante con ID ${userId} en el evento ${eventId}.`
+      );
+      return null;
+    }
+  }
   // **Método NUEVO: Obtener puntajes de los equipos**
   async getPuntajesEquipos(eventId: string): Promise<{ [key: string]: number }> {
     const equiposCollection = collection(this.firestore, this.equiposCollectionPath(eventId));

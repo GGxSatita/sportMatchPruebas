@@ -5,15 +5,8 @@ import { ReglasService } from 'src/app/services/reglas.service';
 import { ParticipantModel } from 'src/app/models/desafio';
 import { Subscription, interval } from 'rxjs';
 import { gsap } from 'gsap';
-import {
-  IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonAvatar,
-  IonIcon,
-  IonButton,
-} from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
+import { IonContent, IonList, IonItem, IonLabel, IonAvatar, IonIcon, IonButton, IonProgressBar } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
@@ -25,18 +18,7 @@ import { EventosService } from 'src/app/services/evento.service';
   templateUrl: './enfrentamiento.page.html',
   styleUrls: ['./enfrentamiento.page.scss'],
   standalone: true,
-  imports: [
-    IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonAvatar,
-    IonIcon,
-    IonButton,
-    HeaderComponent,
-    FooterComponent,
-    CommonModule,
-  ],
+  imports: [IonProgressBar, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonIcon, IonButton, HeaderComponent, FooterComponent, CommonModule],
 })
 export class EnfrentamientoPage implements OnInit, OnDestroy {
   participantes: ParticipantModel[] = [];
@@ -48,6 +30,7 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
   animatingParticipantId: string | null = null;
   eventId: string = '';
   eventName: string = '';
+  progressValue: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,7 +38,8 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     private reglasService: ReglasService,
     private eventosService: EventosService,
     private authService: AutenticacionService,
-    private router: Router
+    private router: Router,
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
@@ -82,7 +66,16 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       this.autoRefreshSubscription.unsubscribe();
     }
   }
+  actualizarProgreso() {
+    // Encontrar el puntaje más alto de los participantes
+    const puntajeMasAlto = Math.max(...this.participantes.map(p => p.score));
 
+    // Calcular el porcentaje de progreso
+    const porcentajeProgreso = (puntajeMasAlto / this.maxPoints) * 100;
+
+    // Actualizar el valor de progressValue, asegurándonos de que no exceda el 100%
+    this.progressValue = Math.min(100, porcentajeProgreso);
+  }
   async obtenerTituloDelEvento(eventId: string): Promise<string> {
     const evento = await this.eventosService.getEvento(eventId);
     return evento?.titulo || 'Evento Sin Nombre';
@@ -101,6 +94,7 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       victories: 0,
       score: 0,
       equipo: '', // No aplica para enfrentamientos normales
+      photo: currentUser?.photoURL || 'assets/default-profile.png',
     };
     await this.participantesService.addParticipante(participante, this.eventId);
   }
@@ -112,62 +106,57 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
         this.participantes = participantes;
         this.setCurrentParticipante();
         this.verificarGanador();
+        this.actualizarProgreso();
       }
     );
   }
-  incrementarRonda() {
-    this.participantes.forEach(async (participante) => {
-      participante.score += 1; // Incrementa el puntaje de todos los participantes
-      this.animarTarjeta(participante.id); // Realiza la animación de la tarjeta
-      await this.participantesService.addParticipante(participante, this.eventId); // Actualiza en Firestore
-    });
 
-    this.verificarGanador(); // Verifica si alguno alcanzó el puntaje máximo
-  }
-  async incrementarPuntaje(participanteId: string) {
-    const participante = this.participantes.find((p) => p.id === participanteId);
-    if (!participante) return;
-
+  async incrementarRonda() {
+    // Verificar si ya existe un ganador
     if (this.ganador) {
-      console.warn('Ya existe un ganador:', this.ganador);
+      const toast = await this.toastController.create({
+        message: 'El evento ya tiene un ganador. No puedes aumentar más puntos.',
+        duration: 2000,
+        color: 'warning',
+      });
+      toast.present();
       return;
     }
 
-    participante.score += 1;
+    // Encontrar al participante actual
+    const currentParticipante = this.participantes.find((p) => p.id === this.currentUserId);
 
-    this.animarTarjeta(participante.id);
+    // Si el participante actual existe, incrementar su puntaje
+    if (currentParticipante) {
+      currentParticipante.score += 1;  // Incrementa el puntaje del participante actual
+      this.animarTarjeta(currentParticipante.id); // Realiza la animación de la tarjeta
 
-    if (participante.score >= this.maxPoints) {
-      this.ganador = participante.name;
-
-      // Guardar puntaje del ganador
-      await this.participantesService.guardarPuntaje(participante, true);
-    } else {
-      // Guardar puntaje del participante sin victoria
-      await this.participantesService.guardarPuntaje(participante, false);
+      // Actualiza el puntaje del participante en Firestore
+      await this.participantesService.addParticipante(currentParticipante, this.eventId);
     }
 
-    await this.participantesService.addParticipante(participante, this.eventId);
+    this.verificarGanador(); // Verifica si el participante actual o algún otro ha alcanzado el puntaje máximo
   }
 
   private verificarGanador() {
     const ganador = this.participantes.find((p) => p.score >= this.maxPoints);
     if (ganador && !this.ganador) {
       this.ganador = ganador.name;
+
+      // Guardar puntaje del ganador
+      this.participantesService.guardarPuntaje(ganador, true);
+
+      // Registrar que el evento ha terminado
+      this.eventosService.marcarEventoComoTerminado(this.eventId);
     }
   }
 
   private setCurrentParticipante() {
-    this.currentParticipante =
-      this.participantes.find((p) => p.id === this.currentUserId) || null;
+    this.currentParticipante = this.participantes.find((p) => p.id === this.currentUserId) || null;
   }
 
   volverAlInicio() {
     this.router.navigate(['/menu-principal']);
-  }
-
-  volverAListaEventos() {
-    this.router.navigate(['/evento-list']);
   }
 
   animarTarjeta(participanteId: string) {
@@ -180,6 +169,7 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       );
     }
   }
+
   handleImageError(event: any) {
     event.target.src = 'assets/img/default-profile.png'; // Imagen por defecto si la URL falla
   }

@@ -1,88 +1,144 @@
-/* Animación al destacar el participante que anotó */
-.participante-card.animate-points {
-  animation: pulseHighlight 1s ease-in-out;
+/* Contenedor general */
+.container {
+  padding: 1rem;
+  color: #333333;
+  background: #ffffff;
+  min-height: 100vh;
 }
 
-@keyframes pulseHighlight {
-  0% {
-    background-color: #ffcc00;
-    transform: scale(1);
-  }
-  50% {
-    background-color: #ffdd44;
-    transform: scale(1.05);
-  }
-  100% {
-    background-color: transparent;
-    transform: scale(1);
-  }
+/* Título con borde negro */
+.title-container {
+  text-align: center;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  color: #ff724c;
+}
+
+/* Información adicional */
+.info-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.info {
+  font-size: 1.2rem;
+  color: #666666;
+}
+
+/* Participantes y Equipos con borde negro */
+.bordered-box {
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar */
+ion-avatar img {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 50px;
+  height: 50px;
+}
+
+/* Botón principal (Ronda Ganada) */
+.circle-button {
+  width: 70px;
+  height: 70px;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto;
+  border-radius: 50%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Iconos de los botones con sombra */
+.circle-button ion-icon {
+  font-size: 2rem;
+  color: #ffffff;  /* Mantener el color original */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra más densa para simular grosor */
+}
+
+/* Botón de salida */
+.exit-button {
+  width: 70px;
+  height: 70px;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto;
+  border-radius: 50%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Iconos de los botones con sombra */
+.exit-button ion-icon {
+  font-size: 2rem;
+  color: #ffffff;  /* Mantener el color original */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra más densa para simular grosor */
 }
 
 /* Ganador */
 .ganador-container {
   text-align: center;
-  margin-top: 20px;
-  animation: fadeIn 1s ease-in;
+  margin: 1rem 0;
+  font-size: 1.5rem;
+  color: #ff724c;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-/* Estilo general */
-.container {
-  padding: 20px;
-}
-
-.equipo-selection {
-  margin-bottom: 20px;
-}
-
-.equipos-container {
-  margin: 20px 0;
-}
-.ronda-container {
-  margin: 20px 0;
-  text-align: center;
-}
-
-.ganador-container {
-  background-color: #ffcc00;
-  color: #000;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 20px 0;
-  text-align: center;
-}
-
-.equipos-container {
+/* Imagen pulsante */
+.imagen-container {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.equipo {
-  width: 48%;
-  background-color: #ca5b17;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
   margin-top: 20px;
 }
-.player-name {
-  font-size: 0.5em; /* Reducir tamaño del nombre */
-  color: #ffffff; /* Opcional: Cambiar color */
+
+.imagen-pulsante {
+  width: 150px;
+  height: 150px;
+  animation: pulsar 1s ease-in-out infinite;
 }
 
+.imagen-completada {
+  width: 150px;
+  height: 150px;
+}
+
+@keyframes pulsar {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

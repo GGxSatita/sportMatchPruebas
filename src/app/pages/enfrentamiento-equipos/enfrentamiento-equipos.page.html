@@ -2,31 +2,72 @@
 
 <ion-content>
   <div class="container">
-    <!-- Nombre del evento -->
-    <h1 class="title" *ngIf="eventName; else loading">Enfrentamiento por Equipos: {{ eventName }}</h1>
-    <ng-template #loading>
-      <h1 class="title">Cargando...</h1>
-    </ng-template>
+    <!-- Título del enfrentamiento con borde -->
+    <div class="title-container bordered-box">
+      <h1 class="title" calss="ion-color-primary">{{ eventName }}</h1>
+      <div class="imagen-container">
+        <img
+          *ngIf="!ganador"
+          [src]="'assets/img/favicon3.png'"
+          class="imagen-pulsante"
+          alt="Imagen que palpita"
+        />
+        <img
+          *ngIf="ganador"
+          [src]="'assets/img/COPA.jpg'"
+          class="imagen-completada"
+          alt="Imagen de victoria"
+        />
+      </div>
+      <!-- Mensaje de equipo ganador y botón de salida -->
+      <div *ngIf="ganador" class="ganador-container">
+        <h2>¡El equipo ganador es: {{ ganador }}!</h2>
+        <ion-button
+          shape="round"
+          color="danger"
+          class="exit-button"
+          (click)="volverAlInicio()"
+        >
+          <ion-icon name="exit-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <!-- Barra de progreso de la meta -->
+      <p class="info"><strong>Progreso:</strong></p>
+      <ion-progress-bar
+        [value]="progressValue / 100"
+        color="primary"
+      ></ion-progress-bar>
+    </div>
 
     <!-- Selección de equipo -->
     <div *ngIf="mostrarSeleccionEquipo" class="equipo-selection">
-      <h3>Selecciona tu equipo:</h3>
+      <h3 class="section-title">Selecciona tu equipo:</h3>
       <ion-radio-group [(ngModel)]="equipoSeleccionado">
         <ion-item *ngFor="let equipo of equipos">
           <ion-label>{{ equipo.name }}</ion-label>
           <ion-radio slot="start" [value]="equipo.name"></ion-radio>
         </ion-item>
       </ion-radio-group>
-      <ion-button expand="block" (click)="unirseAEquipo()" [disabled]="!equipoSeleccionado">
-        Unirse al equipo
+      <ion-button
+        shape="round"
+        class="circle-button"
+        (click)="unirseAEquipo()"
+        [disabled]="!equipoSeleccionado"
+      >
+        <ion-icon name="people-outline"></ion-icon>
       </ion-button>
     </div>
 
-    <!-- Mostrar puntajes y participantes -->
+    <!-- Mostrar puntajes y participantes con bordes para cada equipo -->
     <div *ngIf="!mostrarSeleccionEquipo" class="equipos-container">
-      <div class="equipo" *ngFor="let equipo of equipos">
-        <h3>{{ equipo.name }}</h3>
-        <p>Puntaje: {{ equipo.score }}</p>
+      <div class="equipo bordered-box" *ngFor="let equipo of equipos">
+        <h3 class="section-title">{{ equipo.name }}</h3>
+        <!-- Barra de progreso de equipo -->
+        <ion-progress-bar
+          [value]="equipo.score / maxPoints"
+          color="secondary"
+        ></ion-progress-bar>
+        <p class="equipo-score">Puntaje: {{ equipo.score }}</p>
         <ion-list>
           <ion-item
             *ngFor="let participante of getParticipantesPorEquipo(equipo.name)"
@@ -49,21 +90,15 @@
     </div>
 
     <!-- Botón Ronda Ganada -->
-    <div *ngIf="!mostrarSeleccionEquipo" class="ronda-container">
-      <ion-button expand="block" color="success" (click)="incrementarRondaEquipo()">
-        Ronda Ganada
+    <div *ngIf="!ganador" class="ronda-container">
+      <ion-button
+        shape="round"
+        color="success"
+        class="circle-button"
+        (click)="incrementarRondaEquipo()"
+      >
+        <ion-icon name="trophy-outline"></ion-icon>
       </ion-button>
-    </div>
-
-    <!-- Mensaje de equipo ganador -->
-    <div *ngIf="ganador" class="ganador-container animate-winner">
-      <h2>¡El equipo ganador es: {{ ganador }}!</h2>
-    </div>
-
-    <!-- Botones de navegación -->
-    <div class="action-buttons">
-      <ion-button expand="block" color="primary" (click)="volverAlInicio()">Home</ion-button>
-      <ion-button expand="block" color="secondary" (click)="volverAListaEventos()">Eventos</ion-button>
     </div>
   </div>
 </ion-content>

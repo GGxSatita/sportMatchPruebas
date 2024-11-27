@@ -33,4 +33,21 @@ export class EnfrentamientoService {
     const docSnap = await getDoc(docRef);
     return docSnap.exists() ? (docSnap.data() as EnfrentamientoModel) : null;
   }
+  async marcarInterrumpidoSiJugadorSeVa(id: string, participantes: EnfrentamientoModel['participantes']): Promise<void> {
+    const docRef = doc(this.firestore, `${this.enfrentamientosCollection}/${id}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const enfrentamientoData = docSnap.data() as EnfrentamientoModel;
+
+      // Verificar si algún participante se ha ido
+      const jugadorAbandonado = participantes.some(participante => participante.estaActivo === false);
+
+      if (jugadorAbandonado && !enfrentamientoData.ganador) {
+        // Si un jugador se ha ido y el enfrentamiento no tiene ganador, marcar como interrumpido
+        await updateDoc(docRef, { interrumpido: true });
+        console.log(`El enfrentamiento ${id} ha sido marcado como interrumpido debido a que un jugador abandonó.`);
+      }
+    }
+  }
 }

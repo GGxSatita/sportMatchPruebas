@@ -6,6 +6,7 @@ import { ParticipantModel } from 'src/app/models/desafio';
 import { Subscription, interval } from 'rxjs';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { ToastController } from '@ionic/angular';
 import {
   IonContent,
   IonList,
@@ -15,7 +16,7 @@ import {
   IonIcon,
   IonButton,
   IonRadioGroup,
-  IonRadio,
+  IonRadio, IonCard, IonCardHeader, IonCardContent, IonProgressBar
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +29,7 @@ import { EventosService } from 'src/app/services/evento.service';
   templateUrl: './enfrentamiento-equipos.page.html',
   styleUrls: ['./enfrentamiento-equipos.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonProgressBar, IonCardContent, IonCardHeader, IonCard,
     IonRadio,
     IonRadioGroup,
     IonButton,
@@ -56,6 +57,7 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
   ganador: string | null = null;
   currentUserId: string = '';
   eventName: string = '';
+  progressValue: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -63,7 +65,8 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     private eventosService: EventosService,
     private reglasService: ReglasService,
     private authService: AutenticacionService,
-    private router: Router
+    private router: Router,
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
@@ -75,6 +78,7 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
 
     await this.loadEventDetails();
     await this.loadReglas();
+    await this.checkEquipoSeleccionado();
     this.refreshParticipantes();
 
     this.autoRefreshSubscription = interval(10000).subscribe(() => {
@@ -87,7 +91,16 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       this.autoRefreshSubscription.unsubscribe();
     }
   }
+  actualizarProgreso() {
+    // Encontrar el equipo con el puntaje más alto
+    const puntajeEquipoMasAlto = Math.max(...this.equipos.map(equipo => equipo.score));
 
+    // Calcular el porcentaje de progreso basado en el puntaje del equipo más alto
+    const porcentajeProgreso = (puntajeEquipoMasAlto / this.maxPoints) * 100;
+
+    // Actualizar el valor de progressValue, asegurándonos de que no exceda el 100%
+    this.progressValue = Math.min(100, porcentajeProgreso);
+  }
   private async loadEventDetails() {
     try {
       const evento = await this.eventosService.getEvento(this.eventId);
@@ -122,6 +135,30 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     }
   }
 
+  private async checkEquipoSeleccionado() {
+    try {
+      const currentUser = await this.authService.getCurrentUserAsync();
+      this.currentUserId = currentUser?.uid || '';
+
+      // Verificar si el participante ya tiene un equipo asignado
+      const participante = await this.participantesService.getParticipanteByEventAndUser(
+        this.eventId,
+        this.currentUserId
+      );
+
+      if (participante && participante.equipo) {
+        console.log('Usuario ya tiene equipo asignado:', participante.equipo);
+        // Ocultar selección de equipo y mostrar el enfrentamiento
+        this.mostrarSeleccionEquipo = false;
+      } else {
+        console.log('El usuario no tiene equipo asignado. Mostrando selección de equipo.');
+        this.mostrarSeleccionEquipo = true;
+      }
+    } catch (error) {
+      console.error('Error verificando si el usuario ya eligió un equipo:', error);
+    }
+  }
+
   refreshParticipantes() {
     this.participantesService.getParticipantesTiempoReal(
       this.eventId,
@@ -141,14 +178,25 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     });
   }
 
+  // Función agregada para obtener participantes por equipo
   getParticipantesPorEquipo(equipoName: string): ParticipantModel[] {
     return this.participantes.filter((p) => p.equipo === equipoName);
   }
 
-  incrementarRondaEquipo() {
-    const currentUser = this.participantes.find(
-      (p) => p.id === this.currentUserId
-    );
+  async incrementarRondaEquipo() {
+    // Verificar si ya existe un ganador
+    if (this.ganador) {
+      console.warn('Ya existe un ganador:', this.ganador);
+      const toast = await this.toastController.create({
+        message: 'El evento ya tiene un ganador. No puedes aumentar más puntos.',
+        duration: 2000,
+        color: 'warning',
+      });
+      toast.present();
+      return;
+    }
+
+    const currentUser = this.participantes.find((p) => p.id === this.currentUserId);
     if (currentUser) {
       currentUser.score += 1;
       this.animarTarjeta(currentUser.id);
@@ -167,8 +215,15 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     const participante = this.participantes.find((p) => p.id === participanteId);
     if (!participante) return;
 
+    // Verificar si ya existe un ganador
     if (this.ganador) {
-      console.warn('Ya existe un ganador: ', this.ganador);
+      console.warn('Ya existe un ganador:', this.ganador);
+      const toast = await this.toastController.create({
+        message: 'El evento ya tiene un ganador. No puedes aumentar más puntos.',
+        duration: 2000,
+        color: 'warning',
+      });
+      await toast.present();
       return;
     }
 
@@ -177,12 +232,13 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     const equipo = this.equipos.find((e) => e.name === participante.equipo);
     if (equipo) equipo.score += 1;
 
-    this.animarTarjeta(participanteId);
+    this.animarTarjeta(participante.id);
+
     await this.participantesService.addParticipante(participante, this.eventId);
     this.verificarGanador();
   }
 
-  verificarGanador() {
+  private verificarGanador() {
     const equipoGanador = this.equipos.find((e) => e.score >= this.maxPoints);
     if (equipoGanador && !this.ganador) {
       this.ganador = equipoGanador.name;
@@ -195,6 +251,15 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       participantesGanadores.forEach((participante) => {
         this.participantesService.guardarPuntaje(participante, true);
       });
+
+      // Registrar que el evento ha terminado
+      this.eventosService.marcarEventoComoTerminado(this.eventId)
+        .then(() => {
+          console.log(`El evento ${this.eventId} se marcó como terminado.`);
+        })
+        .catch((error) => {
+          console.error('Error al marcar el evento como terminado:', error);
+        });
     }
   }
 
@@ -251,8 +316,9 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       );
     }
   }
+
+  // Función para manejar errores en la carga de imágenes
   handleImageError(event: any) {
     event.target.src = 'assets/img/default-profile.png'; // Imagen por defecto si la URL falla
   }
-
 }

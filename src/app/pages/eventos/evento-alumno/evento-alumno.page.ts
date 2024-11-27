@@ -92,73 +92,110 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
   }
 
   async unirseEvento(evento: any) {
-    if (evento.idAlumno === this.idAlumno) {
-      // Redirigir a la página `qr-creador`
-      this.router.navigate(['/qr-creador'], {
-        queryParams: { eventId: evento.idEventosAlumnos },
-      });
-    } else {
-      // Redirigir a la página `qr-usuario`
-      this.router.navigate(['/qr-usuario'], {
-        queryParams: { eventId: evento.idEventosAlumnos },
-      });
-    }
-    // Verifica si el usuario ya está inscrito en el evento
-    if (evento.participantesActuales.includes(this.idAlumno)) {
-      const toast = await this.toastController.create({
-        message: 'Ya estás inscrito en este evento.',
-        duration: 2000,
-        color: 'warning',
-      });
-      await toast.present();
-      return;
-    }
+    try {
+      // Verificar si el evento está marcado como terminado
+      const eventoTerminado = await this.eventosService.esEventoTerminado(evento.idEventosAlumnos);
+      if (eventoTerminado) {
+        const alert = await this.alertController.create({
+          header: 'Evento terminado',
+          message: 'Este evento ha finalizado y no puedes acceder.',
+          buttons: ['OK']
+        });
+        await alert.present();
+        return;
+      }
 
-    // Verifica si hay espacio disponible en el evento
-    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      const toast = await this.toastController.create({
-        message: 'El evento ha alcanzado el límite de participantes.',
+      // Verificar si el usuario ya está inscrito
+      if (evento.participantesActuales.includes(this.idAlumno)) {
+        // Redirigir según el rol del usuario
+        if (evento.idAlumno === this.idAlumno) {
+          this.router.navigate(['/qr-creador'], {
+            queryParams: { eventId: evento.idEventosAlumnos },
+          });
+        } else {
+          this.router.navigate(['/qr-usuario'], {
+            queryParams: { eventId: evento.idEventosAlumnos },
+          });
+        }
+        return; // Salimos aquí porque ya está inscrito y no necesitamos continuar.
+      }
+
+      // Verificar si hay espacio disponible en el evento
+      if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+        const toast = await this.toastController.create({
+          message: 'El evento ha alcanzado el límite de participantes.',
+          duration: 2000,
+          color: 'danger',
+        });
+        await toast.present();
+        return;
+      }
+
+      // Confirmación antes de unirse al evento
+      const alert = await this.alertController.create({
+        header: 'Unirse al evento',
+        message: `¿Estás seguro de que deseas unirte a "${evento.titulo}"?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'secondary',
+          },
+          {
+            text: 'Unirse',
+            handler: async () => {
+              // Lógica para unirse al evento (agregar el ID del usuario a la lista de participantes)
+              evento.participantesActuales.push(this.idAlumno);
+
+              try {
+                await this.eventosService.updateEvento(evento.idEventosAlumnos, {
+                  participantesActuales: evento.participantesActuales,
+                });
+
+                // Muestra un mensaje de éxito
+                const toast = await this.toastController.create({
+                  message: 'Te has unido al evento exitosamente.',
+                  duration: 2000,
+                  color: 'success',
+                });
+                await toast.present();
+
+                // Redirigir según el rol del usuario
+                if (evento.idAlumno === this.idAlumno) {
+                  this.router.navigate(['/qr-creador'], {
+                    queryParams: { eventId: evento.idEventosAlumnos },
+                  });
+                } else {
+                  this.router.navigate(['/qr-usuario'], {
+                    queryParams: { eventId: evento.idEventosAlumnos },
+                  });
+                }
+              } catch (error) {
+                console.error('Error al unirse al evento:', error);
+                const errorToast = await this.toastController.create({
+                  message: 'Hubo un error al intentar unirte al evento.',
+                  duration: 2000,
+                  color: 'danger',
+                });
+                await errorToast.present();
+              }
+            },
+          },
+        ],
+      });
+
+      await alert.present();
+    } catch (error) {
+      console.error('Error verificando el estado del evento:', error);
+      const errorToast = await this.toastController.create({
+        message: 'Hubo un error al verificar el estado del evento.',
         duration: 2000,
         color: 'danger',
       });
-      await toast.present();
-      return;
+      await errorToast.present();
     }
-
-    // Confirmación antes de unirse al evento
-    const alert = await this.alertController.create({
-      header: 'Unirse al evento',
-      message: `¿Estás seguro de que deseas unirte a "${evento.titulo}"?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Unirse',
-          handler: () => {
-            // Lógica para unirse al evento (agregar el ID del usuario a la lista de participantes)
-            evento.participantesActuales.push(this.idAlumno);
-
-            // Muestra un mensaje de éxito
-            this.toastController
-              .create({
-                message: 'Te has unido al evento exitosamente.',
-                duration: 2000,
-                color: 'success',
-              })
-              .then((toast) => toast.present());
-
-            // Opcional: Actualiza en el backend o en la base de datos si es necesario
-            // this.eventoService.updateEvento(evento.id, { participantesActuales: evento.participantesActuales });
-          },
-        },
-      ],
-    });
-
-    await alert.present();
   }
+
 
   async loadAlumnoIdAdmin() {
     const user = this.auth.currentUser;
