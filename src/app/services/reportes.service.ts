@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, setDoc, DocumentData, DocumentReference } from '@angular/fire/firestore';
 import { map, Observable } from 'rxjs';
 import { Reporte } from '../models/reportes';
+import { AutenticacionService } from './autenticacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,16 +11,27 @@ export class ReportesService {
 
   private reportesCollection = collection(this.firestore, 'Reportes');
 
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore,
+              private autenticacionService: AutenticacionService
+  ) {}
 
   // Crear un nuevo reporte
-  crearReporte(reporte: Reporte): Promise<DocumentReference<DocumentData>> {
-    return addDoc(this.reportesCollection, {
+// ReportesService
+  async crearReporte(reporte: Reporte): Promise<DocumentReference<DocumentData>> {
+    const correoUsuario = await this.autenticacionService.obtenerCorreoUsuario(reporte.usuarioId);
+    const correoReportado = await this.autenticacionService.obtenerCorreoUsuario(reporte.reportadoId);
+
+    const reporteData = {
       ...reporte,
       fechaCreacion: new Date(),
-      estado: 'Abierto'
-    });
+      estado: 'Abierto',
+      correoUsuario,  // Agregar el correo del usuario que reporta
+      correoReportado  // Agregar el correo del usuario reportado
+    };
+
+    return addDoc(this.reportesCollection, reporteData);
   }
+
 
    // Obtener el último reporte de sanción activo de un usuario
    obtenerSancionActiva(usuarioId: string): Observable<Reporte | null> {
@@ -49,6 +61,8 @@ export class ReportesService {
       )
     );
   }
+
+
 
   // Obtener un reporte por ID
   obtenerReportePorId(reporteId: string): Observable<Reporte | undefined> {
@@ -91,5 +105,9 @@ export class ReportesService {
       fechaActualizacion: new Date()
     });
   }
+
+
+
+
 
 }
