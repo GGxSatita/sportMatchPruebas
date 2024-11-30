@@ -75,11 +75,20 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       console.error('Error: No se proporcionó eventId');
       return;
     }
-
+    this.eventName = await this.obtenerTituloDelEvento(this.eventId);
+    this.currentUserId = (await this.authService.getCurrentUserAsync())?.uid || '';
     await this.loadEventDetails();
     await this.loadReglas();
     await this.checkEquipoSeleccionado();
     this.refreshParticipantes();
+
+    // Intentar cargar el valor de mostrarSeleccionEquipo desde localStorage
+    const storedValue = localStorage.getItem('mostrarSeleccionEquipo');
+    if (storedValue === 'false') {
+      this.mostrarSeleccionEquipo = false;
+    } else {
+      this.mostrarSeleccionEquipo = true;
+    }
 
     this.autoRefreshSubscription = interval(10000).subscribe(() => {
       this.refreshParticipantes();
@@ -90,6 +99,10 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
     if (this.autoRefreshSubscription) {
       this.autoRefreshSubscription.unsubscribe();
     }
+  }
+  async obtenerTituloDelEvento(eventId: string): Promise<string> {
+    const evento = await this.eventosService.getEvento(eventId);
+    return evento?.titulo || 'Evento Sin Nombre';
   }
   actualizarProgreso() {
     // Encontrar el equipo con el puntaje más alto
@@ -119,8 +132,8 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
 
       if (reglas?.esPorEquipos) {
         this.equipos = [
-          { name: 'Equipo 1', score: 0 },
-          { name: 'Equipo 2', score: 0 },
+          { name: 'Equipo Alpha', score: 0 },
+          { name: 'Equipo Omega', score: 0 },
         ];
       } else {
         this.equipos = [];
@@ -140,6 +153,11 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       const currentUser = await this.authService.getCurrentUserAsync();
       this.currentUserId = currentUser?.uid || '';
 
+      if (!this.currentUserId) {
+        console.error('No se encontró el ID del usuario actual.');
+        return;
+      }
+
       // Verificar si el participante ya tiene un equipo asignado
       const participante = await this.participantesService.getParticipanteByEventAndUser(
         this.eventId,
@@ -150,14 +168,24 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
         console.log('Usuario ya tiene equipo asignado:', participante.equipo);
         // Ocultar selección de equipo y mostrar el enfrentamiento
         this.mostrarSeleccionEquipo = false;
+        localStorage.setItem('mostrarSeleccionEquipo', 'false'); // Guardar en localStorage
       } else {
         console.log('El usuario no tiene equipo asignado. Mostrando selección de equipo.');
         this.mostrarSeleccionEquipo = true;
+        localStorage.setItem('mostrarSeleccionEquipo', 'true'); // Guardar en localStorage
       }
     } catch (error) {
       console.error('Error verificando si el usuario ya eligió un equipo:', error);
+      // Mostrar algún tipo de mensaje de error o recuperación en la interfaz
+      const toast = await this.toastController.create({
+        message: 'Hubo un problema al verificar el equipo del usuario.',
+        duration: 2000,
+        color: 'danger',
+      });
+      toast.present();
     }
   }
+
 
   refreshParticipantes() {
     this.participantesService.getParticipantesTiempoReal(
@@ -171,11 +199,25 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
   }
 
   actualizarPuntajesDeEquipos() {
-    this.equipos.forEach((equipo) => (equipo.score = 0));
+    let puntajesActualizados = false;
+
+    // Primero, resetear puntajes
+    this.equipos.forEach((equipo) => equipo.score = 0);
+
+    // Actualizamos los puntajes con la información de los participantes
     this.participantes.forEach((p) => {
       const equipo = this.equipos.find((e) => e.name === p.equipo);
-      if (equipo) equipo.score += p.score;
+      if (equipo) {
+        // Se asegura que el puntaje se incremente correctamente sin perder datos anteriores
+        equipo.score += p.score;
+        puntajesActualizados = true;
+      }
     });
+
+    // Solo actualiza el progreso si los puntajes han cambiado
+    if (puntajesActualizados) {
+      this.actualizarProgreso();
+    }
   }
 
   // Función agregada para obtener participantes por equipo
@@ -213,7 +255,10 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
 
   async incrementarPuntaje(participanteId: string) {
     const participante = this.participantes.find((p) => p.id === participanteId);
-    if (!participante) return;
+    if (!participante) {
+      console.error(`Participante con id ${participanteId} no encontrado.`);
+      return;
+    }
 
     // Verificar si ya existe un ganador
     if (this.ganador) {
@@ -264,16 +309,33 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
   }
 
   async unirseAEquipo() {
+    const currentUser = await this.authService.getCurrentUserAsync();
+    const userId = currentUser?.uid || '';
+
+    // Verificar si el usuario ya tiene un equipo asignado
+    const participante = await this.participantesService.getParticipanteByEventAndUser(
+      this.eventId,
+      userId
+    );
+
+    if (participante) {
+      // Si el participante ya tiene un equipo asignado, no permitir seleccionar otro equipo
+      if (participante.equipo) {
+        console.log(`El participante ya pertenece al equipo ${participante.equipo}`);
+        // Mostrar un mensaje de advertencia o solo salir de la función si ya tiene equipo
+        this.mostrarSeleccionEquipo = false;  // Ocultar la selección de equipo
+        localStorage.setItem('mostrarSeleccionEquipo', 'false'); // Actualizar el valor en localStorage
+        return; // Salir de la función para no continuar con el registro
+      }
+    }
+
     if (!this.equipoSeleccionado) {
       console.error('Error: No se ha seleccionado un equipo');
       return;
     }
 
-    const currentUser = await this.authService.getCurrentUserAsync();
-    const userId = currentUser?.uid || '';
     const userName = currentUser?.displayName || 'Usuario Anónimo';
-
-    const participante: ParticipantModel = {
+    const participanteNuevo: ParticipantModel = {
       id: userId,
       name: userName,
       victories: 0,
@@ -282,15 +344,22 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
       photo: currentUser?.photoURL || 'assets/default-profile.png',
     };
 
+    // Registrar al participante con el equipo seleccionado
     await this.participantesService.addParticipanteConEquipo(
-      participante,
+      participanteNuevo,
       this.eventId,
       this.equipoSeleccionado
     );
 
-    this.mostrarSeleccionEquipo = false;
+    // Cambiar el estado de la selección de equipo
+    this.mostrarSeleccionEquipo = false;  // Ocultar la selección de equipo después de registrarlo
+    localStorage.setItem('mostrarSeleccionEquipo', 'false');  // Guardar en localStorage
+
+    // Refrescar la lista de participantes o cualquier otra acción necesaria
     this.refreshParticipantes();
   }
+
+
 
   volverAlInicio() {
     this.router.navigate(['/menu-principal']);

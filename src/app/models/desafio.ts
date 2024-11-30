@@ -12,7 +12,8 @@ export interface ParticipantModel {
   score: number;
   equipo?: string; // Nombre del equipo al que pertenece el jugador
   eventId?: string; // Relación con el evento
-  photo?: string
+  photo?: string;
+  // activo: boolean;
 }
 
 export interface RulesModel {

@@ -22,14 +22,6 @@
       <!-- Mensaje de equipo ganador y botón de salida -->
       <div *ngIf="ganador" class="ganador-container">
         <h2>¡El equipo ganador es: {{ ganador }}!</h2>
-        <ion-button
-          shape="round"
-          color="danger"
-          class="exit-button"
-          (click)="volverAlInicio()"
-        >
-          <ion-icon name="exit-outline"></ion-icon>
-        </ion-button>
       </div>
       <!-- Barra de progreso de la meta -->
       <p class="info"><strong>Progreso:</strong></p>
@@ -99,6 +91,16 @@
       >
         <ion-icon name="trophy-outline"></ion-icon>
       </ion-button>
+    </div>
+    <div *ngIf="ganador" class="ronda-container">
+      <ion-button
+      shape="round"
+      color="danger"
+      class="exit-button"
+      (click)="volverAlInicio()"
+    >
+      <ion-icon name="exit-outline"></ion-icon>
+    </ion-button>
     </div>
   </div>
 </ion-content>

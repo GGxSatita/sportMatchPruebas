@@ -6,7 +6,16 @@ import { ParticipantModel } from 'src/app/models/desafio';
 import { Subscription, interval } from 'rxjs';
 import { gsap } from 'gsap';
 import { ToastController } from '@ionic/angular';
-import { IonContent, IonList, IonItem, IonLabel, IonAvatar, IonIcon, IonButton, IonProgressBar } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonAvatar,
+  IonIcon,
+  IonButton,
+  IonProgressBar,
+} from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
@@ -18,7 +27,19 @@ import { EventosService } from 'src/app/services/evento.service';
   templateUrl: './enfrentamiento.page.html',
   styleUrls: ['./enfrentamiento.page.scss'],
   standalone: true,
-  imports: [IonProgressBar, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonIcon, IonButton, HeaderComponent, FooterComponent, CommonModule],
+  imports: [
+    IonProgressBar,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonAvatar,
+    IonIcon,
+    IonButton,
+    HeaderComponent,
+    FooterComponent,
+    CommonModule,
+  ],
 })
 export class EnfrentamientoPage implements OnInit, OnDestroy {
   participantes: ParticipantModel[] = [];
@@ -48,27 +69,39 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       console.error('Error: No se proporcionó eventId');
       return;
     }
-
     this.eventName = await this.obtenerTituloDelEvento(this.eventId);
     this.currentUserId = (await this.authService.getCurrentUserAsync())?.uid || '';
-
+    await this.loadEventDetails();
     await this.loadReglas();
-    await this.registrarParticipante();
-
     this.refreshParticipantes();
+
+    // Intentar cargar el valor de mostrarSeleccionEquipo desde localStorage
+
     this.autoRefreshSubscription = interval(10000).subscribe(() => {
       this.refreshParticipantes();
     });
   }
+
+
 
   ngOnDestroy() {
     if (this.autoRefreshSubscription) {
       this.autoRefreshSubscription.unsubscribe();
     }
   }
+  private async loadEventDetails() {
+    try {
+      const evento = await this.eventosService.getEvento(this.eventId);
+      this.eventName = evento?.titulo || 'Sin Título';
+      const currentUser = await this.authService.getCurrentUserAsync();
+      this.currentUserId = currentUser?.uid || '';
+    } catch (error) {
+      console.error('Error cargando detalles del evento:', error);
+    }
+  }
   actualizarProgreso() {
     // Encontrar el puntaje más alto de los participantes
-    const puntajeMasAlto = Math.max(...this.participantes.map(p => p.score));
+    const puntajeMasAlto = Math.max(...this.participantes.map((p) => p.score));
 
     // Calcular el porcentaje de progreso
     const porcentajeProgreso = (puntajeMasAlto / this.maxPoints) * 100;
@@ -76,6 +109,7 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     // Actualizar el valor de progressValue, asegurándonos de que no exceda el 100%
     this.progressValue = Math.min(100, porcentajeProgreso);
   }
+
   async obtenerTituloDelEvento(eventId: string): Promise<string> {
     const evento = await this.eventosService.getEvento(eventId);
     return evento?.titulo || 'Evento Sin Nombre';
@@ -128,14 +162,15 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
 
     // Si el participante actual existe, incrementar su puntaje
     if (currentParticipante) {
-      currentParticipante.score += 1;  // Incrementa el puntaje del participante actual
+      currentParticipante.score += 1; // Incrementa el puntaje del participante
       this.animarTarjeta(currentParticipante.id); // Realiza la animación de la tarjeta
 
-      // Actualiza el puntaje del participante en Firestore
+      // Llamar al servicio para actualizar el puntaje del participante en la base de datos
       await this.participantesService.addParticipante(currentParticipante, this.eventId);
-    }
 
-    this.verificarGanador(); // Verifica si el participante actual o algún otro ha alcanzado el puntaje máximo
+      // Verificar si el participante actual o algún otro ha alcanzado el puntaje máximo
+      this.verificarGanador();
+    }
   }
 
   private verificarGanador() {
@@ -152,7 +187,8 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
   }
 
   private setCurrentParticipante() {
-    this.currentParticipante = this.participantes.find((p) => p.id === this.currentUserId) || null;
+    this.currentParticipante =
+      this.participantes.find((p) => p.id === this.currentUserId) || null;
   }
 
   volverAlInicio() {
@@ -165,7 +201,13 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       gsap.fromTo(
         playerCard,
         { scale: 1, backgroundColor: '#fff' },
-        { scale: 1.1, backgroundColor: '#ffcc00', duration: 0.5, yoyo: true, repeat: 1 }
+        {
+          scale: 1.1,
+          backgroundColor: '#ffcc00',
+          duration: 0.5,
+          yoyo: true,
+          repeat: 1,
+        }
       );
     }
   }
