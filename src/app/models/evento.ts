@@ -16,6 +16,7 @@ export class eventos {
     public status?: boolean,
     public idAlumno?: string,
     public informacionAdicional?: string,
-    public terminado: boolean = false
+    public terminado: boolean = false,
+    public deporte?: string
   ) {}
 }

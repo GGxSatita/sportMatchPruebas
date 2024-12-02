@@ -13,6 +13,7 @@ export interface ParticipantModel {
   equipo?: string; // Nombre del equipo al que pertenece el jugador
   eventId?: string; // Relación con el evento
   photo?: string;
+  deportes: { [deporte: string]: { score: number; rank: string } };
   // activo: boolean;
 }
 
@@ -41,9 +42,11 @@ export interface Desafio {
 }
 
 export interface ScoreModel {
-  id: string;        // ID único del usuario
-  name: string;      // Nombre del usuario
-  score: number;     // Puntuación acumulada
-  victories: number; // Número de victorias
-  rank: string;      // Rango del jugador (Principiante, Intermedio, Avanzado, Experto, etc.)
+  id: string;             // ID único del usuario
+  name: string;           // Nombre del usuario
+  score: number;          // Puntuación total (si la necesitas a nivel global del jugador)
+  victories: number;      // Número total de victorias
+  rank: string;           // Rango global del jugador (Principiante, Intermedio, Avanzado, Experto, etc.)
+  deportes: { [deporte: string]: { score: number; rank: string } };
 }
+

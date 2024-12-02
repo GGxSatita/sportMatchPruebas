@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantesService } from 'src/app/services/participantes.service';
 import { ReglasService } from 'src/app/services/reglas.service';
-import { ParticipantModel } from 'src/app/models/desafio';
+import { ParticipantModel, SportType } from 'src/app/models/desafio';
 import { Subscription, interval } from 'rxjs';
 import { gsap } from 'gsap';
 import { ToastController } from '@ionic/angular';
@@ -70,10 +70,19 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       return;
     }
     this.eventName = await this.obtenerTituloDelEvento(this.eventId);
-    this.currentUserId = (await this.authService.getCurrentUserAsync())?.uid || '';
+    this.currentUserId =
+      (await this.authService.getCurrentUserAsync())?.uid || '';
+    const participanteRegistrado =
+      await this.participantesService.getParticipanteByEventAndUser(
+        this.eventId,
+        this.currentUserId
+      );
     await this.loadEventDetails();
     await this.loadReglas();
     this.refreshParticipantes();
+    if (!participanteRegistrado) {
+      await this.registrarParticipante(); // Registrar al participante si no existe
+    }
 
     // Intentar cargar el valor de mostrarSeleccionEquipo desde localStorage
 
@@ -81,8 +90,6 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       this.refreshParticipantes();
     });
   }
-
-
 
   ngOnDestroy() {
     if (this.autoRefreshSubscription) {
@@ -129,6 +136,18 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       score: 0,
       equipo: '', // No aplica para enfrentamientos normales
       photo: currentUser?.photoURL || 'assets/default-profile.png',
+      deportes: {
+        'Taka Taka': { score: 0, rank: 'Principiante' },
+        'Handbol': { score: 0, rank: 'Principiante' },
+        'Fútbol': { score: 0, rank: 'Principiante' },
+        'Baloncesto': { score: 0, rank: 'Principiante' },
+        'Voleibol': { score: 0, rank: 'Principiante' },
+        'Tenis': { score: 0, rank: 'Principiante' },
+        'Splendor': { score: 0, rank: 'Principiante' },
+        'Catan': { score: 0, rank: 'Principiante' },
+        'Dixit': { score: 0, rank: 'Principiante' },
+        'Uno': { score: 0, rank: 'Principiante' },
+      }
     };
     await this.participantesService.addParticipante(participante, this.eventId);
   }
@@ -149,7 +168,8 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     // Verificar si ya existe un ganador
     if (this.ganador) {
       const toast = await this.toastController.create({
-        message: 'El evento ya tiene un ganador. No puedes aumentar más puntos.',
+        message:
+          'El evento ya tiene un ganador. No puedes aumentar más puntos.',
         duration: 2000,
         color: 'warning',
       });
@@ -158,31 +178,65 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
     }
 
     // Encontrar al participante actual
-    const currentParticipante = this.participantes.find((p) => p.id === this.currentUserId);
+    const currentParticipante = this.participantes.find(
+      (p) => p.id === this.currentUserId
+    );
 
     // Si el participante actual existe, incrementar su puntaje
     if (currentParticipante) {
       currentParticipante.score += 1; // Incrementa el puntaje del participante
       this.animarTarjeta(currentParticipante.id); // Realiza la animación de la tarjeta
-
-      // Llamar al servicio para actualizar el puntaje del participante en la base de datos
-      await this.participantesService.addParticipante(currentParticipante, this.eventId);
-
-      // Verificar si el participante actual o algún otro ha alcanzado el puntaje máximo
-      this.verificarGanador();
     }
+
+    // Llamar al servicio para actualizar el puntaje del participante en la base de datos
+    await this.participantesService.addParticipante(
+      currentParticipante!,
+      this.eventId
+    );
+
+    // Verificar si el participante actual o algún otro ha alcanzado el puntaje máximo
+    this.verificarGanador();
   }
 
-  private verificarGanador() {
+  private async verificarGanador() {
+    // Encontrar al participante con el puntaje que supera o iguala el puntaje máximo
     const ganador = this.participantes.find((p) => p.score >= this.maxPoints);
+
+    // Si encontramos un ganador y no se ha asignado un ganador aún
     if (ganador && !this.ganador) {
       this.ganador = ganador.name;
 
-      // Guardar puntaje del ganador
-      this.participantesService.guardarPuntaje(ganador, true);
+      try {
+        // Obtener el deporte asociado al evento (esto puede necesitar ser asincrónico)
+        const deporteDelEvento = await this.obtenerDeporteDelEvento(this.eventId);
 
-      // Registrar que el evento ha terminado
-      this.eventosService.marcarEventoComoTerminado(this.eventId);
+        // Guardar el puntaje del ganador
+        await this.participantesService.guardarPuntaje(ganador, deporteDelEvento, true);
+
+        // Marcar que el evento ha terminado
+        await this.eventosService.marcarEventoComoTerminado(this.eventId);
+
+        console.log(`El evento ${this.eventId} ha terminado y el ganador es ${this.ganador}`);
+      } catch (error) {
+        console.error('Error al verificar o guardar el puntaje del ganador:', error);
+      }
+    }
+  }
+
+  // Método para obtener el deporte relacionado con el evento
+  private async obtenerDeporteDelEvento(eventId: string): Promise<SportType> {
+    try {
+      // Obtener el evento, puedes usar tu servicio para obtener los detalles
+      const evento = await this.eventosService.getEvento(eventId);
+      if (evento && evento.deporte) {
+        return evento.deporte as SportType; // Asegúrate de que el valor sea un SportType
+      } else {
+        console.warn(`El evento ${eventId} no tiene un deporte asociado.`);
+        return 'OTRO' as SportType; // Valor por defecto
+      }
+    } catch (error) {
+      console.error('Error al obtener el deporte del evento:', error);
+      return 'OTRO' as SportType; // Valor por defecto en caso de error
     }
   }
 

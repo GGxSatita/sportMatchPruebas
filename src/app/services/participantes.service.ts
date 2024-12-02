@@ -8,7 +8,7 @@ import {
   getDocs,
 } from '@angular/fire/firestore';
 import { Injectable } from '@angular/core';
-import { ParticipantModel, ScoreModel } from '../models/desafio';
+import { ParticipantModel, ScoreModel, SportType } from '../models/desafio';
 
 @Injectable({
   providedIn: 'root',
@@ -86,12 +86,24 @@ export class ParticipantesService {
   // **Método existente: Guardar puntaje de enfrentamientos normales**
   async guardarPuntaje(
     participante: ParticipantModel,
-    esGanador: boolean
+    deporte: SportType,  // Deporte específico para el puntaje
+    esGanador: boolean   // Valor que indica si el participante ganó
   ): Promise<void> {
     const scoreRef = doc(this.scoresCollection, participante.id);
     const scoreSnapshot = await getDoc(scoreRef);
 
+    // Función para calcular el rango global
     const calculateRank = (score: number): string => {
+      if (score >= 200) return 'Leyenda';
+      if (score >= 100) return 'Experto';
+      if (score >= 50) return 'Avanzado';
+      if (score >= 20) return 'Intermedio';
+      return 'Principiante';
+    };
+
+    // Función para calcular el rango por deporte
+    const calculateSportRank = (score: number): string => {
+      if (score >= 200) return 'Leyenda';
       if (score >= 100) return 'Experto';
       if (score >= 50) return 'Avanzado';
       if (score >= 20) return 'Intermedio';
@@ -99,40 +111,64 @@ export class ParticipantesService {
     };
 
     if (scoreSnapshot.exists()) {
+      // Si ya existe el puntaje para este participante
       const existingScore = scoreSnapshot.data() as ScoreModel;
 
-      const updatedScore: ScoreModel & { rank: string } = {
-        id: participante.id,
-        name: participante.name,
-        score: existingScore.score + (esGanador ? 10 : -5),
-        victories: esGanador
-          ? existingScore.victories + 1
-          : existingScore.victories,
-        rank: calculateRank(
-          existingScore.score + (esGanador ? 10 : -5) // Calcular el rango actualizado
-        ),
+      // Calculamos el puntaje por deporte
+      const deportePuntaje = esGanador ? 10 : -5;
+
+      // Actualizamos los puntajes por deporte
+      const updatedDeportes = { ...existingScore.deportes };
+      updatedDeportes[deporte] = {
+        score: (updatedDeportes[deporte]?.score || 0) + deportePuntaje,
+        rank: calculateSportRank((updatedDeportes[deporte]?.score || 0) + deportePuntaje), // Actualizamos el rank del deporte
       };
 
-      updatedScore.score = Math.max(0, updatedScore.score);
+      // Calculamos el puntaje global (acumulado de todos los deportes)
+      const totalScore = Object.values(updatedDeportes).reduce((acc, deporte) => acc + deporte.score, 0);
 
-      await setDoc(scoreRef, updatedScore);
-      console.log(
-        `Puntaje actualizado para ${participante.name}:`,
-        updatedScore
-      );
-    } else {
-      const newScore: ScoreModel & { rank: string } = {
+      // Recalculamos el rank global
+      const updatedScore: ScoreModel = {
         id: participante.id,
         name: participante.name,
-        score: esGanador ? 10 : -5,
+        score: totalScore,  // Puntaje global calculado
+        victories: esGanador ? existingScore.victories + 1 : existingScore.victories,
+        rank: calculateRank(totalScore),  // Rank global basado en el puntaje total
+        deportes: updatedDeportes,  // Puntajes y ranks por deporte
+      };
+
+      await setDoc(scoreRef, updatedScore);
+      console.log(`Puntaje actualizado para ${participante.name}:`, updatedScore);
+
+    } else {
+      // Si no existe el puntaje para este participante, lo creamos
+      const deportePuntaje = esGanador ? 10 : -5;
+
+      // Inicializamos el puntaje para el deporte
+      const newDeportes = {
+        [deporte]: {
+          score: deportePuntaje,
+          rank: calculateSportRank(deportePuntaje),
+        }
+      };
+
+      // Calculamos el puntaje global (solo con el puntaje del deporte inicial)
+      const totalScore = deportePuntaje;
+
+      const newScore: ScoreModel = {
+        id: participante.id,
+        name: participante.name,
+        score: totalScore,  // Puntaje global inicial
         victories: esGanador ? 1 : 0,
-        rank: calculateRank(esGanador ? 10 : -5), // Calcular el rango inicial
+        rank: calculateRank(totalScore),  // Rank global inicial
+        deportes: newDeportes,  // Puntajes y ranks por deporte
       };
 
       await setDoc(scoreRef, newScore);
       console.log(`Nuevo puntaje creado para ${participante.name}:`, newScore);
     }
   }
+
 
   // **Método NUEVO: Incrementar puntaje del equipo**
   async incrementarPuntajeEquipo(
