@@ -59,18 +59,32 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     this.obtenerAsistencia();
   }
 
+
   ngOnDestroy() {
     if (this.html5QrcodeScanner) {
-      this.html5QrcodeScanner
-        .clear()
-        .then(() => {
-          console.log('Cámara apagada correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al apagar la cámara:', error);
-        });
+      this.html5QrcodeScanner.clear().catch((error) => {
+        console.error('Error al apagar la cámara:', error);
+      });
     }
   }
+
+
+
+  initializeScanner() {
+    const qrReaderElement = document.getElementById('qr-reader');
+    if (qrReaderElement) {
+      this.html5QrcodeScanner = new Html5QrcodeScanner(
+        'qr-reader',
+        { fps: 10, qrbox: 250 },
+        false
+      );
+      this.html5QrcodeScanner.render(this.onScanSuccess.bind(this), this.onScanFailure.bind(this));
+    } else {
+      console.error('No se encontró el elemento del lector QR.');
+    }
+  }
+
+
 
   initializeParticipants() {
     this.totalParticipantes = 20;
@@ -96,6 +110,7 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     }
   }
 
+
   startQrScanner() {
     const qrReaderElement = document.getElementById('qr-reader');
     if (!qrReaderElement) {
@@ -118,6 +133,7 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
       this.onScanFailure.bind(this)
     );
   }
+
 
   async onScanSuccess(qrCodeMessage: string) {
     const eventId = qrCodeMessage.trim();

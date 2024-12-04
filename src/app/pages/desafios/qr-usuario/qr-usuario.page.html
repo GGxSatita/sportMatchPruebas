@@ -3,27 +3,14 @@
 <ion-content class="ion-padding">
   <!-- Lector QR -->
   <div
-    *ngIf="qrScannerVisible"
-    id="qr-reader"
-    style="width: 100%; height: auto; margin-top: 20px"
-  ></div>
+    id="qr-reader-container"
+    style="width: 100%; height: 100vh; display: block; position: relative"
+  >
+  <div id="qr-reader" style="width: 100%; height: 300px;"></div>
+</div>
 
   <!-- Modal para la lista de jugadores -->
-  <ion-modal
-    [isOpen]="modalParticipantesAbierto"
-    (ionModalDidDismiss)="cerrarListaJugadores()"
-  >
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-buttons slot="start">
-            <ion-button (click)="cerrarListaJugadores()">
-              <ion-icon name="arrow-back"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-          <ion-title>Lista de Participantes</ion-title>
-        </ion-toolbar>
-      </ion-header>
+
 
       <ion-content>
         <!-- Lista de Participantes -->
@@ -79,8 +66,7 @@
           <p>No hay participantes en este evento.</p>
         </div>
       </ion-content>
-    </ng-template>
-  </ion-modal>
+
 
   <!-- Modal para el formulario de reporte -->
   <ion-modal
@@ -173,16 +159,6 @@
           </ion-button>
         </ion-col>
 
-        <!-- Botón Lista de jugadores -->
-        <ion-col>
-          <ion-button
-            expand="block"
-            fill="clear"
-            (click)="abrirListaJugadores()"
-          >
-            <ion-icon name="people-outline" size="large"></ion-icon>
-          </ion-button>
-        </ion-col>
 
         <!-- Botón Chat -->
         <ion-col>
