@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { BrowserMultiFormatReader } from '@zxing/library';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -31,6 +32,7 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
   asistencia: { nombre: string; idAlumno: string; estado: boolean }[] = [];
   html5QrcodeScanner!: Html5QrcodeScanner;
   eventId: string = '';
+
   qrScannerVisible: boolean = false;
   modalAbierto: boolean = false; // Controla la visibilidad del modal de reportes
   modalParticipantesAbierto: boolean = false; // Controla la visibilidad del modal de la lista de jugadores
@@ -43,6 +45,9 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
     reportadoId: '',
     detallesAdicionales: '',
   };
+
+  private codeReader: BrowserMultiFormatReader | null = null; // Instancia del lector de ZXing
+  private videoElement: HTMLVideoElement | null = null;
 
   constructor(
     private eventosService: EventosService,
@@ -61,30 +66,29 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
-    if (this.html5QrcodeScanner) {
-      this.html5QrcodeScanner.clear().catch((error) => {
-        console.error('Error al apagar la cámara:', error);
-      });
+    if (this.codeReader) {
+      this.codeReader.reset();
     }
   }
 
 
 
   initializeScanner() {
+    // Asegúrate de que el elemento #qr-reader exista
     const qrReaderElement = document.getElementById('qr-reader');
-    if (qrReaderElement) {
-      this.html5QrcodeScanner = new Html5QrcodeScanner(
-        'qr-reader',
-        { fps: 10, qrbox: 250 },
-        false
-      );
-      this.html5QrcodeScanner.render(this.onScanSuccess.bind(this), this.onScanFailure.bind(this));
+    if (qrReaderElement && !this.codeReader) {
+      this.videoElement = document.createElement('video');
+      qrReaderElement.appendChild(this.videoElement);
+
+      // Inicializa BrowserMultiFormatReader
+      this.codeReader = new BrowserMultiFormatReader();
+
+      // Comienza el escaneo desde la cámara por defecto
+      this.startQrScanner();
     } else {
-      console.error('No se encontró el elemento del lector QR.');
+      console.error('No se encontró el elemento del lector QR o el lector ya está inicializado.');
     }
   }
-
-
 
   initializeParticipants() {
     this.totalParticipantes = 20;
@@ -94,46 +98,46 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
   toggleQrScanner() {
     this.qrScannerVisible = !this.qrScannerVisible;
 
+    // Si el escáner se va a mostrar
     if (this.qrScannerVisible) {
+      // Esperamos un pequeño retraso para que los elementos DOM estén listos
       setTimeout(() => {
-        this.startQrScanner();
-      }, 0);
-    } else if (this.html5QrcodeScanner) {
-      this.html5QrcodeScanner
-        .clear()
-        .then(() => {
-          console.log('Cámara apagada correctamente');
-        })
-        .catch((error) => {
-          console.error('Error al apagar la cámara:', error);
-        });
+        this.initializeScanner();
+      }, 100); // Ajusta el retraso si es necesario
+    } else {
+      // Apagar el lector QR cuando el escáner no es visible
+      if (this.codeReader) {
+        this.codeReader.reset();
+        console.log('Escáner QR detenido.');
+      }
     }
   }
+
 
 
   startQrScanner() {
-    const qrReaderElement = document.getElementById('qr-reader');
-    if (!qrReaderElement) {
-      console.error('No se encontró el elemento del lector QR.');
-      return;
-    }
+    if (!this.codeReader || !this.videoElement) return;
 
-    qrReaderElement.style.display = 'block';
-
-    if (!this.html5QrcodeScanner) {
-      this.html5QrcodeScanner = new Html5QrcodeScanner(
-        'qr-reader',
-        { fps: 10, qrbox: 250 },
-        false
-      );
-    }
-
-    this.html5QrcodeScanner.render(
-      this.onScanSuccess.bind(this),
-      this.onScanFailure.bind(this)
-    );
+    this.codeReader
+      .decodeFromVideoDevice(
+        null, // Si no deseas una cámara específica, pasa null
+        this.videoElement,
+        (result, error) => {
+          if (result) {
+            this.onScanSuccess(result.getText());
+          }
+          if (error) {
+            this.onScanFailure(error);
+          }
+        }
+      )
+      .then(() => {
+        console.log('Escaneo iniciado');
+      })
+      .catch((err) => {
+        console.error('Error al iniciar el escaneo:', err);
+      });
   }
-
 
   async onScanSuccess(qrCodeMessage: string) {
     const eventId = qrCodeMessage.trim();
@@ -146,20 +150,14 @@ export class QrUsuarioPage implements OnInit, OnDestroy {
 
     try {
       if (eventId && alumnoId) {
-        await this.eventosService.actualizarEstadoParticipante(
-          eventId,
-          alumnoId
-        );
+        await this.eventosService.actualizarEstadoParticipante(eventId, alumnoId);
         alert('Asistencia registrada exitosamente para el alumno!');
         this.obtenerAsistencia(); // Recargar la lista después de registrar la asistencia
       } else {
         alert('Error: Información incompleta.');
       }
     } catch (error) {
-      console.error(
-        'Error al actualizar la asistencia del participante:',
-        error
-      );
+      console.error('Error al actualizar la asistencia del participante:', error);
       alert('Error al registrar la asistencia.');
     }
   }
