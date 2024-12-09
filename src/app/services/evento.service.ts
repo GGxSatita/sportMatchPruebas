@@ -202,6 +202,7 @@ getParticipantesDeEvento(eventId: string): Observable<string[]> {
   async checkCameraPermissions(): Promise<boolean> {
     try {
       const permission = await Camera.requestPermissions();
+      console.log('Permiso de cámara:', permission.camera); // Esto debería mostrar el estado del permiso
       if (permission.camera === 'granted') {
         console.log('Permisos de cámara otorgados.');
         return true;
@@ -214,6 +215,9 @@ getParticipantesDeEvento(eventId: string): Observable<string[]> {
       return false;
     }
   }
+
+
+
 
   async takePicture(): Promise<string | null> {
     const permissionsGranted = await this.checkCameraPermissions();
