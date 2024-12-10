@@ -14,4 +14,6 @@ export interface Reporte {
     respuesta?: string;
     visibleUsuario: boolean;
     fechaExpiracionSancion?: Date;
+    correoUsuario?: string;  // Nuevo campo
+    correoReportado?: string;  // Nuevo campo
   }
