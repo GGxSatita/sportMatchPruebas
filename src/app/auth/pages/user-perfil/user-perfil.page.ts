@@ -40,6 +40,7 @@ export class UserPerfilPage implements OnInit {
   deportes: Deporte[] = [];
   cargando: boolean = false;
   isEditing: boolean = false;
+  deporteFavorito: { score: number; rank: string } | null = null; // Para almacenar puntaje y rango del deporte favorito
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.cargando = true;
@@ -51,6 +52,7 @@ export class UserPerfilPage implements OnInit {
           photo: res.photoURL ? res.photoURL : 'assets/default-profile.png'
         };
         this.getDatosProfile(res.uid);
+        this.getUserScore(); // Obtener puntaje global del usuario
       } else {
         this.user = null;
         this.cargando = false;
@@ -80,12 +82,16 @@ export class UserPerfilPage implements OnInit {
     this.firestoreService.getDocumentChanges<Models.Auth.UserProfile>(`${Models.Auth.PathUsers}/${uid}`).subscribe(res => {
       if (res) {
         this.userProfile = res;
-        this.profileForm.patchValue({
-          nuevaEdad: this.userProfile.edad,
-          deporteFavorito: this.userProfile.deporteFavorito
-        });
 
-        this.user.photo = this.userProfile.photo || 'assets/default-profile.png';
+        // Buscar el puntaje y rango del deporte favorito
+        if (this.userProfile.deporteFavorito && this.userScore) {
+          const deporte = this.userScore.deportes[this.userProfile.deporteFavorito];
+          if (deporte) {
+            this.deporteFavorito = deporte;
+          } else {
+            this.deporteFavorito = null; // No hay puntaje para el deporte favorito
+          }
+        }
       }
       this.cargando = false;
     });
@@ -182,8 +188,8 @@ export class UserPerfilPage implements OnInit {
         return;
       }
 
-      const userId = currentUser.uid; // ID del usuario actual
-      const scorePath = `scores/${userId}`; // Ruta del documento en Firestore
+      const userId = currentUser.uid;
+      const scorePath = `scores/${userId}`;
       this.userScore = await this.firestoreService.getDocument<ScoreModel>(scorePath);
 
       if (this.userScore) {
@@ -194,6 +200,9 @@ export class UserPerfilPage implements OnInit {
     } catch (error) {
       console.error('Error al obtener el puntaje del usuario:', error);
     }
+  }
+  verDetallesDeportes() {
+    this.router.navigate(['/detalles-deportes']); // Redirige a la página de detalles de puntuación por deporte
   }
 
   redirigirPerfilActualizado() {

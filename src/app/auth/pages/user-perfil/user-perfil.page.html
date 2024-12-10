@@ -28,24 +28,45 @@
               <p>{{ user?.email }}</p>
             </ion-item>
           </ion-col>
+
           <ion-col size="12" size-md="6" *ngIf="userProfile?.edad">
             <ion-item lines="none" class="info-item">
               <ion-icon name="calendar-outline" slot="start" class="info-icon"></ion-icon>
               <p>{{ userProfile.edad }} años</p>
             </ion-item>
           </ion-col>
+
           <ion-col size="12" size-md="6" *ngIf="userProfile?.deporteFavorito">
             <ion-item lines="none" class="info-item">
               <ion-icon name="star-outline" slot="start" class="info-icon"></ion-icon>
               <p>{{ userProfile.deporteFavorito }}</p>
             </ion-item>
           </ion-col>
+
+          <!-- Puntaje y rango del deporte favorito -->
+          <ion-col size="12" size-md="6" *ngIf="userProfile?.deporteFavorito">
+            <ion-item lines="none" class="info-item">
+              <ion-icon name="trophy-outline" slot="start" class="info-icon"></ion-icon>
+              <p>{{ deporteFavorito ? 'Puntaje: ' + deporteFavorito.score + ', Rango: ' + deporteFavorito.rank : 'No hay puntos' }}</p>
+            </ion-item>
+          </ion-col>
+
+          <!-- Botón para ver más detalles de puntuación por deporte -->
+          <ion-col size="12" size-md="6" *ngIf="userProfile?.deporteFavorito">
+            <ion-item lines="none" class="info-item">
+              <ion-button fill="outline" color="tertiary" (click)="verDetallesDeportes()">
+                Ver puntuación por deporte
+              </ion-button>
+            </ion-item>
+          </ion-col>
+
           <ion-col size="12" size-md="6" *ngIf="userScore">
             <ion-item lines="none" class="info-item">
               <ion-icon name="trophy-outline" slot="start" class="info-icon"></ion-icon>
               <p>Puntaje: {{ userScore.score }}</p>
             </ion-item>
           </ion-col>
+
           <ion-col size="12" size-md="6" *ngIf="userScore">
             <ion-item lines="none" class="info-item">
               <ion-icon name="medal-outline" slot="start" class="info-icon"></ion-icon>
