@@ -224,7 +224,8 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
 
       // Procesar todos los participantes
       for (const participante of this.participantes) {
-        const puntos = participante.id === ganador.id ? 10 : -5; // 10 puntos para el ganador, -5 para los demás
+        // Asignar puntos: +10 para el ganador, -5 para los demás
+        const puntos = participante.id === ganador.id ? +10 : -5;
 
         console.log(
           `Procesando participante: ${participante.name}, Puntos asignados: ${puntos}`
@@ -245,6 +246,7 @@ export class EnfrentamientoPage implements OnInit, OnDestroy {
       console.error('Error en verificarGanador:', error);
     }
   }
+
 
 
 
