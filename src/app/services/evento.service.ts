@@ -15,6 +15,8 @@ import {
 import { combineLatest, from, map, Observable, switchMap } from 'rxjs';
 import { eventos } from '../models/evento';
 import { HttpClient } from '@angular/common/http';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+
 
 @Injectable({
   providedIn: 'root',
@@ -225,5 +227,46 @@ export class EventosService {
   deleteEvento(id: string): Promise<void> {
     const eventoDoc = doc(this.firestore, `${this.collectionName}/${id}`);
     return deleteDoc(eventoDoc);
+  }
+
+  async checkCameraPermissions(): Promise<boolean> {
+    try {
+      const permission = await Camera.requestPermissions();
+      console.log('Permiso de cámara:', permission.camera); // Esto debería mostrar el estado del permiso
+      if (permission.camera === 'granted') {
+        console.log('Permisos de cámara otorgados.');
+        return true;
+      } else {
+        console.warn('Permisos de cámara denegados.');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error verificando permisos de la cámara:', error);
+      return false;
+    }
+  }
+
+
+
+
+  async takePicture(): Promise<string | null> {
+    const permissionsGranted = await this.checkCameraPermissions();
+    if (!permissionsGranted) {
+      console.warn('No se pueden tomar fotos sin permisos de cámara.');
+      return null;
+    }
+
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        resultType: CameraResultType.DataUrl, // También puedes usar Base64 o URI
+        source: CameraSource.Camera
+      });
+      console.log('Foto tomada con éxito:', photo.dataUrl);
+      return photo.dataUrl || null;
+    } catch (error) {
+      console.error('Error al tomar la foto:', error);
+      return null;
+    }
   }
 }

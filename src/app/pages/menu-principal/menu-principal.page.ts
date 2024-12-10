@@ -23,6 +23,8 @@ import { Timestamp } from 'firebase/firestore';
 import { NoticiasComponent } from 'src/app/components/noticias/noticias.component';
 import { Capacitor } from '@capacitor/core';
 import { NotificacionNativaService } from 'src/app/services/notificacion-nativa.service';
+import { EventosService } from 'src/app/services/evento.service';
+
 
 @Component({
   selector: 'app-menu-principal',
@@ -86,7 +88,9 @@ export class MenuPrincipalPage implements OnInit {
     private notificacionesService: NotificacionesService,
     private noticiasService: NoticiasService,
     private cdr: ChangeDetectorRef,
-    private notificacionesNativas: NotificacionNativaService // Inyección del servicio de notificaciones nativas
+    private notificacionesNativas: NotificacionNativaService,
+    private eventosService: EventosService,
+
   ) {}
 
   async ngOnInit() {
@@ -101,6 +105,17 @@ export class MenuPrincipalPage implements OnInit {
       }
     }
 
+    try {
+      // Solicitar permisos de cámara
+      const cameraPermission = await this.eventosService.checkCameraPermissions();
+      if (cameraPermission) {
+        console.log('Permisos de cámara otorgados.');
+      } else {
+        console.warn('Permisos de cámara denegados.');
+      }
+    } catch (error) {
+      console.error('Error al solicitar permisos de la cámara:', error);
+    }
 
     await this.cargarNoticias();
 
