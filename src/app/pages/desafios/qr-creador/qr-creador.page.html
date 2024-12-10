@@ -1,72 +1,111 @@
 <app-header></app-header>
 
 <ion-content>
-  <div
-    id="qrcode"
-    style="
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20px;
-    "
-  >
-    <div style="width: 100%; height: auto; max-width: 300px; max-height: 300px">
+  <div id="qrcode" style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+    <div style="width: 100%; height: auto; max-width: 300px; max-height: 300px;">
       <!-- Aquí se insertará el código QR -->
     </div>
   </div>
 
-  <div *ngIf="asistencia.length > 0" style="padding: 20px">
-    <h3 style="text-align: center; font-weight: bold">
-      Participantes en el evento
-    </h3>
+  <div *ngIf="asistencia.length > 0" style="padding: 20px;">
+    <h3 style="text-align: center; font-weight: bold;">Participantes en el evento</h3>
     <ion-list>
-      <ion-item
-        *ngFor="let participante of asistencia"
-        lines="none"
-        class="participante-item"
-      >
+      <ion-item *ngFor="let participante of asistencia" lines="none" class="participante-item">
         <ion-avatar slot="start">
           <ion-icon
             [name]="participante.estado ? 'checkmark-circle' : 'alert-circle'"
             [color]="participante.estado ? 'success' : 'warning'"
-            size="large"
-          >
+            size="large">
           </ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2 style="font-weight: bold">
-            {{ participante.nombre || participante.idAlumno }}
-          </h2>
-          <p style="color: gray">
-            <span
-              [style.color]="participante.estado ? 'green' : 'red'"
-              [style.fontWeight]="'bold'"
-            >
+          <h2 style="font-weight: bold;">{{ participante.nombre || participante.idAlumno }}</h2>
+          <p style="color: gray;">
+            <span [style.color]="participante.estado ? 'green' : 'red'" [style.fontWeight]="'bold'">
               {{ participante.estado ? 'Aceptado' : 'Pendiente' }}
             </span>
           </p>
         </ion-label>
 
-        <ion-button slot="end" fill="clear" color="danger">
-          <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
-        </ion-button>
+        <ion-button
+        slot="end"
+        fill="clear"
+        color="danger"
+        (click)="abrirFormularioReporte(participante)"
+      >
+        <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+      </ion-button>
+
       </ion-item>
     </ion-list>
   </div>
-  <div
-    *ngIf="asistencia.length === 0"
-    style="text-align: center; padding: 20px"
-  >
+  <div *ngIf="asistencia.length === 0" style="text-align: center; padding: 20px;">
     <p>No hay participantes en este evento.</p>
   </div>
-  <ion-button
-    (click)="irAEnfrentamiento()"
-    shape="round"
-    color="primary"
-    class="floating-button"
-  >
-    <ion-icon slot="icon-only" name="arrow-forward-outline"></ion-icon>
-  </ion-button>
+  <div style="text-align: center; margin-top: 20px;">
+    <ion-button (click)="irAEnfrentamiento()">Ir a Enfrentamiento</ion-button>
+  </div>
+
+  <ion-modal
+  [isOpen]="modalAbierto"
+  (ionModalDidDismiss)="cerrarFormularioReporte()"
+>
+  <ng-template>
+
+
+
+    <ion-content>
+
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cerrarFormularioReporte()">
+              <ion-icon name="arrow-back"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title>Lista de Participantes</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <form (ngSubmit)="enviarReporte()">
+        <ion-list>
+          <ion-item>
+            <ion-label>Motivo</ion-label>
+            <ion-select
+              [(ngModel)]="reporteForm.razon"
+              name="razon"
+              placeholder="Seleccionar"
+            >
+              <ion-select-option value="Retraso">Retraso</ion-select-option>
+              <ion-select-option value="Mala competitividad"
+                >Mala competitividad</ion-select-option
+              >
+              <ion-select-option value="Tóxico">Tóxico</ion-select-option>
+              <ion-select-option value="Otro">Otro</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Detalles adicionales</ion-label>
+            <ion-textarea
+              [(ngModel)]="reporteForm.detallesAdicionales"
+              name="detallesAdicionales"
+              placeholder="Proporcione más detalles (opcional)"
+            >
+            </ion-textarea>
+          </ion-item>
+        </ion-list>
+        <ion-footer>
+          <ion-toolbar>
+            <ion-buttons slot="end">
+              <ion-button type="submit" color="primary">Enviar</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-footer>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
 </ion-content>
 
 <app-footer></app-footer>

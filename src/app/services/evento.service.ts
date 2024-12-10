@@ -18,6 +18,7 @@ import { HttpClient } from '@angular/common/http';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -269,4 +270,7 @@ export class EventosService {
       return null;
     }
   }
+
+
+
 }

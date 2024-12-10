@@ -25,7 +25,6 @@ import { Capacitor } from '@capacitor/core';
 import { NotificacionNativaService } from 'src/app/services/notificacion-nativa.service';
 import { EventosService } from 'src/app/services/evento.service';
 
-
 @Component({
   selector: 'app-menu-principal',
   templateUrl: './menu-principal.page.html',
@@ -88,7 +87,7 @@ export class MenuPrincipalPage implements OnInit {
     private notificacionesService: NotificacionesService,
     private noticiasService: NoticiasService,
     private cdr: ChangeDetectorRef,
-    private notificacionesNativas: NotificacionNativaService,
+    private notificacionesNativas: NotificacionNativaService, // Inyección del servicio de notificaciones nativas
     private eventosService: EventosService,
 
   ) {}
@@ -105,6 +104,7 @@ export class MenuPrincipalPage implements OnInit {
       }
     }
 
+
     try {
       // Solicitar permisos de cámara
       const cameraPermission = await this.eventosService.checkCameraPermissions();
@@ -119,6 +119,9 @@ export class MenuPrincipalPage implements OnInit {
 
     await this.cargarNoticias();
 
+
+
+
     try {
       const user = await this.autenticacionService.getCurrentUser();
       if (user) {
@@ -127,6 +130,8 @@ export class MenuPrincipalPage implements OnInit {
         this.notificacionesService.getNotificacionesUsuario().subscribe((notificaciones) => {
           this.notificaciones = notificaciones;
         });
+
+
 
       }
 
@@ -141,6 +146,8 @@ export class MenuPrincipalPage implements OnInit {
       console.error('Error al obtener el usuario:', error);
     }
   }
+
+
 
   cargarNoticias() {
     this.noticiasService.getNoticias().subscribe((noticias: Noticias[]) => {

@@ -21,6 +21,7 @@ import { Reporte } from '../models/reportes';
 import { Timestamp } from '@angular/fire/firestore';
 
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+import { Usuario } from '../models/usuario';
 
 
 
@@ -81,6 +82,20 @@ export class AutenticacionService {
     } catch (error: any) {
       console.error('Error en login:', error);
       throw error;
+    }
+  }
+
+  // AutenticacionService
+  async obtenerCorreoUsuario(usuarioId: string): Promise<string | null> {
+    const userDocRef = doc(this.firestore, `Users/${usuarioId}`);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data() as Usuario; // Cast explícito al modelo `Usuario`
+      return userData?.['email'] || null; // Accede al correo con notación de índice
+    } else {
+      console.error('Usuario no encontrado en la base de datos.');
+      return null;
     }
   }
 
