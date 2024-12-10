@@ -1,5 +1,5 @@
 
-export type SportType = 'FUTBOL' | 'TENIS' | 'BASQUETBOL' | 'VOLEIBOL' | 'OTRO';
+export type SportType = 'Taka Taka' | 'Handbol' | 'Fútbol' | 'Baloncesto' | 'Voleibol' | 'Tenis' | 'Splendor'|  'Catan' | 'Dixit' | 'Uno';
 import { eventos } from './evento'; // Asegúrate del path correcto
 import { Deporte } from './deporte';
 export type ChallengeStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'FINALIZADO';

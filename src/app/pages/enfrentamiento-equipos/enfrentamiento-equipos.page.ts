@@ -307,35 +307,63 @@ export class EnfrentamientoEquiposPage implements OnInit, OnDestroy {
   }
 
   private async verificarGanador() {
-    const equipoGanador = this.equipos.find((e) => e.score >= this.maxPoints);
-    if (equipoGanador && !this.ganador) {
+    try {
+      // Buscar el equipo ganador: aquel cuyo puntaje es mayor o igual al máximo requerido
+      const equipoGanador = this.equipos.find((e) => e.score >= this.maxPoints);
+
+      if (!equipoGanador) {
+        console.warn('No se encontró un equipo ganador válido.');
+        return;
+      }
+
+      // Verificar si ya se registró un ganador
+      if (this.ganador) {
+        console.warn('El ganador ya ha sido registrado previamente.');
+        return;
+      }
+
+      // Asignar el nombre del equipo ganador
       this.ganador = equipoGanador.name;
+      console.log(`Equipo ganador identificado: ${this.ganador}`);
+
       // Obtener el deporte relacionado con el evento
-      const deporteDelEvento = this.obtenerDeporteDelEvento(this.eventId); // Método para obtener el deporte asociado al evento
-      // Guardar puntaje para todos los participantes del equipo ganador
-      const participantesGanadores = this.participantes.filter(
-        (p) => p.equipo === equipoGanador.name
-      );
+      const deporteDelEvento = await this.obtenerDeporteDelEvento(this.eventId);
+      console.log(`Deporte asociado al evento: ${deporteDelEvento}`);
 
-      participantesGanadores.forEach(async (participante) => {
-        this.participantesService.guardarPuntaje(
-          participante,
-          await deporteDelEvento ,
-          true
+      // Procesar todos los participantes
+      for (const participante of this.participantes) {
+        if (!participante.equipo) {
+          console.warn(
+            `El participante ${participante.name} no tiene un equipo asignado.`
+          );
+          continue; // Saltar participantes sin equipo
+        }
+
+        const puntos =
+          participante.equipo === equipoGanador.name ? 10 : -5; // 10 puntos para ganadores, -5 para perdedores
+
+        console.log(
+          `Procesando participante: ${participante.name}, Equipo: ${participante.equipo}, Puntos asignados: ${puntos}`
         );
-      });
 
-      // Registrar que el evento ha terminado
-      this.eventosService
-        .marcarEventoComoTerminado(this.eventId)
-        .then(() => {
-          console.log(`El evento ${this.eventId} se marcó como terminado.`);
-        })
-        .catch((error) => {
-          console.error('Error al marcar el evento como terminado:', error);
-        });
+        // Guardar puntaje en Firestore
+        await this.participantesService.guardarPuntaje(
+          participante,
+          deporteDelEvento,
+          puntos
+        );
+      }
+
+      // Registrar el evento como terminado
+      await this.eventosService.marcarEventoComoTerminado(this.eventId);
+      console.log(`El evento ${this.eventId} se marcó como terminado.`);
+    } catch (error) {
+      console.error('Error en verificarGanador:', error);
     }
   }
+
+
+
   private async obtenerDeporteDelEvento(eventId: string): Promise<SportType> {
     // Aquí deberías obtener el evento y su deporte
     return this.eventosService.getEvento(eventId).then((evento) => {

@@ -1,0 +1,23 @@
+<app-header></app-header>
+
+<ion-content class="profile-content ion-padding fondo-app">
+  <ion-card class="profile-card">
+    <ion-card-header>
+      <ion-card-title>Puntajes por Deportes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <!-- Iterar por los deportes y sus puntajes -->
+        <ion-item *ngFor="let deporte of deportes">
+          <ion-label>
+            <h2>{{ deporte.nombre }}</h2>
+            <p>Puntaje: {{ deporte.score }}</p>
+            <p>Rango: {{ deporte.rank }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<app-footer></app-footer>
