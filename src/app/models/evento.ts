@@ -15,6 +15,8 @@ export class eventos {
     public asistencia: { name: string,idAlumno: string, estado: boolean  }[] = [],
     public status?: boolean,
     public idAlumno?: string,
-    public informacionAdicional?: string
+    public informacionAdicional?: string,
+    public terminado: boolean = false,
+    public deporte?: string
   ) {}
 }

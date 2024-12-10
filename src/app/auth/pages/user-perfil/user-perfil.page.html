@@ -28,6 +28,7 @@
               <p>{{ user?.email }}</p>
             </ion-item>
           </ion-col>
+
           <ion-col size="12" size-md="6" *ngIf="userProfile?.edad">
             <ion-item lines="none" class="info-item">
               <ion-icon name="calendar-outline" slot="start" class="info-icon"></ion-icon>
@@ -40,16 +41,34 @@
               <p>{{ userProfile.deporteFavorito }}</p>
             </ion-item>
           </ion-col>
+
+          <!-- Mostrar el puntaje del deporte favorito -->
+          <ion-col size="12" size-md="6" *ngIf="userProfile?.deporteFavorito && userScore?.deportes">
+            <ion-item lines="none" class="info-item">
+              <ion-icon name="trophy-outline" slot="start" class="info-icon"></ion-icon>
+              <p>Puntaje en {{ userProfile.deporteFavorito }}: {{ getFavoriteSportData('score') }}</p>
+            </ion-item>
+          </ion-col>
+
+          <!-- Mostrar el rango del deporte favorito -->
+          <ion-col size="12" size-md="6" *ngIf="userProfile?.deporteFavorito && userScore?.deportes">
+            <ion-item lines="none" class="info-item">
+              <ion-icon name="medal-outline" slot="start" class="info-icon"></ion-icon>
+              <p>Rango en {{ userProfile.deporteFavorito }}: {{ getFavoriteSportData('rank') }}</p>
+            </ion-item>
+          </ion-col>
+
+          <!-- Información general del puntaje -->
           <ion-col size="12" size-md="6" *ngIf="userScore">
             <ion-item lines="none" class="info-item">
               <ion-icon name="trophy-outline" slot="start" class="info-icon"></ion-icon>
-              <p>Puntaje: {{ userScore.score }}</p>
+              <p>Puntaje global: {{ userScore.score }}</p>
             </ion-item>
           </ion-col>
           <ion-col size="12" size-md="6" *ngIf="userScore">
             <ion-item lines="none" class="info-item">
               <ion-icon name="medal-outline" slot="start" class="info-icon"></ion-icon>
-              <p>Rango: {{ userScore.rank }}</p>
+              <p>Rango global: {{ userScore.rank }}</p>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -65,6 +84,12 @@
         <ion-col size="6">
           <ion-button expand="block" fill="outline" color="secondary" (click)="goToCambiarContrasena()">
             <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col size="12" class="ion-margin-top">
+          <ion-button expand="block" fill="solid" color="tertiary" (click)="goToPuntajesPorDeporte()">
+            <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+            Ver Puntajes por Deportes
           </ion-button>
         </ion-col>
       </ion-row>

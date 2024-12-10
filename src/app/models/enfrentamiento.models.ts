@@ -4,6 +4,7 @@ export interface EnfrentamientoModel {
     id: string;
     name: string;
     score: number;
+    estaActivo: boolean;
   }[];
   ganador?: {
     id: string;
@@ -11,4 +12,5 @@ export interface EnfrentamientoModel {
     score: number;
   };
   fecha: Date; // Fecha del enfrentamiento
+  interrumpido?: boolean;
 }

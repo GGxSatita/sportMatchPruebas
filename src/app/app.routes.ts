@@ -88,19 +88,23 @@ export const routes: Routes = [
   },
   {
     path: 'enfrentamiento-equipos',
-    loadComponent: () => import('./pages/enfrentamiento-equipos/enfrentamiento-equipos.page').then( m => m.EnfrentamientoEquiposPage)
+    loadComponent: () => import('./pages/enfrentamiento-equipos/enfrentamiento-equipos.page').then( m => m.EnfrentamientoEquiposPage),
+    canActivate: [authGuard]
   },
   {
     path: 'enfrentamiento-espera',
-    loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage)
+    loadComponent: () => import('./pages/enfrentamiento-espera/enfrentamiento-espera.page').then( m => m.EnfrentamientoEsperaPage),
+    canActivate: [authGuard]
   },
   {
     path: 'club-miembros/:id',
-    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage)
+    loadComponent: () => import('./pages/club/club-miembros/club-miembros.page').then( m => m.ClubMiembrosPage),
+    canActivate: [authGuard]
   },
       {
     path: 'menu-club',
-    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage)
+    loadComponent: () => import('./pages/club/menu-club/menu-club.page').then( m => m.MenuClubPage),
+    canActivate: [authGuard]
   },
   {
     path: 'lector',
@@ -147,6 +151,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/desafios/vista-usaurio/vista-usaurio.page').then( m => m.VistaUsaurioPage),
     canActivate:[authGuard]
   },
+  {
+    path: 'puntajes-por-deporte',
+    loadComponent: () => import('./auth/pages/puntajes-por-deporte/puntajes-por-deporte.page').then( m => m.PuntajesPorDeportePage),
+    canActivate: [authGuard]
+  },
+
 
 
 

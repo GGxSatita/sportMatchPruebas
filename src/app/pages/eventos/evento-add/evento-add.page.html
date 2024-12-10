@@ -28,6 +28,14 @@
             <div *ngIf="selectedSectorImage" class="sector-image-container">
               <img [src]="selectedSectorImage" alt="Imagen del sector" />
             </div>
+            <ion-item>
+              <ion-label>Deporte</ion-label>
+              <ion-select [(ngModel)]="newEvento.deporte" (ionChange)="onDeporteChange($event)">
+                <ion-select-option *ngFor="let deporte of deportesDisponibles" [value]="deporte.id">
+                  {{ deporte || deporte.id }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
           </ion-card-content>
         </ion-card>
 

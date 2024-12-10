@@ -1,7 +1,23 @@
-import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel, IonButton, IonItemDivider, IonIcon } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonButton,
+  IonItemDivider,
+  IonIcon,
+} from '@ionic/angular/standalone';
 import { EventosService } from 'src/app/services/evento.service';
 import { eventos } from 'src/app/models/evento';
 import { Auth } from '@angular/fire/auth';
@@ -10,7 +26,7 @@ import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { Router } from '@angular/router';
 import { eventosAdmin } from 'src/app/models/evento-admin';
 import { EventoAdminService } from 'src/app/services/evento-admin.service';
-import { AlertController,ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Html5Qrcode } from 'html5-qrcode';
 
 @Component({
@@ -34,7 +50,7 @@ import { Html5Qrcode } from 'html5-qrcode';
     IonIcon,
     HeaderComponent,
     FooterComponent,
-  ]
+  ],
 })
 export class EventoAlumnoPage implements OnInit, OnDestroy {
   eventosAprobados: eventos[] = [];
@@ -44,7 +60,6 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
   eventosAprobadosOInscritos: eventos[] = [];
   eventosAdminInscritos: eventosAdmin[] = [];
   private html5Qrcode: Html5Qrcode | null = null;
-
 
   constructor(
     private eventosService: EventosService,
@@ -62,16 +77,16 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.html5Qrcode) {
-      this.html5Qrcode.stop().catch(err => console.error("Error al detener el escáner", err));
+      this.html5Qrcode
+        .stop()
+        .catch((err) => console.error('Error al detener el escáner', err));
     }
   }
-
 
   verDetallesEvento(evento: eventos | eventosAdmin) {
     console.log('Detalles del evento:', evento);
     // Aquí puedes navegar a una nueva página o mostrar un modal con más información.
   }
-
 
   async loadAlumnoId() {
     const user = this.auth.currentUser;
@@ -92,72 +107,113 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
   }
 
   async unirseEvento(evento: any) {
-    if (evento.idAlumno === this.idAlumno) {
-      // Redirigir a la página `qr-creador`
-      this.router.navigate(['/qr-creador'], {
-        queryParams: { eventId: evento.idEventosAlumnos },
-      });
-    } else {
-      // Redirigir a la página `qr-usuario`
-      this.router.navigate(['/qr-usuario'], {
-        queryParams: { eventId: evento.idEventosAlumnos },
-      });
-    }
-    // Verifica si el usuario ya está inscrito en el evento
-    if (evento.participantesActuales.includes(this.idAlumno)) {
-      const toast = await this.toastController.create({
-        message: 'Ya estás inscrito en este evento.',
-        duration: 2000,
-        color: 'warning',
-      });
-      await toast.present();
-      return;
-    }
+    try {
+      // Verificar si el evento está marcado como terminado
+      const eventoTerminado = await this.eventosService.esEventoTerminado(
+        evento.idEventosAlumnos
+      );
+      if (eventoTerminado) {
+        const alert = await this.alertController.create({
+          header: 'Evento terminado',
+          message: 'Este evento ha finalizado y no puedes acceder.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+      }
 
-    // Verifica si hay espacio disponible en el evento
-    if (evento.participantesActuales.length >= evento.capacidadMaxima) {
-      const toast = await this.toastController.create({
-        message: 'El evento ha alcanzado el límite de participantes.',
+      // Verificar si el usuario ya está inscrito
+      if (evento.participantesActuales.includes(this.idAlumno)) {
+        // Redirigir según el rol del usuario
+        if (evento.idAlumno === this.idAlumno) {
+          this.router.navigate(['/qr-creador'], {
+            queryParams: { eventId: evento.idEventosAlumnos },
+          });
+        } else {
+          this.router.navigate(['/qr-usuario'], {
+            queryParams: { eventId: evento.idEventosAlumnos },
+          });
+        }
+        return; // Salimos aquí porque ya está inscrito y no necesitamos continuar.
+      }
+
+      // Verificar si hay espacio disponible en el evento
+      if (evento.participantesActuales.length >= evento.capacidadMaxima) {
+        const toast = await this.toastController.create({
+          message: 'El evento ha alcanzado el límite de participantes.',
+          duration: 2000,
+          color: 'danger',
+        });
+        await toast.present();
+        return;
+      }
+
+      // Confirmación antes de unirse al evento
+      const alert = await this.alertController.create({
+        header: 'Unirse al evento',
+        message: `¿Estás seguro de que deseas unirte a "${evento.titulo}"?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'secondary',
+          },
+          {
+            text: 'Unirse',
+            handler: async () => {
+              // Lógica para unirse al evento (agregar el ID del usuario a la lista de participantes)
+              evento.participantesActuales.push(this.idAlumno);
+
+              try {
+                await this.eventosService.updateEvento(
+                  evento.idEventosAlumnos,
+                  {
+                    participantesActuales: evento.participantesActuales,
+                  }
+                );
+
+                // Muestra un mensaje de éxito
+                const toast = await this.toastController.create({
+                  message: 'Te has unido al evento exitosamente.',
+                  duration: 2000,
+                  color: 'success',
+                });
+                await toast.present();
+
+                // Redirigir según el rol del usuario
+                if (evento.idAlumno === this.idAlumno) {
+                  this.router.navigate(['/qr-creador'], {
+                    queryParams: { eventId: evento.idEventosAlumnos },
+                  });
+                } else {
+                  this.router.navigate(['/qr-usuario'], {
+                    queryParams: { eventId: evento.idEventosAlumnos },
+                  });
+                }
+              } catch (error) {
+                console.error('Error verificando el estado del evento:', error);
+                const errorToast = await this.toastController.create({
+                  message: 'Hubo un error al verificar el estado del evento.',
+                  duration: 2000,
+                  color: 'danger',
+                });
+                await errorToast.present();
+              }
+            },
+          },
+        ],
+      });
+
+      await alert.present();
+    } catch (error) {
+      console.error('Error verificando el estado del evento:', error);
+      const errorToast = await this.toastController.create({
+        message: 'Hubo un error al verificar el estado del evento.',
         duration: 2000,
         color: 'danger',
       });
-      await toast.present();
-      return;
+      await errorToast.present();
     }
-
-    // Confirmación antes de unirse al evento
-    const alert = await this.alertController.create({
-      header: 'Unirse al evento',
-      message: `¿Estás seguro de que deseas unirte a "${evento.titulo}"?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Unirse',
-          handler: () => {
-            // Lógica para unirse al evento (agregar el ID del usuario a la lista de participantes)
-            evento.participantesActuales.push(this.idAlumno);
-
-            // Muestra un mensaje de éxito
-            this.toastController
-              .create({
-                message: 'Te has unido al evento exitosamente.',
-                duration: 2000,
-                color: 'success',
-              })
-              .then((toast) => toast.present());
-
-            // Opcional: Actualiza en el backend o en la base de datos si es necesario
-            // this.eventoService.updateEvento(evento.id, { participantesActuales: evento.participantesActuales });
-          },
-        },
-      ],
-    });
-
-    await alert.present();
   }
 
   async loadAlumnoIdAdmin() {
@@ -175,26 +231,41 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
       if (!this.idAlumno) return;
 
       const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const hoy = new Date(
+        ahora.getFullYear(),
+        ahora.getMonth(),
+        ahora.getDate()
+      );
 
-      this.eventosAprobadosOInscritos = eventos.filter(evento => {
+      this.eventosAprobadosOInscritos = eventos.filter((evento) => {
         const fechaEvento = new Date(evento.fechaReservada);
-        const fechaEventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
-        return ((evento.espera && evento.idAlumno === this.idAlumno) ||
-                evento.participantesActuales?.includes(this.idAlumno)) &&
-                fechaEventoSinHora >= hoy;
+        const fechaEventoSinHora = new Date(
+          fechaEvento.getFullYear(),
+          fechaEvento.getMonth(),
+          fechaEvento.getDate()
+        );
+        return (
+          ((evento.espera && evento.idAlumno === this.idAlumno) ||
+            evento.participantesActuales?.includes(this.idAlumno)) &&
+          fechaEventoSinHora >= hoy
+        );
       });
 
-      this.eventosEnEspera = eventos.filter(evento => {
+      this.eventosEnEspera = eventos.filter((evento) => {
         const fechaEvento = new Date(evento.fechaReservada);
-        const fechaEventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
-        return !evento.espera && evento.idAlumno === this.idAlumno &&
-               fechaEventoSinHora >= hoy;
+        const fechaEventoSinHora = new Date(
+          fechaEvento.getFullYear(),
+          fechaEvento.getMonth(),
+          fechaEvento.getDate()
+        );
+        return (
+          !evento.espera &&
+          evento.idAlumno === this.idAlumno &&
+          fechaEventoSinHora >= hoy
+        );
       });
     });
   }
-
-
 
   loadEventosAdmin(): void {
     this.eventoAdminService.getEventos().subscribe((eventosAdmin) => {
@@ -202,19 +273,22 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
 
       const ahora = new Date();
 
-      this.eventosAdminInscritos = eventosAdmin.filter(eventoAdmin =>
-        eventoAdmin.participants.some(part => part.idAlumno === this.idAlumno) &&
-        eventoAdmin.status === true &&
-        new Date(eventoAdmin.fechaReservada) >= ahora
+      this.eventosAdminInscritos = eventosAdmin.filter(
+        (eventoAdmin) =>
+          eventoAdmin.participants.some(
+            (part) => part.idAlumno === this.idAlumno
+          ) &&
+          eventoAdmin.status === true &&
+          new Date(eventoAdmin.fechaReservada) >= ahora
       );
     });
   }
 
   configurarDesafio(evento: eventos) {
-    this.router.navigate(['/desafio'], { queryParams: { evento: JSON.stringify(evento) } });
+    this.router.navigate(['/desafio'], {
+      queryParams: { evento: JSON.stringify(evento) },
+    });
   }
-
-
 
   async eliminarEvento(evento: eventos | eventosAdmin) {
     if (this.esEventoAlumno(evento) && evento.idAlumno === this.idAlumno) {
@@ -254,12 +328,9 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
     }
   }
 
-
   getDisponibilidad(evento: eventos): string {
     return evento.espera ? 'Disponible' : 'No Disponible';
   }
-
-
 
   // Método para identificar si el evento es del tipo eventos
   esEventoAlumno(evento: eventos | eventosAdmin): evento is eventos {
@@ -267,190 +338,240 @@ export class EventoAlumnoPage implements OnInit, OnDestroy {
   }
 
   iniciarEscaneo() {
-    const readerElement = document.getElementById("reader");
+    const readerElement = document.getElementById('reader');
     if (!readerElement) {
       console.error("El elemento 'reader' no se encuentra en el DOM.");
       return;
     }
 
     if (!this.html5Qrcode) {
-      this.html5Qrcode = new Html5Qrcode("reader");
-      console.log("html5Qrcode inicializado:", this.html5Qrcode);
+      this.html5Qrcode = new Html5Qrcode('reader');
+      console.log('html5Qrcode inicializado:', this.html5Qrcode);
     }
 
     const config = {
       fps: 10,
-      qrbox: 250
+      qrbox: 250,
     };
 
-    this.html5Qrcode.start(
-      { facingMode: "environment" },
-      config,
-      (decodedText, decodedResult) => {
-        console.log(`Código QR detectado: ${decodedText}`);
-        this.actualizarLlegada(decodedText);
-        this.html5Qrcode?.stop().catch(err => console.error("Error al detener el escáner", err));
-      },
-      (errorMessage) => {
-        console.warn(`Código QR no detectado: ${errorMessage}`);
-      }
-    ).catch(err => {
-      console.error("Error al iniciar el escáner", err);
-    });
+    this.html5Qrcode
+      .start(
+        { facingMode: 'environment' },
+        config,
+        (decodedText, decodedResult) => {
+          console.log(`Código QR detectado: ${decodedText}`);
+          this.actualizarLlegada(decodedText);
+          this.html5Qrcode
+            ?.stop()
+            .catch((err) => console.error('Error al detener el escáner', err));
+        },
+        (errorMessage) => {
+          console.warn(`Código QR no detectado: ${errorMessage}`);
+        }
+      )
+      .catch((err) => {
+        console.error('Error al iniciar el escáner', err);
+      });
   }
-
-
 
   esEventoAdmin(evento: eventos | eventosAdmin): evento is eventosAdmin {
     return (evento as eventosAdmin).participants !== undefined;
   }
 
-
-
   async cancelarInscripcionAdmin(evento: eventosAdmin) {
-    const participante = evento.participants.find(p => p.idAlumno === this.idAlumno);
+    const participante = evento.participants.find(
+      (p) => p.idAlumno === this.idAlumno
+    );
 
     if (participante) {
       const alert = await this.alertController.create({
         header: 'Cancelar inscripción',
-        message: '¿Estás seguro de que deseas cancelar tu inscripción en este evento?',
+        message:
+          '¿Estás seguro de que deseas cancelar tu inscripción en este evento?',
         buttons: [
           { text: 'Cancelar', role: 'cancel' },
           {
             text: 'Confirmar',
             handler: async () => {
-              const index = evento.participants.findIndex(p => p.idAlumno === this.idAlumno);
+              const index = evento.participants.findIndex(
+                (p) => p.idAlumno === this.idAlumno
+              );
 
               if (index > -1) {
                 evento.participants.splice(index, 1);
                 try {
-                  await this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants });
-                  console.log(`Inscripción en el evento ${evento.idEventosAdmin} cancelada exitosamente.`);
+                  await this.eventoAdminService.updateEvento(
+                    evento.idEventosAdmin,
+                    { participants: evento.participants }
+                  );
+                  console.log(
+                    `Inscripción en el evento ${evento.idEventosAdmin} cancelada exitosamente.`
+                  );
                   this.loadEventosAdmin();
                 } catch (error) {
-                  console.error('Error al cancelar la inscripción en el evento:', error);
+                  console.error(
+                    'Error al cancelar la inscripción en el evento:',
+                    error
+                  );
                 }
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
 
       await alert.present();
     } else {
-      console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+      console.error(
+        'No estás inscrito en este evento o no se permite cancelar la inscripción.'
+      );
     }
   }
 
   isParticipating(evento: eventosAdmin): boolean {
-    return evento.participants.some(part => part.idAlumno === this.idAlumno);
+    return evento.participants.some((part) => part.idAlumno === this.idAlumno);
   }
 
   hasArrived(evento: eventosAdmin): boolean {
-    const participante = evento.participants.find(part => part.idAlumno === this.idAlumno);
+    const participante = evento.participants.find(
+      (part) => part.idAlumno === this.idAlumno
+    );
     return participante ? participante.llego : false;
-}
+  }
 
+  actualizarLlegada(codigoQr: string) {
+    let qrData;
 
-actualizarLlegada(codigoQr: string) {
-  let qrData;
-
-  try {
+    try {
       qrData = JSON.parse(codigoQr);
-  } catch (error) {
+    } catch (error) {
       console.error('Error al parsear el código QR:', error);
       return;
-  }
+    }
 
-  if (!qrData.eventoId) {
+    if (!qrData.eventoId) {
       console.error('El código QR no contiene un eventoId.');
       return;
-  }
+    }
 
-  const evento = this.eventosAprobadosOInscritos.find(evento => evento.idEventosAlumnos === qrData.eventoId) ||
-                 this.eventosAdminInscritos.find(eventoAdmin => eventoAdmin.idEventosAdmin === qrData.eventoId);
+    const evento =
+      this.eventosAprobadosOInscritos.find(
+        (evento) => evento.idEventosAlumnos === qrData.eventoId
+      ) ||
+      this.eventosAdminInscritos.find(
+        (eventoAdmin) => eventoAdmin.idEventosAdmin === qrData.eventoId
+      );
 
-  if (evento && this.esEventoAdmin(evento)) {
-      const participante = evento.participants.find(part => part.idAlumno === this.idAlumno);
+    if (evento && this.esEventoAdmin(evento)) {
+      const participante = evento.participants.find(
+        (part) => part.idAlumno === this.idAlumno
+      );
 
       if (participante) {
-          participante.llego = true;
-          this.eventoAdminService.updateEvento(evento.idEventosAdmin, { participants: evento.participants })
-              .then(() => {
-                  console.log(`Estado de llegada actualizado para el evento ${evento.idEventosAdmin}`);
-                  // Refrescar el estado de la interfaz para reflejar "Registrado"
-                  this.loadEventosAdmin();  // Opcional: puedes llamar a esta función si necesitas refrescar la lista completa
-              })
-              .catch(error => console.error('Error al actualizar el estado de llegada:', error));
+        participante.llego = true;
+        this.eventoAdminService
+          .updateEvento(evento.idEventosAdmin, {
+            participants: evento.participants,
+          })
+          .then(() => {
+            console.log(
+              `Estado de llegada actualizado para el evento ${evento.idEventosAdmin}`
+            );
+            // Refrescar el estado de la interfaz para reflejar "Registrado"
+            this.loadEventosAdmin(); // Opcional: puedes llamar a esta función si necesitas refrescar la lista completa
+          })
+          .catch((error) =>
+            console.error('Error al actualizar el estado de llegada:', error)
+          );
       } else {
-          console.error('Participante no encontrado');
+        console.error('Participante no encontrado');
       }
-  } else {
-      console.error('Evento no encontrado para el código QR proporcionado o no es un evento administrado.');
+    } else {
+      console.error(
+        'Evento no encontrado para el código QR proporcionado o no es un evento administrado.'
+      );
+    }
   }
- }
 
-
-
-
-
- async cancelarInscripcion(evento: eventos) {
-  if (evento.participantesActuales?.includes(this.idAlumno!)) {
-    const alert = await this.alertController.create({
-      header: 'Cancelar inscripción',
-      message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cancelación de inscripción detenida por el usuario.');
+  async cancelarInscripcion(evento: eventos) {
+    if (evento.participantesActuales?.includes(this.idAlumno!)) {
+      const alert = await this.alertController.create({
+        header: 'Cancelar inscripción',
+        message: `¿Estás seguro de que deseas cancelar tu inscripción en este evento?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            handler: () => {
+              console.log(
+                'Cancelación de inscripción detenida por el usuario.'
+              );
+            },
           },
-        },
-        {
-          text: 'Confirmar',
-          handler: async () => {
-            // Encontrar el índice del ID del alumno en la lista de participantes
-            const index = evento.participantesActuales.indexOf(this.idAlumno!);
+          {
+            text: 'Confirmar',
+            handler: async () => {
+              // Encontrar el índice del ID del alumno en la lista de participantes
+              const index = evento.participantesActuales.indexOf(
+                this.idAlumno!
+              );
 
-            if (index > -1) {
-              // Eliminar el ID del alumno de la lista de participantes
-              evento.participantesActuales.splice(index, 1);
+              if (index > -1) {
+                // Eliminar el ID del alumno de la lista de participantes
+                evento.participantesActuales.splice(index, 1);
 
-              try {
-                // Actualizar el evento con la nueva lista de participantes
-                await this.eventosService.updateEvento(evento.idEventosAlumnos, {
-                  participantesActuales: evento.participantesActuales
-                });
+                try {
+                  // Actualizar el evento con la nueva lista de participantes
+                  await this.eventosService.updateEvento(
+                    evento.idEventosAlumnos,
+                    {
+                      participantesActuales: evento.participantesActuales,
+                    }
+                  );
 
-                // Eliminar el usuario de la lista de asistencia en Firestore
-                evento.asistencia = evento.asistencia.filter(
-                  (asistencia) => asistencia.idAlumno !== this.idAlumno
-                );
+                  // Eliminar el usuario de la lista de asistencia en Firestore
+                  evento.asistencia = evento.asistencia.filter(
+                    (asistencia) => asistencia.idAlumno !== this.idAlumno
+                  );
 
-                await this.eventosService.updateEvento(evento.idEventosAlumnos, {
-                  asistencia: evento.asistencia
-                });
+                  await this.eventosService.updateEvento(
+                    evento.idEventosAlumnos,
+                    {
+                      asistencia: evento.asistencia,
+                    }
+                  );
 
-                console.log(
-                  `Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`
-                );
+                  console.log(
+                    `Inscripción en el evento ${evento.idEventosAlumnos} cancelada exitosamente.`
+                  );
 
-                // Actualizamos la lista de eventos después de cancelar la inscripción
-                this.loadEventos();
-              } catch (error) {
-                console.error('Error al cancelar la inscripción en el evento:', error);
+                  // Actualizamos la lista de eventos después de cancelar la inscripción
+                  this.loadEventos();
+                } catch (error) {
+                  console.error(
+                    'Error al cancelar la inscripción en el evento:',
+                    error
+                  );
+                }
               }
-            }
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
 
-    await alert.present();
-  } else {
-    console.error('No estás inscrito en este evento o no se permite cancelar la inscripción.');
+      await alert.present();
+    } else {
+      console.error(
+        'No estás inscrito en este evento o no se permite cancelar la inscripción.'
+      );
+    }
   }
-}
+  isEventoFinalizado(evento: any): boolean {
+    const fechaEvento = new Date(evento.fechaReservada);
+    const horaEvento = evento.hora ? evento.hora.split(':') : [0, 0];
+    fechaEvento.setHours(horaEvento[0], horaEvento[1], 0);
 
+    const fechaActual = new Date();
+    return fechaEvento < fechaActual; // Retorna true si el evento ya pasó
+  }
 }

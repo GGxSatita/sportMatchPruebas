@@ -29,13 +29,13 @@ import {
   IonRow,
   IonCol,
   IonSelect,
-  IonSelectOption,
   IonDatetime,
   IonButton,
   IonTextarea,
   IonButtons,
   IonImg,
-  IonItemDivider
+  IonItemDivider,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
@@ -46,7 +46,7 @@ import { Router } from '@angular/router';
   templateUrl: './evento-add.page.html',
   styleUrls: ['./evento-add.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent, FooterComponent, IonContent, IonHeader, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonSelect, IonSelectOption, IonDatetime, IonButton, IonTextarea, IonList, IonItemDivider, IonThumbnail, IonButtons, IonImg]
+  imports: [IonSelectOption, CommonModule, FormsModule, HeaderComponent, FooterComponent, IonContent, IonHeader, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonSelect, IonSelectOption, IonDatetime, IonButton, IonTextarea, IonList, IonItemDivider, IonThumbnail, IonButtons, IonImg]
 })
 export class EventoAddPage implements OnInit {
 
@@ -58,6 +58,8 @@ export class EventoAddPage implements OnInit {
   selectedSectorId: string | null = null;
   selectedSectorImage: string | null = null;
   selectedHorario: Horario | null = null;
+  selectedDeporte: any = null;
+  deportesDisponibles: any[] = [];
   eventos: eventos[] = [];
   newEvento: eventos = new eventos();
   minDate: string;
@@ -147,12 +149,33 @@ export class EventoAddPage implements OnInit {
     if (sector) {
       this.sectorVisibilityStatus = sector.visible ? 'Disponible' : 'Privado';
       this.sectorButtonColor = sector.visible ? 'success' : 'danger'; // 'success' es verde, 'danger' es rojo
+      this.deportesDisponibles = sector.deporte || [];
     } else {
       this.sectorVisibilityStatus = '';
       this.sectorButtonColor = 'primary';
+      this.deportesDisponibles = [];
     }
 
     this.filterHorarios();
+  }
+  onDeporteChange(event: any): void {
+    const selectedDeporteId = event.detail.value; // El id del deporte seleccionado
+    const deporteSeleccionado = this.deportesDisponibles.find(d => d.id === selectedDeporteId);
+
+    // Si encontramos el deporte en la lista de deportes disponibles
+    if (deporteSeleccionado) {
+      // Mostrar el deporte seleccionado o realizar acciones adicionales
+      console.log('Deporte seleccionado:', deporteSeleccionado);
+
+      // Guardamos el deporte completo en la variable
+      this.selectedDeporte = deporteSeleccionado;  // Almacena el objeto completo del deporte seleccionado
+
+      // También puedes guardar el id del deporte en tu modelo de evento si lo necesitas
+      this.newEvento.deporte = selectedDeporteId;  // Guarda el id del deporte seleccionado (si es necesario)
+    } else {
+      // Si no se encuentra el deporte (por algún motivo)
+      console.error('Deporte no encontrado:', selectedDeporteId);
+    }
   }
 
   onDateChange(): void {
@@ -273,6 +296,7 @@ export class EventoAddPage implements OnInit {
         asistencia: [],
         informacionAdicional: this.newEvento.informacionAdicional || '',
         status: status,
+        deporte: this.newEvento.deporte,
       };
 
       console.log('Evento a guardar:', nuevoEvento);

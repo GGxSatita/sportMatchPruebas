@@ -13,23 +13,25 @@
     </ion-row>
     <ion-row *ngFor="let evento of eventosAprobadosOInscritos">
       <ion-col size-md="6" size-lg="4" size-sm="12">
-        <ion-card>
+        <ion-card [class.finalizado]="isEventoFinalizado(evento)">
           <ion-card-header>
             <ion-card-title>{{ evento.titulo }}</ion-card-title>
+            <!-- Indicador para eventos finalizados -->
+            <p *ngIf="isEventoFinalizado(evento)" class="evento-finalizado">Evento Finalizado</p>
           </ion-card-header>
           <ion-card-content>
             <p><strong>Fecha:</strong> {{ evento.fechaReservada }}</p>
             <p><strong>Hora:</strong> {{ evento.hora }}</p>
             <p>
-              <strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' :
-              'No Disponible' }}
+              <strong>Disponibilidad:</strong> {{ evento.espera ? 'Disponible' : 'No Disponible' }}
             </p>
             <p><strong>Sector:</strong> {{ evento.sectorNombre }}</p>
 
+            <!-- Botón para unirse al evento -->
             <ion-button
               expand="full"
               color="primary"
-              [disabled]="!isButtonEnabled(evento)"
+              [disabled]="isEventoFinalizado(evento)"
               (click)="unirseEvento(evento)"
             >
               Unirse al evento

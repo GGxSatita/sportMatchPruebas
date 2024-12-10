@@ -8,13 +8,16 @@ import {
   getDocs,
 } from '@angular/fire/firestore';
 import { Injectable } from '@angular/core';
-import { ParticipantModel, ScoreModel } from '../models/desafio';
+import { ParticipantModel, ScoreModel, SportType } from '../models/desafio';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ParticipantesService {
+  esGanador: boolean = false   // Valor que indica si el participante ganó (predeterminado: false)
+
   private scoresCollection = collection(this.firestore, 'scores');
+
   private equiposCollectionPath = (eventId: string) =>
     `eventos/${eventId}/equipos`;
 
@@ -86,52 +89,98 @@ export class ParticipantesService {
   // **Método existente: Guardar puntaje de enfrentamientos normales**
   async guardarPuntaje(
     participante: ParticipantModel,
-    esGanador: boolean
+    deporte: SportType,
+    puntos: number // Cantidad de puntos a sumar o restar
   ): Promise<void> {
-    const scoreRef = doc(this.scoresCollection, participante.id);
-    const scoreSnapshot = await getDoc(scoreRef);
+    try {
+      const scoreRef = doc(this.scoresCollection, participante.id);
+      const scoreSnapshot = await getDoc(scoreRef);
 
-    const calculateRank = (score: number): string => {
-      if (score >= 100) return 'Experto';
-      if (score >= 50) return 'Avanzado';
-      if (score >= 20) return 'Intermedio';
-      return 'Principiante';
-    };
-
-    if (scoreSnapshot.exists()) {
-      const existingScore = scoreSnapshot.data() as ScoreModel;
-
-      const updatedScore: ScoreModel & { rank: string } = {
-        id: participante.id,
-        name: participante.name,
-        score: existingScore.score + (esGanador ? 10 : -5),
-        victories: esGanador
-          ? existingScore.victories + 1
-          : existingScore.victories,
-        rank: calculateRank(
-          existingScore.score + (esGanador ? 10 : -5) // Calcular el rango actualizado
-        ),
+      // Función para calcular el rango global
+      const calculateRank = (score: number): string => {
+        if (score >= 200) return 'Leyenda';
+        if (score >= 100) return 'Experto';
+        if (score >= 50) return 'Avanzado';
+        if (score >= 20) return 'Intermedio';
+        return 'Principiante';
       };
 
-      updatedScore.score = Math.max(0, updatedScore.score);
-
-      await setDoc(scoreRef, updatedScore);
-      console.log(
-        `Puntaje actualizado para ${participante.name}:`,
-        updatedScore
-      );
-    } else {
-      const newScore: ScoreModel & { rank: string } = {
-        id: participante.id,
-        name: participante.name,
-        score: esGanador ? 10 : 0,
-        victories: esGanador ? 1 : 0,
-        rank: calculateRank(esGanador ? 10 : 0), // Calcular el rango inicial
+      // Función para calcular el rango por deporte
+      const calculateSportRank = (score: number): string => {
+        if (score >= 200) return 'Leyenda';
+        if (score >= 100) return 'Experto';
+        if (score >= 50) return 'Avanzado';
+        if (score >= 20) return 'Intermedio';
+        return 'Principiante';
       };
 
-      await setDoc(scoreRef, newScore);
-      console.log(`Nuevo puntaje creado para ${participante.name}:`, newScore);
+      console.log(`Procesando puntaje para: ${participante.name}, Puntos: ${puntos}`);
+
+      if (scoreSnapshot.exists()) {
+        const existingScore = scoreSnapshot.data() as ScoreModel;
+
+        // Actualizar puntaje del deporte
+        const updatedDeportes = { ...existingScore.deportes };
+        updatedDeportes[deporte] = {
+          score: (updatedDeportes[deporte]?.score || 0) + puntos,
+          rank: calculateSportRank((updatedDeportes[deporte]?.score || 0) + puntos),
+        };
+
+        // Recalcular puntaje global
+        const totalScore = Object.values(updatedDeportes).reduce(
+          (acc, deporte) => acc + deporte.score,
+          0
+        );
+
+        // Crear nuevo objeto actualizado
+        const updatedScore: ScoreModel = {
+          id: participante.id,
+          name: participante.name,
+          score: totalScore,
+          victories: puntos > 0 ? existingScore.victories + 1 : existingScore.victories, // Incrementar victorias si sumamos puntos
+          rank: calculateRank(totalScore),
+          deportes: updatedDeportes,
+        };
+
+        // Actualizar en Firestore
+        console.log(`Actualizando documento en Firestore para: ${participante.name}`);
+        await setDoc(scoreRef, updatedScore);
+      } else {
+        // Si no existe, inicializar puntaje
+        const newDeportes = {
+          [deporte]: {
+            score: puntos,
+            rank: calculateSportRank(puntos),
+          },
+        };
+
+        const newScore: ScoreModel = {
+          id: participante.id,
+          name: participante.name,
+          score: puntos,
+          victories: puntos > 0 ? 1 : 0, // Inicializar victorias solo si sumamos puntos
+          rank: calculateRank(puntos),
+          deportes: newDeportes,
+        };
+
+        console.log(`Creando nuevo documento en Firestore para: ${participante.name}`);
+        await setDoc(scoreRef, newScore);
+      }
+    } catch (error) {
+      console.error(`Error al guardar el puntaje para ${participante.name}:`, error);
     }
+  }
+  async procesarResultados(
+    participantes: ParticipantModel[],
+    ganadorId: string,
+    deporte: SportType
+  ): Promise<void> {
+    for (const participante of participantes) {
+      const puntos = participante.id === ganadorId ? 10 : -5; // 10 para el ganador, -5 para los demás
+      console.log(`Procesando participante: ${participante.name}, Puntos: ${puntos}`);
+      await this.guardarPuntaje(participante, deporte, puntos);
+    }
+    console.log('Resultados procesados con éxito.');
   }
 
 
@@ -141,7 +190,11 @@ export class ParticipantesService {
     equipo: string,
     puntos: number = 1
   ): Promise<void> {
-    const equipoRef = doc(this.firestore, this.equiposCollectionPath(eventId), equipo);
+    const equipoRef = doc(
+      this.firestore,
+      this.equiposCollectionPath(eventId),
+      equipo
+    );
     const equipoSnapshot = await getDoc(equipoRef);
 
     if (equipoSnapshot.exists()) {
@@ -149,16 +202,47 @@ export class ParticipantesService {
       const updatedScore = currentScore + puntos;
 
       await setDoc(equipoRef, { score: updatedScore }, { merge: true });
-      console.log(`Puntaje actualizado para el equipo ${equipo}: ${updatedScore}`);
+      console.log(
+        `Puntaje actualizado para el equipo ${equipo}: ${updatedScore}`
+      );
     } else {
       await setDoc(equipoRef, { score: puntos });
       console.log(`Puntaje inicializado para el equipo ${equipo}: ${puntos}`);
     }
   }
 
+  // **Método NUEVO: Incrementar puntaje de participante**
+  async incrementarPuntajeParticipanteEnEvento(
+    participanteId: string,
+    eventId: string,
+    puntos: number = 1
+  ): Promise<void> {
+    const participantesCollection = collection(
+      this.firestore,
+      `eventos/${eventId}/participantes`
+    );
+    const participanteRef = doc(participantesCollection, participanteId);
+    const participanteSnapshot = await getDoc(participanteRef);
+
+    if (participanteSnapshot.exists()) {
+      const currentScore = participanteSnapshot.data()!['score'] || 0;
+      const updatedScore = currentScore + puntos;
+
+      // Actualiza solo el puntaje del participante en la colección de "participantes"
+      await setDoc(participanteRef, { score: updatedScore }, { merge: true });
+      console.log(
+        `Puntaje incrementado para ${participanteId}: ${updatedScore}`
+      );
+    } else {
+      console.warn(`El participante con ID ${participanteId} no existe.`);
+    }
+  }
   // **Método NUEVO: Inicializar equipos al crear el enfrentamiento**
   async inicializarEquipos(eventId: string, equipos: string[]): Promise<void> {
-    const equiposCollection = collection(this.firestore, this.equiposCollectionPath(eventId));
+    const equiposCollection = collection(
+      this.firestore,
+      this.equiposCollectionPath(eventId)
+    );
     for (const equipo of equipos) {
       const equipoRef = doc(equiposCollection, equipo);
       const equipoSnapshot = await getDoc(equipoRef);
@@ -169,10 +253,56 @@ export class ParticipantesService {
       }
     }
   }
+  async getParticipanteByEventAndUser(
+    eventId: string,
+    userId: string
+  ): Promise<ParticipantModel | null> {
+    const participanteRef = doc(
+      this.firestore,
+      `eventos/${eventId}/participantes/${userId}`
+    );
+    const participanteSnapshot = await getDoc(participanteRef);
 
+    if (participanteSnapshot.exists()) {
+      console.log('Participante encontrado:', participanteSnapshot.data());
+      return participanteSnapshot.data() as ParticipantModel;
+    } else {
+      console.warn(
+        `No se encontró al participante con ID ${userId} en el evento ${eventId}.`
+      );
+      return null;
+    }
+  }
+  // **Método NUEVO: Recuperar el puntaje del participante dentro del evento**
+  async getParticipantePuntajeEnEvento(
+    participanteId: string,
+    eventId: string
+  ): Promise<number> {
+    const participanteRef = doc(
+      this.firestore,
+      `eventos/${eventId}/participantes/${participanteId}`
+    );
+    const participanteSnapshot = await getDoc(participanteRef);
+
+    if (participanteSnapshot.exists()) {
+      // Si el participante existe, retorna el puntaje actual.
+      return participanteSnapshot.data()!['score'] || 0;
+    } else {
+      // Si no existe, retornar puntaje inicial 0.
+      console.warn(
+        `El participante con ID ${participanteId} no tiene puntaje almacenado.`
+      );
+      return 0;
+    }
+  }
   // **Método NUEVO: Obtener puntajes de los equipos**
-  async getPuntajesEquipos(eventId: string): Promise<{ [key: string]: number }> {
-    const equiposCollection = collection(this.firestore, this.equiposCollectionPath(eventId));
+  async getPuntajesEquipos(
+    eventId: string
+  ): Promise<{ [key: string]: number }> {
+    const equiposCollection = collection(
+      this.firestore,
+      this.equiposCollectionPath(eventId)
+    );
     const equiposSnapshot = await getDocs(equiposCollection);
 
     const puntajes: { [key: string]: number } = {};
