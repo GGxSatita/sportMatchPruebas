@@ -1,5 +1,7 @@
 <app-header></app-header>
 
+<ion-content class="ion-padding">
+
 <ion-content class="ion-padding" style="position: relative;">
   <!-- Lector QR -->
   <div
@@ -124,9 +126,15 @@
   </ion-item>
 </ion-card-content>
 
-<div style="text-align: center; margin-top: 20px">
-  <ion-button (click)="irAEnfrentamiento()">Ir a Enfrentamiento</ion-button>
-</div>
+<ion-button
+(click)="irAEnfrentamiento()"
+shape="round"
+color="primary"
+class="floating-button"
+>
+<ion-icon slot="icon-only" name="arrow-forward-outline"></ion-icon>
+</ion-button>
+</ion-content>
 
 <ion-footer>
   <ion-toolbar>
